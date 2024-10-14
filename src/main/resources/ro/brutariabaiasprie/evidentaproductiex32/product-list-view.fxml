@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.brutariabaiasprie.evidentaproductiex32.ProductListController">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <GridPane prefWidth="600.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="461.0" minWidth="10.0" prefWidth="415.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="185.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="txtFldSearchProduct" prefHeight="25.0" prefWidth="230.0" promptText="Denumire" />
+                              <Button fx:id="btnSearchProduct" mnemonicParsing="false" onAction="#handleTxtFldSearchProduct" prefHeight="25.0" prefWidth="67.0" text="Cauta" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </GridPane>
+                  <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ListView fx:id="listView" prefHeight="310.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </ListView>
+                        <Button fx:id="btnNext" disable="true" mnemonicParsing="false" onAction="#handleBtnNextOnAction" text="Urmatorul &gt;&gt;" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </BorderPane.margin>
+            </VBox>
+         </center>
+         <left>
+            <VBox alignment="BOTTOM_CENTER" prefHeight="400.0" prefWidth="116.0" spacing="10.0" BorderPane.alignment="TOP_LEFT">
+               <children>
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Button fx:id="btnAddProductRecord" alignment="CENTER" contentDisplay="CENTER" minWidth="96.0" mnemonicParsing="false" onAction="#handleBtnAddProductOnAction" style="-fx-background-color: #2596be;" text="Adauga un produs nou in lista" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
+                        <Button fx:id="btnExcelExport" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleBtnExcelExportOnAction" style="-fx-background-color: #1d6f42;" text="Exporta in excel" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="BOTTOM_CENTER" prefHeight="0.0" prefWidth="96.0" spacing="10.0" VBox.vgrow="NEVER">
+                     <children>
+                        <Button visible="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Setari">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </Button>
+                        <Button visible="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #ba3c3c;" text="Deconectare" textFill="WHITE">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </VBox>
+         </left>
+      </BorderPane>
+   </children>
+</AnchorPane>
