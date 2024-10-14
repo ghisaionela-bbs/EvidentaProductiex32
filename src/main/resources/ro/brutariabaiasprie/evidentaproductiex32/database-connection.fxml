@@ -9,9 +9,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.brutariabaiasprie.evidentaproductiex32.DatabaseConnectionController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.brutariabaiasprie.evidentaproductiex32.DatabaseConnectionController">
    <children>
-      <VBox alignment="CENTER" fillWidth="false" prefHeight="87.0" prefWidth="147.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Label text="Label" />
+      <VBox fx:id="vBoxConnConfig" alignment="CENTER" fillWidth="false" prefHeight="87.0" prefWidth="147.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Label prefHeight="17.0" prefWidth="166.0" text="Conectare la baza de date" />
             <GridPane prefHeight="87.0" prefWidth="267.0">

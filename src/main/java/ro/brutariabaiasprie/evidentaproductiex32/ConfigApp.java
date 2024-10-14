@@ -13,12 +13,10 @@ import java.util.Scanner;
 public class ConfigApp {
     public static Map<String, Object> configuration = new Hashtable<>();
     private static File fileConfig;
-//    private static String fileConfigPath = "\\configApp.txt";
-    private static String fileConfigPath = "src/main/resources/configApp.txt";
-
+    private static String fileConfigPath = "\\configApp.txt";
 
     public static void check_config() {
-//        fileConfigPath = System.getProperty("user.dir") + fileConfigPath;
+        fileConfigPath = System.getProperty("user.dir") + fileConfigPath;
 
         try {
             System.out.println("check config");

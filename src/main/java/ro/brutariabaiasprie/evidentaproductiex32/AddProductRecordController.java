@@ -164,7 +164,8 @@ public class AddProductRecordController {
         productListController.connection = connection;
         productListController.setController(stage);
         productListController.loadListView();
-        stage.setScene(new Scene(root));
+//        stage.setScene(new Scene(root));
+        stage.getScene().setRoot(root);
         stage.show();
     }
 

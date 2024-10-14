@@ -4,22 +4,35 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.sql.*;
 import java.time.ZonedDateTime;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class EvidentaProductie extends Application {
     private static Scene scene;
     Connection connection;
     FXMLLoader fxmlLoader;
+    public static Map<String, Scene> sceneMap = new Hashtable<>();
+
+//    public void loadScenes(){
+//        sceneMap.put("database-connection.fxml")
+//    }
 
     @Override
     public void start(Stage stage) throws IOException {
+        // get screensize of monitor
+//        Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+
+
         FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("database-connection.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         DatabaseConnectionController databaseConnectionController = fxmlLoader.getController();

@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javax.swing.filechooser.FileSystemView;
@@ -41,6 +42,9 @@ public class DatabaseConnectionController {
     @FXML
     Label errorLabel;
 
+    @FXML
+    VBox vBoxConnConfig;
+
     public void setController(Stage stage) {
         this.stage = stage;
         errorLabel.setVisible(false);
@@ -61,8 +65,9 @@ public class DatabaseConnectionController {
             productListController.connection = connection;
             productListController.setController(stage);
             productListController.loadListView();
-            scene = new Scene(root);
-            stage.setScene(scene);
+//            scene = new Scene(root);
+//            stage.setScene(scene);
+            stage.getScene().setRoot(root);
             stage.show();
 
         } catch (SQLException e) {

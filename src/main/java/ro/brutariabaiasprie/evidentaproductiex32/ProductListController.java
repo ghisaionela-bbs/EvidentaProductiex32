@@ -95,12 +95,14 @@ public class ProductListController {
     public void handleBtnAddProductOnAction() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("add-product-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
+//            Scene scene = new Scene(fxmlLoader.load());
+            root = fxmlLoader.load();
             AddProductController addProductController = fxmlLoader.getController();
             addProductController.setController();
-            Stage stage = new Stage();
+//            Stage stage = new Stage();
             stage.setTitle("Adauga un produs");
-            stage.setScene(scene);
+//            stage.setScene(scene);
+            stage.getScene().setRoot(root);
             stage.showAndWait();
             String productName = addProductController.txtFldProductName.getText();
 
@@ -128,7 +130,8 @@ public class ProductListController {
         addProductRecordController.connection = connection;
         addProductRecordController.productDTO = selectedItem;
         addProductRecordController.setController(stage);
-        stage.setScene(new Scene(root));
+//        stage.setScene(new Scene(root));
+        stage.getScene().setRoot(root);
         stage.show();
     }
 
