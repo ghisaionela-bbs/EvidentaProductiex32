@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -43,9 +44,13 @@ public class DatabaseConnectionController {
     Label errorLabel;
 
     @FXML
+    Button btnConnect;
+
+    @FXML
     VBox vBoxConnConfig;
 
     public void setController(Stage stage) {
+        btnConnect.requestFocus();
         this.stage = stage;
         errorLabel.setVisible(false);
         dbConnUrl.setText((String) ConfigApp.configuration.get("DBURL"));

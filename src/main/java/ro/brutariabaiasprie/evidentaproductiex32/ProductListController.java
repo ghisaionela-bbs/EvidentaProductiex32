@@ -3,6 +3,7 @@ package ro.brutariabaiasprie.evidentaproductiex32;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,6 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TouchEvent;
 import javafx.stage.Stage;
 import jxl.write.DateTime;
 import org.apache.poi.ss.usermodel.*;
@@ -56,6 +59,31 @@ public class ProductListController {
 
     public void setController(Stage stage) {
         this.stage = stage;
+        //Setting up double click for elements in listview
+        listView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                //Use ListView's getSelected Item
+                ProductDTO productDTO = listView.getSelectionModel().getSelectedItem();
+                try {
+                    handleListViewItemSelected(productDTO);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        //Setting up double tap for elements in listview
+        listView.setOnTouchPressed(event -> {
+            if (event.getTouchCount() == 2) {
+                //Use ListView's getSelected Item
+                ProductDTO productDTO = listView.getSelectionModel().getSelectedItem();
+                try {
+                    handleListViewItemSelected(productDTO);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         btnNext.disableProperty().bind(listView.getSelectionModel().selectedItemProperty().isNull());
     }
 
@@ -95,14 +123,14 @@ public class ProductListController {
     public void handleBtnAddProductOnAction() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("add-product-view.fxml"));
-//            Scene scene = new Scene(fxmlLoader.load());
-            root = fxmlLoader.load();
+            Scene scene = new Scene(fxmlLoader.load());
+//            root = fxmlLoader.load();
             AddProductController addProductController = fxmlLoader.getController();
             addProductController.setController();
-//            Stage stage = new Stage();
+            Stage stage = new Stage();
             stage.setTitle("Adauga un produs");
-//            stage.setScene(scene);
-            stage.getScene().setRoot(root);
+            stage.setScene(scene);
+//            stage.getScene().setRoot(root);
             stage.showAndWait();
             String productName = addProductController.txtFldProductName.getText();
 
@@ -131,6 +159,18 @@ public class ProductListController {
         addProductRecordController.productDTO = selectedItem;
         addProductRecordController.setController(stage);
 //        stage.setScene(new Scene(root));
+        stage.getScene().setRoot(root);
+        stage.show();
+    }
+
+    private void handleListViewItemSelected(ProductDTO selectedItem) throws IOException {
+        System.out.println(selectedItem);
+        FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("add-product-record-view.fxml"));
+        root = fxmlLoader.load();
+        AddProductRecordController addProductRecordController = fxmlLoader.getController();
+        addProductRecordController.connection = connection;
+        addProductRecordController.productDTO = selectedItem;
+        addProductRecordController.setController(stage);
         stage.getScene().setRoot(root);
         stage.show();
     }

@@ -4,8 +4,10 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -264,6 +266,26 @@ public class AddProductRecordController {
             Runtime.getRuntime().exec("explorer.exe /select,\"" + path + "\\" + fileName + "\"");
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+//    public void handleBtnNumpadOnAction() {
+//
+//    }
+
+    @FXML
+    private void handleBtnNumpadOnAction(ActionEvent event) {
+        Button node = (Button) event.getSource() ;
+        String value = node.getText();
+        if("0123456789.".contains(value)) {
+            String quantity = txtFldQuantity.getText();
+            txtFldQuantity.setText(quantity + value);
+        } else if ("Sterge".equals(value)) {
+            String quantity = txtFldQuantity.getText();
+            if (quantity.isEmpty()){
+                return;
+            }
+            txtFldQuantity.setText(quantity.substring(0, quantity.length() - 1));
         }
     }
 
