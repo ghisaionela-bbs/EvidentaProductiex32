@@ -18,7 +18,7 @@
          <center>
             <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                <children>
-                  <GridPane prefWidth="600.0">
+                  <GridPane prefWidth="600.0" VBox.vgrow="SOMETIMES">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="461.0" minWidth="10.0" prefWidth="415.0" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="185.0" />
@@ -27,9 +27,9 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.hgrow="SOMETIMES" GridPane.vgrow="SOMETIMES">
                            <children>
-                              <TextField fx:id="txtFldSearchProduct" prefHeight="25.0" prefWidth="230.0" promptText="Denumire" />
+                              <TextField fx:id="txtFldSearchProduct" focusTraversable="false" prefHeight="25.0" prefWidth="230.0" promptText="Denumire" />
                               <Button fx:id="btnSearchProduct" mnemonicParsing="false" onAction="#handleTxtFldSearchProduct" prefHeight="25.0" prefWidth="67.0" text="Cauta" />
                            </children>
                         </HBox>
@@ -56,18 +56,18 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <Button fx:id="btnAddProductRecord" alignment="CENTER" contentDisplay="CENTER" minWidth="96.0" mnemonicParsing="false" onAction="#handleBtnAddProductOnAction" style="-fx-background-color: #2596be;" text="Adauga un produs nou in lista" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
-                        <Button fx:id="btnExcelExport" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleBtnExcelExportOnAction" style="-fx-background-color: #1d6f42;" text="Exporta in excel" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
+                        <Button fx:id="btnAddProductRecord" alignment="CENTER" contentDisplay="CENTER" minHeight="64.0" mnemonicParsing="false" onAction="#handleBtnAddProductOnAction" style="-fx-background-color: #2596be;" text="Adauga un produs nou in lista" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
+                        <Button fx:id="btnExcelExport" alignment="CENTER" contentDisplay="CENTER" minHeight="64.0" mnemonicParsing="false" onAction="#handleBtnExcelExportOnAction" style="-fx-background-color: #1d6f42;" text="Exporta in excel" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
                      </children>
                   </VBox>
                   <VBox alignment="BOTTOM_CENTER" prefHeight="0.0" prefWidth="96.0" spacing="10.0" VBox.vgrow="NEVER">
                      <children>
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Setari" visible="false">
+                        <Button maxWidth="1.7976931348623157E308" minHeight="64.0" mnemonicParsing="false" text="Setari" visible="false">
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </padding>
                         </Button>
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #ba3c3c;" text="Deconectare" textFill="WHITE" visible="false">
+                        <Button maxWidth="1.7976931348623157E308" minHeight="64.0" mnemonicParsing="false" style="-fx-background-color: #ba3c3c;" text="Deconectare" textFill="WHITE" visible="false">
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </padding>

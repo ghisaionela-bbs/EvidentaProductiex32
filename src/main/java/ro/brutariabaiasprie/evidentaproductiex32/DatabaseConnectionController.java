@@ -23,7 +23,6 @@ import java.util.Stack;
 
 public class DatabaseConnectionController {
     private Stage stage;
-    private Scene scene;
     private Parent root;
     Connection connection;
     Boolean is_connected = false;
@@ -50,8 +49,8 @@ public class DatabaseConnectionController {
     VBox vBoxConnConfig;
 
     public void setController(Stage stage) {
-        btnConnect.requestFocus();
         this.stage = stage;
+        btnConnect.requestFocus();
         errorLabel.setVisible(false);
         dbConnUrl.setText((String) ConfigApp.configuration.get("DBURL"));
         dbConnUser.setText((String) ConfigApp.configuration.get("DBUSER"));

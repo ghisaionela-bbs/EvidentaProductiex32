@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -55,8 +56,13 @@ public class AddProductRecordController {
     @FXML
     TableView<ProductRecordDTO> tableView;
 
+    @FXML
+    GridPane numPad;
+
     public void setController(Stage stage) {
         this.stage = stage;
+        numPad.setVisible(false);
+        txtFldQuantity.getProperties().put("vkType", "numeric");
         lblHistory.setText("Istoric " + productDTO.getName());
         lblProductName.setText(productDTO.getName());
         lblAddRecordError.setVisible(false);
@@ -93,6 +99,7 @@ public class AddProductRecordController {
         tableView.setPlaceholder(new Label("Nu exista inregistrari pentru acest produs."));
         TableColumn<ProductRecordDTO, Float> quantityColumn = new TableColumn<>("Cantitate");
         quantityColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
+        quantityColumn.setPrefWidth(100);
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         quantityColumn.setCellFactory(column -> {
             TableCell<ProductRecordDTO, Float> cell = new TableCell<ProductRecordDTO, Float>()  {
@@ -113,6 +120,7 @@ public class AddProductRecordController {
 
         TableColumn<ProductRecordDTO, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
         dateAndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateAndTime"));
+        quantityColumn.setPrefWidth(100);
         dateAndTimeColumn.setCellFactory(column -> {
             TableCell<ProductRecordDTO, Timestamp> cell = new TableCell<ProductRecordDTO, Timestamp>() {
                 private SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");

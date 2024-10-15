@@ -10,10 +10,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="837d3ee9-ac9b-4d92-975d-3cc0e66fbe14" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/stylesheet.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/Evidenta productie x32-1.0.msi" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/EvidentaProductiex32.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/EvidentaProductiex32.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/AddProductRecordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/AddProductRecordController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/DatabaseConnectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/DatabaseConnectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/EvidentaProductie.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/EvidentaProductie.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/ProductListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/ProductListController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/add-product-record-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/add-product-record-view.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/product-list-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/product-list-view.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,6 +62,12 @@
     &quot;project.structure.side.proportion&quot;: &quot;0.112488925&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductiex32\src\main\resources\ro\brutariabaiasprie\evidentaproductiex32" />
+      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductiex32\src" />
+    </key>
+  </component>
   <component name="RunManager" selected="Application.MainWrapper">
     <configuration name="MainWrapper" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ro.brutariabaiasprie.evidentaproductiex32.MainWrapper" />

@@ -16,6 +16,7 @@ import java.sql.*;
 import java.time.ZonedDateTime;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 public class EvidentaProductie extends Application {
     private static Scene scene;
@@ -38,6 +39,8 @@ public class EvidentaProductie extends Application {
         DatabaseConnectionController databaseConnectionController = fxmlLoader.getController();
         databaseConnectionController.setController(stage);
         stage.setTitle("Evidenta productie Brutaria Baia Sprie");
+        String css = Objects.requireNonNull(this.getClass().getResource("stylesheet.css")).toExternalForm();
+        scene.getStylesheets().add(css);
         stage.setScene(scene);
         stage.show();
 

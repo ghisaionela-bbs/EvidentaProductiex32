@@ -6,14 +6,17 @@ import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TouchEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import jxl.write.DateTime;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -59,17 +62,11 @@ public class ProductListController {
 
     public void setController(Stage stage) {
         this.stage = stage;
-        txtFldSearchProduct.getProperties().put("vkType", "text");
-        txtFldSearchProduct.focusedProperty().addListener((ov, oldPropertyValue, newPropertyValue) -> {
-            if (newPropertyValue)
-            {
-                System.out.println("Textfield on focus");
-            }
-            else
-            {
-                System.out.println("Textfield out focus");
-            }
-        });
+        setListView();
+        btnNext.disableProperty().bind(listView.getSelectionModel().selectedItemProperty().isNull());
+    }
+
+    private void setListView() {
         //Setting up double click for elements in listview
         listView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -94,8 +91,30 @@ public class ProductListController {
                 }
             }
         });
+        listView.setCellFactory(new Callback<ListView<ProductDTO>, ListCell<ProductDTO>>() {
+            @Override
+            public ListCell<ProductDTO> call(ListView<ProductDTO> param) {
+                return new ListCell<ProductDTO>() {
 
-        btnNext.disableProperty().bind(listView.getSelectionModel().selectedItemProperty().isNull());
+                    @Override
+                    protected void updateItem(ProductDTO item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                            setGraphic(null);
+                        } else {
+                            Label lblId = new Label(item.getId() + ":");
+                            Label lblProductName = new Label(item.getName());
+                            HBox hBox = new HBox(lblId, lblProductName);
+                            hBox.setSpacing(10);
+                            hBox.setPadding(new Insets(10));
+                            setText(null);
+                            setGraphic(hBox);
+                        }
+                    }
+                };
+            }
+        });
     }
 
     public void handleTxtFldSearchProduct() {
@@ -176,6 +195,9 @@ public class ProductListController {
 
     private void handleListViewItemSelected(ProductDTO selectedItem) throws IOException {
         System.out.println(selectedItem);
+        if(selectedItem == null) {
+            return;
+        }
         FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("add-product-record-view.fxml"));
         root = fxmlLoader.load();
         AddProductRecordController addProductRecordController = fxmlLoader.getController();
