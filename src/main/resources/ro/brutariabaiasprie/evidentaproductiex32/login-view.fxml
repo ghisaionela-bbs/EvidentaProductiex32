@@ -8,17 +8,20 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.brutariabaiasprie.evidentaproductiex32.LoginController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.brutariabaiasprie.evidentaproductiex32.LoginController">
    <children>
       <VBox alignment="CENTER" fillWidth="false" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label text="Bun venit!" />
-            <GridPane>
+            <Label text="Bun venit!">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+            <GridPane prefHeight="60.0" prefWidth="254.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="183.0" minWidth="10.0" prefWidth="139.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -31,6 +34,7 @@
                   <TextField fx:id="txtFldPasswod" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
+            <Label fx:id="lblErrorMessage" text="Parola sau numele de utilizator sunt incorecte!" textFill="RED" />
             <Button mnemonicParsing="false" onAction="#handleBtnLoginOnAction" style="-fx-background-color: #2596be;" text="Logare" textFill="WHITE" />
          </children>
       </VBox>

@@ -1,5 +1,6 @@
 package ro.brutariabaiasprie.evidentaproductiex32;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -70,12 +71,19 @@ public class ConfigApp {
     }
 
     private static void init_default_config() {
+        String appDirrPath = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie";
         configuration.put("DBURL", "jdbc:sqlserver://192.168.3.145;databaseName=DB_EVIDENTA_PRODUCTIE;encrypt=false;");
         configuration.put("DBUSER", "sa");
         configuration.put("DBPASS", "sqlserverstatia51");
+        configuration.put("ERRLOG_PATH", appDirrPath + "\\ErrorLog.txt");
+        configuration.put("EXCEL_EXPORT_PATH", appDirrPath + "\\Rapoarte excel");
     }
 
     public static Object getConfig(String key) {
         return configuration.get(key);
+    }
+
+    public static void setConfig(String key, Object value) {
+        configuration.put(key, value);
     }
 }

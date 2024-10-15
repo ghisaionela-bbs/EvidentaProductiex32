@@ -191,7 +191,7 @@ public class AddProductRecordController {
 
 //            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             Calendar calendar = Calendar.getInstance();
-            Timestamp timestamp = new java.sql.Timestamp(calendar.getTimeInMillis());
+            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
             String sql = "INSERT INTO INREGISTRARI_PRODUSE (ID_PRODUS, cantitate, datasiora) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -277,24 +277,20 @@ public class AddProductRecordController {
         }
     }
 
-//    public void handleBtnNumpadOnAction() {
-//
+//    @FXML
+//    private void handleBtnNumpadOnAction(ActionEvent event) {
+//        Button node = (Button) event.getSource() ;
+//        String value = node.getText();
+//        if("0123456789.".contains(value)) {
+//            String quantity = txtFldQuantity.getText();
+//            txtFldQuantity.setText(quantity + value);
+//        } else if ("Sterge".equals(value)) {
+//            String quantity = txtFldQuantity.getText();
+//            if (quantity.isEmpty()){
+//                return;
+//            }
+//            txtFldQuantity.setText(quantity.substring(0, quantity.length() - 1));
+//        }
 //    }
-
-    @FXML
-    private void handleBtnNumpadOnAction(ActionEvent event) {
-        Button node = (Button) event.getSource() ;
-        String value = node.getText();
-        if("0123456789.".contains(value)) {
-            String quantity = txtFldQuantity.getText();
-            txtFldQuantity.setText(quantity + value);
-        } else if ("Sterge".equals(value)) {
-            String quantity = txtFldQuantity.getText();
-            if (quantity.isEmpty()){
-                return;
-            }
-            txtFldQuantity.setText(quantity.substring(0, quantity.length() - 1));
-        }
-    }
 
 }

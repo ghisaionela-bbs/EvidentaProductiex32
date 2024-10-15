@@ -19,21 +19,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class EvidentaProductie extends Application {
-    private static Scene scene;
-    Connection connection;
-    FXMLLoader fxmlLoader;
-    public static Map<String, Scene> sceneMap = new Hashtable<>();
-
-//    public void loadScenes(){
-//        sceneMap.put("database-connection.fxml")
-//    }
+    Stage stage;
 
     @Override
-    public void start(Stage stage) throws IOException {
-        // get screensize of monitor
-//        Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-
-
+    public void start(Stage stage) throws IOException, InterruptedException {
+        this.stage = stage;
         FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("database-connection.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         DatabaseConnectionController databaseConnectionController = fxmlLoader.getController();
@@ -42,8 +32,6 @@ public class EvidentaProductie extends Application {
         String css = Objects.requireNonNull(this.getClass().getResource("stylesheet.css")).toExternalForm();
         scene.getStylesheets().add(css);
         stage.setScene(scene);
-        stage.show();
-
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
@@ -58,6 +46,7 @@ public class EvidentaProductie extends Application {
                 System.exit(0);
             }
         });
+        stage.show();
     }
 
     public static void main(String[] args) {

@@ -16,4 +16,6 @@ module ro.brutariabaiasprie.evidentaproductiex32 {
     exports ro.brutariabaiasprie.evidentaproductiex32;
     exports ro.brutariabaiasprie.evidentaproductiex32.DTO;
     opens ro.brutariabaiasprie.evidentaproductiex32.DTO to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductiex32.Data;
+    opens ro.brutariabaiasprie.evidentaproductiex32.Data to javafx.fxml;
 }

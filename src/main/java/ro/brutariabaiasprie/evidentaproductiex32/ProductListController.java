@@ -214,7 +214,7 @@ public class ProductListController {
             if(ConfigApp.getConfig("EXCEL_EXPORT_PATH") != null){
                 path = (String) ConfigApp.getConfig("EXCEL_EXPORT_PATH");
             } else {
-                path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie";
+                path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie\\Rapoarte excel";
             }
 
             System.out.println(path);
