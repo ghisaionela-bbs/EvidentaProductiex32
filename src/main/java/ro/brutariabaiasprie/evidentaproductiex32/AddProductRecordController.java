@@ -197,7 +197,7 @@ public class AddProductRecordController {
 
             User user =(User) ConfigApp.getConfig("APPUSER");
 
-            String sql = "INSERT INTO INREGISTRARI_PRODUSE (ID_PRODUS, cantitate, datasiora, ID_USER) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO INREGISTRARI_PRODUSE (ID_PRODUS, cantitate, datasiora, ID_UTILIZATOR) VALUES (?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, productDTO.getId());
             preparedStatement.setFloat(2, quantity);
