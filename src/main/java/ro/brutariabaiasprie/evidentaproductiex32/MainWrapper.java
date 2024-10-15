@@ -1,5 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductiex32;
 
+import ro.brutariabaiasprie.evidentaproductiex32.Data.User;
+
 import java.util.Properties;
 
 public class MainWrapper {

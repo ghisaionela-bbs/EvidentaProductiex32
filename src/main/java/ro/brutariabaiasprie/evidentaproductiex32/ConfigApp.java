@@ -86,4 +86,8 @@ public class ConfigApp {
     public static void setConfig(String key, Object value) {
         configuration.put(key, value);
     }
+
+    public static void deleteConfig(String key) {
+        configuration.remove(key);
+    }
 }

@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductRecordDTO;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.User;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -56,12 +57,8 @@ public class AddProductRecordController {
     @FXML
     TableView<ProductRecordDTO> tableView;
 
-    @FXML
-    GridPane numPad;
-
     public void setController(Stage stage) {
         this.stage = stage;
-        numPad.setVisible(false);
         txtFldQuantity.getProperties().put("vkType", "numeric");
         lblHistory.setText("Istoric " + productDTO.getName());
         lblProductName.setText(productDTO.getName());
@@ -145,9 +142,14 @@ public class AddProductRecordController {
     public void loadTableView() {
         try {
             Statement statement = connection.createStatement();
+            User user =(User) ConfigApp.getConfig("APPUSER");
+            String userCond = "";
+            if(user.getID_ROLE() != 1) {
+                userCond = " AND ip.ID_UTILIZATOR=" + user.getID() + " ";
+            }
             String sql = "SELECT p.ID, p.denumire, ip.cantitate, ip.datasiora FROM " +
                     "INREGISTRARI_PRODUSE AS ip join PRODUSE AS p ON ip.ID_PRODUS = p.ID" +
-                    " " + "WHERE p.ID = " + productDTO.getId() +
+                    " " + "WHERE p.ID = " + productDTO.getId() + userCond +
                     " " + "ORDER BY datasiora DESC";
             System.out.println(sql);
             ResultSet resultSet = statement.executeQuery(sql);
@@ -193,11 +195,14 @@ public class AddProductRecordController {
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
-            String sql = "INSERT INTO INREGISTRARI_PRODUSE (ID_PRODUS, cantitate, datasiora) VALUES (?, ?, ?)";
+            User user =(User) ConfigApp.getConfig("APPUSER");
+
+            String sql = "INSERT INTO INREGISTRARI_PRODUSE (ID_PRODUS, cantitate, datasiora, ID_USER) VALUES (?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, productDTO.getId());
             preparedStatement.setFloat(2, quantity);
             preparedStatement.setTimestamp(3, timestamp);
+            preparedStatement.setInt(4, user.getID());
             preparedStatement.execute();
             loadTableView();
         } catch (SQLException e) {

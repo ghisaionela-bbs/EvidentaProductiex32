@@ -281,4 +281,20 @@ public class ProductListController {
             throw new RuntimeException(e);
         }
     }
+
+    public void handleBtnDisconnectOnAction() {
+        try {
+            ConfigApp.deleteConfig("APPUSER");
+            FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("login-view.fxml"));
+            root = fxmlLoader.load();
+            LoginController loginController = fxmlLoader.getController();
+            loginController.connection = connection;
+            loginController.setController(stage);
+            stage.getScene().setRoot(root);
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }
