@@ -11,11 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="837d3ee9-ac9b-4d92-975d-3cc0e66fbe14" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/AddProductRecordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/AddProductRecordController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/DatabaseConnectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/DatabaseConnectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/Evidenta productie x32-1.0.msi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/EvidentaProductiex32.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/EvidentaProductiex32.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/ProductListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/ProductListController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/add-product-record-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/add-product-record-view.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/database-connection.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/database-connection.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/product-list-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/product-list-view.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

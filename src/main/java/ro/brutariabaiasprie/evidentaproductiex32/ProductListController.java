@@ -59,6 +59,17 @@ public class ProductListController {
 
     public void setController(Stage stage) {
         this.stage = stage;
+        txtFldSearchProduct.getProperties().put("vkType", "text");
+        txtFldSearchProduct.focusedProperty().addListener((ov, oldPropertyValue, newPropertyValue) -> {
+            if (newPropertyValue)
+            {
+                System.out.println("Textfield on focus");
+            }
+            else
+            {
+                System.out.println("Textfield out focus");
+            }
+        });
         //Setting up double click for elements in listview
         listView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
