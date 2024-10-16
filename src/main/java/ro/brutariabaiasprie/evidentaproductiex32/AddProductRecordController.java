@@ -118,7 +118,7 @@ public class AddProductRecordController {
         quantityColumn.setPrefWidth(100);
         dateAndTimeColumn.setCellFactory(column -> {
             TableCell<ProductRecordDTO, Timestamp> cell = new TableCell<ProductRecordDTO, Timestamp>() {
-                private SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+                private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 @Override
                 protected void updateItem(Timestamp item, boolean empty) {
                     super.updateItem(item, empty);
@@ -266,7 +266,7 @@ public class AddProductRecordController {
             //Select records from database
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Object[]> recordData = new ArrayList<>();
-            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             while (resultSet.next()) {
                 String name = resultSet.getString("denumire");
                 double quantity = resultSet.getDouble("cantitate");
@@ -277,7 +277,7 @@ public class AddProductRecordController {
             // Create a new Excel workbook
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new java.sql.Timestamp(calendar.getTimeInMillis());
-            SimpleDateFormat dateTimeTitleFormatter = new SimpleDateFormat("_MMddyyyy_HHmm");
+            SimpleDateFormat dateTimeTitleFormatter = new SimpleDateFormat("_ddMMyyyy_HHmm");
             String fileName = "EvidentaProductie" + dateTimeTitleFormatter.format(timestamp) + ".xlsx";
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Evidenta productie" + timestamp);

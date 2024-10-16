@@ -46,6 +46,7 @@ public class EvidentaProductie extends Application {
                 System.exit(0);
             }
         });
+        stage.setMaximized(true);
         stage.show();
     }
 
