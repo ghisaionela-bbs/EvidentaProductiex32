@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductiex32.Data.User;
 
 import java.io.IOException;
@@ -56,7 +58,8 @@ public class LoginController {
             user.setPassword(resultSet.getString("parola"));
             user.setID_ROLE(resultSet.getInt("ID_ROL"));
 
-            ConfigApp.setConfig("APPUSER", user);
+            ConfigApp.setConfig(CONFIG_KEY.APPUSER.name(), user);
+            ConfigApp.write_config();
 
             FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("product-list-view.fxml"));
             root = fxmlLoader.load();

@@ -1,7 +1,5 @@
 /*
-* {
-    -fx-font-size:15.0;
-}
+
 
 .list-cell:filled:selected:focused, .list-cell:filled:selected {
     -fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%);
@@ -18,7 +16,29 @@
 }
 
 
+.list-cell:selected {
+    -fx-text-fill:  -main-light-color;
+    -fx-background-color: -main-dark-color;
+}
+
+.button {
+    -fx-background-color: -main-dark-color;
+    -fx-text-fill: -main-light-color;
+}
+
+* {
+    -main-dark-color: #4f2c1d;
+    -main-light-color: white;
+}
+
 */
+* {
+    -fx-font-size: 14.0;
+}
+
 .list-cell {
     -fx-font-size:15.0;
 }
+
+
+

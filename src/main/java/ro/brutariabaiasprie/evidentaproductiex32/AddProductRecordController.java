@@ -1,23 +1,19 @@
 package ro.brutariabaiasprie.evidentaproductiex32;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductRecordDTO;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductiex32.Data.User;
 
 import javax.swing.filechooser.FileSystemView;
@@ -25,7 +21,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,7 +61,7 @@ public class AddProductRecordController {
         setTableView();
         loadTableView();
 
-        // force the field to be float only (10 decimals and 5 precision)
+        // force the field to be double only (10 decimals and 5 precision)
         txtFldQuantity.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
@@ -94,20 +89,20 @@ public class AddProductRecordController {
 //        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 //        tableView.getColumns().add(nameColumn);
         tableView.setPlaceholder(new Label("Nu exista inregistrari pentru acest produs."));
-        TableColumn<ProductRecordDTO, Float> quantityColumn = new TableColumn<>("Cantitate");
+        TableColumn<ProductRecordDTO, Double> quantityColumn = new TableColumn<>("Cantitate");
         quantityColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
         quantityColumn.setPrefWidth(100);
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         quantityColumn.setCellFactory(column -> {
-            TableCell<ProductRecordDTO, Float> cell = new TableCell<ProductRecordDTO, Float>()  {
+            TableCell<ProductRecordDTO, Double> cell = new TableCell<ProductRecordDTO, Double>()  {
                 @Override
-                protected void updateItem(Float item, boolean empty) {
+                protected void updateItem(Double item, boolean empty) {
                     super.updateItem(item, empty);
                     if(empty) {
                         setText(null);
                     }
                     else {
-                        setText(String.format("%.2f", item.doubleValue()));
+                        setText(String.format("%.2f", item));
                     }
                 }
             };
@@ -142,7 +137,7 @@ public class AddProductRecordController {
     public void loadTableView() {
         try {
             Statement statement = connection.createStatement();
-            User user =(User) ConfigApp.getConfig("APPUSER");
+            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String userCond = "";
             if(user.getID_ROLE() != 1) {
                 userCond = " AND ip.ID_UTILIZATOR=" + user.getID() + " ";
@@ -159,7 +154,7 @@ public class AddProductRecordController {
             while (resultSet.next()) {
                 int productId = resultSet.getInt("ID");
                 String name = resultSet.getString("denumire");
-                float quantity = resultSet.getFloat("cantitate");
+                double quantity = resultSet.getDouble("cantitate");
                 Timestamp dateAndTime = resultSet.getTimestamp("datasiora");
                 ProductRecordDTO productRecordDTO = new ProductRecordDTO(productId, name, quantity, dateAndTime);
                 tableView.getItems().add(productRecordDTO);
@@ -189,18 +184,17 @@ public class AddProductRecordController {
         try {
             lblAddRecordError.setVisible(false);
 
-            float quantity = Float.parseFloat(txtFldQuantity.getText());
-
+            double quantity = Double.parseDouble(txtFldQuantity.getText());
 //            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
-            User user =(User) ConfigApp.getConfig("APPUSER");
+            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
 
             String sql = "INSERT INTO INREGISTRARI_PRODUSE (ID_PRODUS, cantitate, datasiora, ID_UTILIZATOR) VALUES (?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, productDTO.getId());
-            preparedStatement.setFloat(2, quantity);
+            preparedStatement.setDouble(2, quantity);
             preparedStatement.setTimestamp(3, timestamp);
             preparedStatement.setInt(4, user.getID());
             preparedStatement.execute();
@@ -213,8 +207,8 @@ public class AddProductRecordController {
     public void handleBtnExcelExportOnAction() {
         try {
             String path = "";
-            if(ConfigApp.getConfig("EXCEL_EXPORT_PATH") != null){
-                path = (String) ConfigApp.getConfig("EXCEL_EXPORT_PATH");
+            if(ConfigApp.getConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name()) != null){
+                path = (String) ConfigApp.getConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name());
             } else {
                 path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie";
             }
@@ -237,7 +231,7 @@ public class AddProductRecordController {
             SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm");
             while (resultSet.next()) {
                 String name = resultSet.getString("denumire");
-                float quantity = resultSet.getFloat("cantitate");
+                double quantity = resultSet.getDouble("cantitate");
                 Timestamp dateAndTime = resultSet.getTimestamp("datasiora");
                 String formatedDateTime = dateTimeFormatter.format(dateAndTime);
                 recordData.add(new Object[]{name, quantity, formatedDateTime});
@@ -269,7 +263,7 @@ public class AddProductRecordController {
             for (int i = 0; i < recordData.size(); i++) {
                 Row row = sheet.createRow(i + 2); // Start from the second row
                 row.createCell(0).setCellValue((String) recordData.get(i)[0]);
-                row.createCell(1).setCellValue((float) recordData.get(i)[1]);
+                row.createCell(1).setCellValue((double) recordData.get(i)[1]);
                 row.createCell(2).setCellValue((String) recordData.get(i)[2]);
             }
             // Save the Excel file to a local directory

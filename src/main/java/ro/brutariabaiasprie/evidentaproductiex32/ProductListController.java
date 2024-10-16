@@ -1,41 +1,38 @@
 package ro.brutariabaiasprie.evidentaproductiex32;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TouchEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import jxl.write.DateTime;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductDTO;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
 
 
 import javax.swing.filechooser.FileSystemView;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
 
+import java.net.URI;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 public class ProductListController {
     Stage stage;
@@ -210,31 +207,66 @@ public class ProductListController {
 
     public void handleBtnExcelExportOnAction() {
         try {
+            FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("excel-export-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+//            root = fxmlLoader.load();
+            ExcelExportController excelExportController = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.setTitle("Exporta in excel");
+            stage.setScene(scene);
+            stage.showAndWait();
+            if(!excelExportController.export) {
+                return;
+            }
+
             String path = "";
-            if(ConfigApp.getConfig("EXCEL_EXPORT_PATH") != null){
-                path = (String) ConfigApp.getConfig("EXCEL_EXPORT_PATH");
+            if(ConfigApp.getConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name()) != null){
+                path = (String) ConfigApp.getConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name());
             } else {
                 path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie\\Rapoarte excel";
             }
 
             System.out.println(path);
-
             File theDir = new File(path);
             if (!theDir.exists()){
                 theDir.mkdirs();
             }
 
+            LocalDate dateFrom = excelExportController.datePickFrom.getValue();
+            LocalDate dateTo = excelExportController.datePickTo.getValue();
+
             //Select records from database
-            Statement statement = connection.createStatement();
             String sql = "SELECT p.ID, p.denumire, ip.cantitate, ip.datasiora " +
-                    "FROM INREGISTRARI_PRODUSE AS ip join PRODUSE AS p ON ip.ID_PRODUS = p.ID " +
-                    "ORDER BY datasiora DESC";
-            ResultSet resultSet = statement.executeQuery(sql);
+                    "FROM INREGISTRARI_PRODUSE AS ip join PRODUSE AS p ON ip.ID_PRODUS = p.ID ";
+
+            if(dateFrom != null && dateTo != null) {
+                sql += " WHERE ip.datasiora >= ? AND ip.datasiora <= ? ";
+            } else if(dateFrom != null){
+                sql += " WHERE ip.datasiora >= ? ";
+            } else if(dateTo != null) {
+                sql += " WHERE ip.datasiora <= ? ";
+            }
+
+            sql += "ORDER BY ip.datasiora DESC";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            if(dateFrom != null && dateTo != null) {
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
+                preparedStatement.setTimestamp(2, Timestamp.valueOf(dateFrom.atTime(LocalTime.MAX)));
+            } else if(dateFrom != null){
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
+            } else if(dateTo != null) {
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atTime(LocalTime.MAX)));
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
             List<Object[]> recordData = new ArrayList<>();
             SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm");
             while (resultSet.next()) {
                 String name = resultSet.getString("denumire");
-                float quantity = resultSet.getFloat("cantitate");
+                double quantity = resultSet.getDouble("cantitate");
+                System.out.printf("%.2f%n", quantity);
                 Timestamp dateAndTime = resultSet.getTimestamp("datasiora");
                 String formatedDateTime = dateTimeFormatter.format(dateAndTime);
                 recordData.add(new Object[]{name, quantity, formatedDateTime});
@@ -246,16 +278,16 @@ public class ProductListController {
             String fileName = "EvidentaProductie" + dateTimeTitleFormatter.format(timestamp) + ".xlsx";
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Evidenta productie" + timestamp);
-            // Create the header row
+            // Create the first row where we store data like when it was generated
             CellStyle style = workbook.createCellStyle();
             Font font= workbook.createFont();
             font.setBold(true);
             style.setFont(font);
             Row infoRow = sheet.createRow(0);
-            infoRow.createCell(0).setCellValue("Raport pentru toate produsele generat in " +
-                    dateTimeFormatter.format(timestamp));
+            infoRow.createCell(0).setCellValue("Raport pentru toate produsele generat in " + dateTimeFormatter.format(timestamp));
             infoRow.setRowStyle(style);
             infoRow.getCell(0).setCellStyle(style);
+            // Create header row
             Row headerRow = sheet.createRow(1);
             headerRow.createCell(0).setCellValue("Produs");
             headerRow.getCell(0).setCellStyle(style);
@@ -263,20 +295,44 @@ public class ProductListController {
             headerRow.getCell(1).setCellStyle(style);
             headerRow.createCell(2).setCellValue("Data si ora");
             headerRow.getCell(2).setCellStyle(style);
+            // Insert data into cells
             for (int i = 0; i < recordData.size(); i++) {
-                Row row = sheet.createRow(i + 2); // Start from the second row
+                Row row = sheet.createRow(i + 2); // Start from the third row
                 row.createCell(0).setCellValue((String) recordData.get(i)[0]);
-                row.createCell(1).setCellValue((float) recordData.get(i)[1]);
+                row.createCell(1).setCellValue((double) recordData.get(i)[1]);
                 row.createCell(2).setCellValue((String) recordData.get(i)[2]);
             }
+            //Autosize columns
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+            sheet.autoSizeColumn(2);
+
             // Save the Excel file to a local directory
-
-
-
             FileOutputStream fileOut = new FileOutputStream(path + "\\" + fileName);
             workbook.write(fileOut);
+            workbook.close();
+            fileOut.close();
 
             Runtime.getRuntime().exec("explorer.exe /select,\"" + path + "\\" + fileName + "\"");
+//            Desktop desktop = Desktop.getDesktop();
+//            desktop.open(new File(path + "\\" + fileName));
+//            //Check to see if it has Excel installed
+//            Process process = Runtime.getRuntime().exec(new String [] { "cmd.exe", "/c", "assoc", ".xlsx"});
+//            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            String extensionType = input.readLine();
+//            input.close();
+//            process.destroy();
+//            // If it has Excel open file, if not show alert and open directory
+//            if (extensionType == null) {
+//                Alert alert = new Alert(Alert.AlertType.WARNING);
+//                alert.setTitle("Atentionare!");
+//                alert.setHeaderText("Pe acest dispozitiv nu este instalat excel.");
+//                alert.showAndWait();
+//                Runtime.getRuntime().exec("explorer.exe /select,\"" + path + "\\" + fileName + "\"");
+//            } else {
+//                Desktop desktop = Desktop.getDesktop();
+//                desktop.open(new File(path + "\\" + fileName));
+//            }
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -284,7 +340,8 @@ public class ProductListController {
 
     public void handleBtnDisconnectOnAction() {
         try {
-            ConfigApp.deleteConfig("APPUSER");
+            ConfigApp.deleteConfig(CONFIG_KEY.APPUSER.name());
+            ConfigApp.write_config();
             FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("login-view.fxml"));
             root = fxmlLoader.load();
             LoginController loginController = fxmlLoader.getController();

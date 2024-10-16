@@ -1,12 +1,14 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductiex32.Data;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Scanner;
@@ -37,30 +39,44 @@ public class ConfigApp {
         }
     }
 
-    private static void read_config() {
+    public static void read_config() {
         try {
             System.out.println("read config");
             Scanner myReader = new Scanner(fileConfig);
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();
                 int index = line.indexOf("=");
-                configuration.put(line.substring(0, index), line.substring(index + 1));
+                String key = line.substring(0, index);
+                String value = line.substring(index + 1);
+                if(key.equals("APPUSER")){
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    configuration.put(key, objectMapper.readValue(value, User.class));
+                } else {
+                    configuration.put(line.substring(0, index), line.substring(index + 1));
+                }
             }
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static void write_config() {
+    public static void write_config() {
         try {
             System.out.println("write config");
             FileWriter myWriter = new FileWriter(fileConfigPath);
             for (Map.Entry<String, Object> entry : configuration.entrySet()) {
                 String key = entry.getKey();
                 Object val = entry.getValue();
-                myWriter.write(key + "=" + val.toString() + "\n");
+                if(key.equals("APPUSER")){
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    myWriter.write(key + "=" + objectMapper.writeValueAsString(val) + "\n");
+                } else {
+                    myWriter.write(key + "=" + val.toString() + "\n");
+                }
             }
             myWriter.close();
             System.out.println("Successfully wrote to the file.");
@@ -77,6 +93,7 @@ public class ConfigApp {
         configuration.put("DBPASS", "sqlserverstatia51");
         configuration.put("ERRLOG_PATH", appDirrPath + "\\ErrorLog.txt");
         configuration.put("EXCEL_EXPORT_PATH", appDirrPath + "\\Rapoarte excel");
+        configuration.put("APPDIRR", appDirrPath);
     }
 
     public static Object getConfig(String key) {
@@ -89,5 +106,9 @@ public class ConfigApp {
 
     public static void deleteConfig(String key) {
         configuration.remove(key);
+    }
+
+    public enum CONFIG_KEY {
+
     }
 }

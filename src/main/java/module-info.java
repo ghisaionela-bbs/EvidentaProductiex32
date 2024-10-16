@@ -7,10 +7,11 @@ module ro.brutariabaiasprie.evidentaproductiex32 {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
-    requires java.sql;
     requires org.apache.poi.ooxml;
-    requires java.desktop;
     requires jxl;
+    requires com.fasterxml.jackson.databind;
+    requires java.desktop;
+    requires java.sql;
 
     opens ro.brutariabaiasprie.evidentaproductiex32 to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductiex32;

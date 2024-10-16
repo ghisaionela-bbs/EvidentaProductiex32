@@ -1,32 +1,22 @@
 package ro.brutariabaiasprie.evidentaproductiex32;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
-import java.util.Stack;
-import java.util.logging.SimpleFormatter;
 
 public class DatabaseConnectionController {
     private Stage stage;
@@ -64,9 +54,9 @@ public class DatabaseConnectionController {
         dbConnUrl.setDisable(true);
         dbConnUser.setDisable(true);
         dbConnPass.setDisable(true);
-        dbConnUrl.setText((String) ConfigApp.configuration.get("DBURL"));
-        dbConnUser.setText((String) ConfigApp.configuration.get("DBUSER"));
-        dbConnPass.setText((String) ConfigApp.configuration.get("DBPASS"));
+        dbConnUrl.setText((String) ConfigApp.configuration.get(CONFIG_KEY.DBURL.name()));
+        dbConnUser.setText((String) ConfigApp.configuration.get(CONFIG_KEY.DBUSER.name()));
+        dbConnPass.setText((String) ConfigApp.configuration.get(CONFIG_KEY.DBPASS.name()));
     }
 
     @FXML
@@ -76,14 +66,50 @@ public class DatabaseConnectionController {
 
     public void connectToDataBase() {
         try {
-            connection = DriverManager.getConnection(dbConnUrl.getText(), dbConnUser.getText(), dbConnPass.getText());
-            FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("login-view.fxml"));
-            root = fxmlLoader.load();
-            LoginController loginController = fxmlLoader.getController();
-            loginController.connection = connection;
-            loginController.setController(stage);
-            stage.getScene().setRoot(root);
-            stage.show();
+            String url = dbConnUrl.getText();
+            String username = dbConnUser.getText();
+            String password = dbConnPass.getText();
+
+            connection = DriverManager.getConnection(url, username, password);
+
+            boolean updateConn = false;
+            if(!url.equals(ConfigApp.configuration.get(CONFIG_KEY.DBURL.name()))){
+                ConfigApp.setConfig(CONFIG_KEY.DBURL.name(), url);
+                updateConn = true;
+            }
+            if(!username.equals(ConfigApp.configuration.get(CONFIG_KEY.DBUSER.name()))){
+                ConfigApp.setConfig(CONFIG_KEY.DBUSER.name(), username);
+                updateConn = true;
+            }
+            if(!password.equals(ConfigApp.configuration.get(CONFIG_KEY.DBPASS.name()))){
+                ConfigApp.setConfig(CONFIG_KEY.DBPASS.name(), password);
+                updateConn = true;
+            }
+            if(updateConn) {
+                ConfigApp.write_config();
+            }
+
+            //Go to login screen if user was not logged before
+            if(ConfigApp.getConfig(CONFIG_KEY.APPUSER.name()) == null) {
+                FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("login-view.fxml"));
+                root = fxmlLoader.load();
+                LoginController loginController = fxmlLoader.getController();
+                loginController.connection = connection;
+                loginController.setController(stage);
+                stage.getScene().setRoot(root);
+                stage.show();
+            } else {
+                FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("product-list-view.fxml"));
+                root = fxmlLoader.load();
+                ProductListController productListController = fxmlLoader.getController();
+                productListController.connection = connection;
+                productListController.setController(stage);
+                productListController.loadListView();
+                stage.getScene().setRoot(root);
+                stage.show();
+            }
+
+
 
         } catch (SQLException e) {
             errorLabel.setVisible(true);
@@ -93,7 +119,7 @@ public class DatabaseConnectionController {
             dbConnPass.setDisable(false);
 
             try {
-                String path = (String) ConfigApp.configuration.get("ERRLOG_PATH");
+                String path = (String) ConfigApp.configuration.get(CONFIG_KEY.ERRLOG_PATH.name());
                 File errLogFile = new File(path);
                 errLogFile.createNewFile();
                 FileWriter errorWriter = new FileWriter(path);

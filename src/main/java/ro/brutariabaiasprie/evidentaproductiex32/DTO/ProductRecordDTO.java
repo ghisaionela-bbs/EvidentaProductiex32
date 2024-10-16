@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 public class ProductRecordDTO {
     private int id;
     private String name;
-    private float quantity;
+    private double quantity;
     private Timestamp dateAndTime;
 
     public int getId() {
@@ -24,7 +24,7 @@ public class ProductRecordDTO {
         this.name = name;
     }
 
-    public float getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
@@ -40,7 +40,7 @@ public class ProductRecordDTO {
         this.dateAndTime = dateAndTime;
     }
 
-    public ProductRecordDTO(int id, String name, float quantity, Timestamp dateAndTime) {
+    public ProductRecordDTO(int id, String name, double quantity, Timestamp dateAndTime) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
