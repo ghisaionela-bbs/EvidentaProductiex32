@@ -21,10 +21,8 @@ import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
 
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
 import java.io.*;
 
-import java.net.URI;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -32,7 +30,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 
 public class ProductListController {
     Stage stage;
@@ -209,7 +206,6 @@ public class ProductListController {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("excel-export-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
-//            root = fxmlLoader.load();
             ExcelExportController excelExportController = fxmlLoader.getController();
             Stage stage = new Stage();
             stage.setTitle("Exporta in excel");
@@ -250,23 +246,21 @@ public class ProductListController {
             sql += "ORDER BY ip.datasiora DESC";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
             if(dateFrom != null && dateTo != null) {
                 preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
-                preparedStatement.setTimestamp(2, Timestamp.valueOf(dateFrom.atTime(LocalTime.MAX)));
+                preparedStatement.setTimestamp(2, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
             } else if(dateFrom != null){
                 preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
             } else if(dateTo != null) {
-                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atTime(LocalTime.MAX)));
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
             }
 
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Object[]> recordData = new ArrayList<>();
-            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             while (resultSet.next()) {
                 String name = resultSet.getString("denumire");
                 double quantity = resultSet.getDouble("cantitate");
-                System.out.printf("%.2f%n", quantity);
                 Timestamp dateAndTime = resultSet.getTimestamp("datasiora");
                 String formatedDateTime = dateTimeFormatter.format(dateAndTime);
                 recordData.add(new Object[]{name, quantity, formatedDateTime});
@@ -274,7 +268,7 @@ public class ProductListController {
             // Create a new Excel workbook
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new java.sql.Timestamp(calendar.getTimeInMillis());
-            SimpleDateFormat dateTimeTitleFormatter = new SimpleDateFormat("_MMddyyyy_HHmm");
+            SimpleDateFormat dateTimeTitleFormatter = new SimpleDateFormat("_ddMMyyyy_HHmm");
             String fileName = "EvidentaProductie" + dateTimeTitleFormatter.format(timestamp) + ".xlsx";
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Evidenta productie" + timestamp);
@@ -306,33 +300,14 @@ public class ProductListController {
             sheet.autoSizeColumn(0);
             sheet.autoSizeColumn(1);
             sheet.autoSizeColumn(2);
-
             // Save the Excel file to a local directory
             FileOutputStream fileOut = new FileOutputStream(path + "\\" + fileName);
             workbook.write(fileOut);
             workbook.close();
             fileOut.close();
-
             Runtime.getRuntime().exec("explorer.exe /select,\"" + path + "\\" + fileName + "\"");
 //            Desktop desktop = Desktop.getDesktop();
 //            desktop.open(new File(path + "\\" + fileName));
-//            //Check to see if it has Excel installed
-//            Process process = Runtime.getRuntime().exec(new String [] { "cmd.exe", "/c", "assoc", ".xlsx"});
-//            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//            String extensionType = input.readLine();
-//            input.close();
-//            process.destroy();
-//            // If it has Excel open file, if not show alert and open directory
-//            if (extensionType == null) {
-//                Alert alert = new Alert(Alert.AlertType.WARNING);
-//                alert.setTitle("Atentionare!");
-//                alert.setHeaderText("Pe acest dispozitiv nu este instalat excel.");
-//                alert.showAndWait();
-//                Runtime.getRuntime().exec("explorer.exe /select,\"" + path + "\\" + fileName + "\"");
-//            } else {
-//                Desktop desktop = Desktop.getDesktop();
-//                desktop.open(new File(path + "\\" + fileName));
-//            }
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }

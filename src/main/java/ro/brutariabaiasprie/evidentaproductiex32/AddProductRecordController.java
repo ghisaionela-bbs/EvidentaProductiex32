@@ -5,6 +5,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
@@ -22,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -146,11 +149,8 @@ public class AddProductRecordController {
                     "INREGISTRARI_PRODUSE AS ip join PRODUSE AS p ON ip.ID_PRODUS = p.ID" +
                     " " + "WHERE p.ID = " + productDTO.getId() + userCond +
                     " " + "ORDER BY datasiora DESC";
-            System.out.println(sql);
             ResultSet resultSet = statement.executeQuery(sql);
-
             tableView.getItems().clear();
-
             while (resultSet.next()) {
                 int productId = resultSet.getInt("ID");
                 String name = resultSet.getString("denumire");
@@ -206,6 +206,17 @@ public class AddProductRecordController {
 
     public void handleBtnExcelExportOnAction() {
         try {
+            FXMLLoader fxmlLoader = new FXMLLoader(EvidentaProductie.class.getResource("excel-export-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            ExcelExportController excelExportController = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.setTitle("Exporta in excel");
+            stage.setScene(scene);
+            stage.showAndWait();
+            if(!excelExportController.export) {
+                return;
+            }
+
             String path = "";
             if(ConfigApp.getConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name()) != null){
                 path = (String) ConfigApp.getConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name());
@@ -213,20 +224,47 @@ public class AddProductRecordController {
                 path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie";
             }
 
-            System.out.println(path);
-
             File theDir = new File(path);
             if (!theDir.exists()){
                 theDir.mkdirs();
             }
 
+            LocalDate dateFrom = excelExportController.datePickFrom.getValue();
+            LocalDate dateTo = excelExportController.datePickTo.getValue();
+
+            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+            String userCond = "";
+            if(user.getID_ROLE() != 1) {
+                userCond = " AND ip.ID_UTILIZATOR=" + user.getID() + " ";
+            }
+
             //Select records from database
-            Statement statement = connection.createStatement();
             String sql = "SELECT p.ID, p.denumire, ip.cantitate, ip.datasiora FROM " +
                     "INREGISTRARI_PRODUSE AS ip join PRODUSE AS p ON ip.ID_PRODUS = p.ID" +
-                    " " + "WHERE p.ID = " + productDTO.getId() +
-                    " " + "ORDER BY datasiora DESC";
-            ResultSet resultSet = statement.executeQuery(sql);
+                    " WHERE p.ID = " + productDTO.getId() + userCond;
+
+            if(dateFrom != null && dateTo != null) {
+                sql += " AND ip.datasiora >= ? AND ip.datasiora <= ? ";
+            } else if(dateFrom != null){
+                sql += " AND ip.datasiora >= ? ";
+            } else if(dateTo != null) {
+                sql += " AND ip.datasiora <= ? ";
+            }
+
+            sql += "ORDER BY ip.datasiora DESC";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            if(dateFrom != null && dateTo != null) {
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
+                preparedStatement.setTimestamp(2, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            } else if(dateFrom != null){
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
+            } else if(dateTo != null) {
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            }
+
+            //Select records from database
+            ResultSet resultSet = preparedStatement.executeQuery();
             List<Object[]> recordData = new ArrayList<>();
             SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm");
             while (resultSet.next()) {

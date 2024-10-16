@@ -109,8 +109,6 @@ public class DatabaseConnectionController {
                 stage.show();
             }
 
-
-
         } catch (SQLException e) {
             errorLabel.setVisible(true);
             tglBtnEditConnection.setSelected(true);
