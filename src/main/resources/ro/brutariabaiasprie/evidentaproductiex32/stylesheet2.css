@@ -1,0 +1,24 @@
+* {
+    -color_medium : #ebc0ae;
+    -color_bbs : #4f2c1d;
+    -fx-font-size: 20;
+}
+
+.numpad {
+    -fx-border-color: transparent;
+}
+.numpad .button{
+    -fx-margin: 2;
+}
+
+.button {
+    -fx-border-insets: 2px;
+    -fx-background-insets: 2px;
+    -fx-text-fill: -color_bbs;
+    -fx-background-radius: 24;
+    -fx-background-color: -color_medium;
+    -fx-font-weight: bold;
+    -fx-border-width: 1;
+    -fx-border-color: -color_bbs;
+    -fx-border-radius: 24;
+}

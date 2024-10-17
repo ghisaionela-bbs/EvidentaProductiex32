@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -38,9 +39,6 @@ public class AddProductRecordController {
     Parent root;
 
     @FXML
-    Label lblHistory;
-
-    @FXML
     Label lblProductName;
 
     @FXML
@@ -53,12 +51,14 @@ public class AddProductRecordController {
     Label lblAddRecordError;
 
     @FXML
+    GridPane gridPaneNumpad;
+
+    @FXML
     TableView<ProductRecordDTO> tableView;
 
     public void setController(Stage stage) {
         this.stage = stage;
         txtFldQuantity.getProperties().put("vkType", "numeric");
-        lblHistory.setText("Istoric " + productDTO.getName());
         lblProductName.setText(productDTO.getName());
         lblAddRecordError.setVisible(false);
         setTableView();
@@ -85,6 +85,8 @@ public class AddProductRecordController {
                 }
             }
         });
+        lblProductName.prefWidthProperty().bind(txtFldQuantity.widthProperty());
+        gridPaneNumpad.prefWidthProperty().bind(txtFldQuantity.widthProperty());
     }
 
     private void setTableView() {
@@ -134,6 +136,10 @@ public class AddProductRecordController {
             return cell;
         });
         tableView.getColumns().add(dateAndTimeColumn);
+
+        tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 50 ); // 50% width
+        dateAndTimeColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 50 ); // 50% width
 
     }
 
