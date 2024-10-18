@@ -1,4 +1,4 @@
-module ro.brutariabaiasprie.evidentaproductiex32 {
+module ro.brutariabaiasprie.evidentaproductie {
     requires javafx.controls;
     requires javafx.fxml;
 
@@ -13,10 +13,10 @@ module ro.brutariabaiasprie.evidentaproductiex32 {
     requires java.desktop;
     requires java.sql;
 
-    opens ro.brutariabaiasprie.evidentaproductiex32 to javafx.fxml;
-    exports ro.brutariabaiasprie.evidentaproductiex32;
-    exports ro.brutariabaiasprie.evidentaproductiex32.DTO;
-    opens ro.brutariabaiasprie.evidentaproductiex32.DTO to javafx.fxml;
-    exports ro.brutariabaiasprie.evidentaproductiex32.Data;
-    opens ro.brutariabaiasprie.evidentaproductiex32.Data to javafx.fxml;
+    opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie;
+    exports ro.brutariabaiasprie.evidentaproductie.DTO;
+    opens ro.brutariabaiasprie.evidentaproductie.DTO to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie.Data;
+    opens ro.brutariabaiasprie.evidentaproductie.Data to javafx.fxml;
 }

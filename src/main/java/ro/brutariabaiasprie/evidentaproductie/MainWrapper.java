@@ -1,7 +1,6 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
-import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
-import java.util.Properties;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 
 public class MainWrapper {
     public static void main(String[] args) {

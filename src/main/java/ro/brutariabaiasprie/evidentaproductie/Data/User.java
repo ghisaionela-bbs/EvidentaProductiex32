@@ -1,9 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32.Data;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+package ro.brutariabaiasprie.evidentaproductie.Data;
 
 public class  User {
     private int ID;

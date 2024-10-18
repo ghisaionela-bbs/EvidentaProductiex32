@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32.DTO;
+package ro.brutariabaiasprie.evidentaproductie.DTO;
 
 import java.sql.Timestamp;
 

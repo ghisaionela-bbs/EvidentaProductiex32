@@ -8,7 +8,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ro.brutariabaiasprie.evidentaproductiex32.AppSetupController"
+            fx:controller="ro.brutariabaiasprie.evidentaproductie.AppSetupController"
             prefHeight="400.0" prefWidth="600.0">
 
 </AnchorPane>

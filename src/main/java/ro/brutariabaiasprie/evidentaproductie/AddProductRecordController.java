@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -12,11 +12,11 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductDTO;
-import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductRecordDTO;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
+import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.User;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;

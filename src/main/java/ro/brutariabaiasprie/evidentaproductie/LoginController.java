@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -6,9 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.User;
 
 import java.io.IOException;
 import java.sql.Connection;

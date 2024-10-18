@@ -1,21 +1,15 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.sql.*;
-import java.time.ZonedDateTime;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.Objects;
 
 public class EvidentaProductie extends Application {

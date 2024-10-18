@@ -1,9 +1,9 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
-import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductDTO;
+import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 
 public class ProductRecordController {
     @FXML

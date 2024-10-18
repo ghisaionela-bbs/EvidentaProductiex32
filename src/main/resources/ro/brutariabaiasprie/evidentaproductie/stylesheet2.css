@@ -1,0 +1,55 @@
+#product-record-view {
+    -fx-font-size: 2em;
+}
+#product-record-view .list-view {
+    -fx-background-color: transparent;
+}
+#product-record-view .product-section {
+    -fx-background-color: DARKSLATEGRAY;
+    -fx-border-color: gray;
+    -fx-border-width: 8 4 4 4;
+    -fx-border-color: DARKSLATEGRAY;
+}
+#product-record-view .numpad {
+    -fx-border-color: transparent;
+}
+#product-record-view .numpad .button{
+    -fx-margin: 2;
+}
+#product-record-view .button {
+    -fx-border-insets: 4px;
+    -fx-background-insets: 4px;
+    -fx-text-fill: black;
+    -fx-background-radius: 14;
+    -fx-background-color: lightgray;
+    -fx-font-weight: bold;
+    -fx-border-width: 1;
+    -fx-border-color: gray;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(one-pass-box, rgba(0.5,0.5,0.5,0.5), 4.5, 0.5, 2, 2);
+    -fx-cursor: hand;
+}
+#product-record-view .button:hover {
+    -fx-background-color: DARKGRAY;
+}
+#product-record-view .button:pressed {
+    -fx-background-color: gray;
+    -fx-text-fill: white;
+}
+#product-record-view .selected-product-section {
+    -fx-padding: 4px;
+    -fx-background-color: DIMGRAY;
+    -fx-border-color: DIMGREY;
+    -fx-border-radius: 10 10 0 0;
+    -fx-background-radius: 10 10 0 0;
+}
+#product-record-view .selected-product-section .label {
+    -fx-padding: 4px;
+    -fx-text-fill: white;
+}
+#product-record-view .selected-product-section .button {
+    -fx-effect: none;
+}
+#product-record-view .record-list-view {
+    -fx-background-color: white;
+}

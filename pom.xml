@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ro.brutariabaiasprie</groupId>
-  <artifactId>EvidentaProductiex32</artifactId>
+  <artifactId>EvidentaProductie</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>EvidentaProductiex32</name>
 
@@ -100,11 +100,11 @@
       <version>2.20.0</version>
     </dependency>
       <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>2.17.2</version>
-    </dependency>
+      <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+          <version>2.17.2</version>
+      </dependency>
       <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
@@ -133,7 +133,7 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>ro.brutariabaiasprie.evidentaproductiex32/ro.brutariabaiasprie.evidentaproductiex32.HelloApplication</mainClass>
+              <mainClass>ro.brutariabaiasprie.evidentaproductiex32/ro.brutariabaiasprie.evidentaproductie.HelloApplication</mainClass>
               <launcher>app</launcher>
               <jlinkZipName>app</jlinkZipName>
               <jlinkImageName>app</jlinkImageName>

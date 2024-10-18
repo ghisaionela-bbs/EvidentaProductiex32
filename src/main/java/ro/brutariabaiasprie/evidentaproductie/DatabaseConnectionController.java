@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,8 +10,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 
 import java.io.File;
 import java.io.FileWriter;

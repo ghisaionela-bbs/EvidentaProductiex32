@@ -2,7 +2,7 @@
   <artifact type="jar" name="EvidentaProductiex32:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar</output-path>
     <root id="archive" name="EvidentaProductiex32.jar">
-      <element id="module-output" name="EvidentaProductiex32" />
+      <element id="module-output" name="EvidentaProductie" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.14.0/commons-lang3-3.14.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/dhatim/fastexcel-reader/0.18.1/fastexcel-reader-0.18.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.17.2/jackson-databind-2.17.2.jar" path-in-jar="/" />

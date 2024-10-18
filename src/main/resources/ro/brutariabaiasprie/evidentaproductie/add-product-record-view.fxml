@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="add-prod-view" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.brutariabaiasprie.evidentaproductiex32.AddProductRecordController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="add-prod-view" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.brutariabaiasprie.evidentaproductie.AddProductRecordController">
     <padding>
         <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
     </padding>

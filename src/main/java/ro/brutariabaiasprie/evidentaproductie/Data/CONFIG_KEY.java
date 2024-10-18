@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32.Data;
+package ro.brutariabaiasprie.evidentaproductie.Data;
 
 public enum CONFIG_KEY {
     DBURL,

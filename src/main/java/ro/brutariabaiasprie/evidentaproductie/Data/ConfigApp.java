@@ -1,7 +1,6 @@
-package ro.brutariabaiasprie.evidentaproductiex32.Data;
+package ro.brutariabaiasprie.evidentaproductie.Data;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.filechooser.FileSystemView;

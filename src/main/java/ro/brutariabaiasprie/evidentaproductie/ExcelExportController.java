@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

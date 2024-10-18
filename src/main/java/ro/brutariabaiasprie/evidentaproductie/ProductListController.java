@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductiex32;
+package ro.brutariabaiasprie.evidentaproductie;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,9 +15,9 @@ import javafx.util.Callback;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ro.brutariabaiasprie.evidentaproductiex32.DTO.ProductDTO;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.CONFIG_KEY;
-import ro.brutariabaiasprie.evidentaproductiex32.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 
 
 import javax.swing.filechooser.FileSystemView;
