@@ -15,6 +15,7 @@ import javafx.util.Callback;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class ProductListController {
+public class ProductListController implements IController {
     Stage stage;
     Parent root;
     Connection connection;

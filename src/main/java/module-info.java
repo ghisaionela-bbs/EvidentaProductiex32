@@ -10,8 +10,9 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires org.apache.poi.ooxml;
     requires jxl;
     requires com.fasterxml.jackson.databind;
-    requires java.desktop;
     requires java.sql;
+    requires org.jetbrains.annotations;
+    requires java.desktop;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie;

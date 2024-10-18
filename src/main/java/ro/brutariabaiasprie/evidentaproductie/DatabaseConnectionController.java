@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 
@@ -18,7 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
 
-public class DatabaseConnectionController {
+public class DatabaseConnectionController implements IController {
     private Stage stage;
     private Parent root;
     Connection connection;

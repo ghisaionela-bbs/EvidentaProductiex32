@@ -1,4 +1,6 @@
 package ro.brutariabaiasprie.evidentaproductie;
 
-public class AppSetupController {
+import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
+
+public class AppSetupController implements IController {
 }
