@@ -13,22 +13,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="837d3ee9-ac9b-4d92-975d-3cc0e66fbe14" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Controllers/IController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnViewBuilder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Services/DBConnectionService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/AddProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/AddProductController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/AddProductRecordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/AddProductRecordController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/AppSetupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/AppSetupController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DatabaseConnectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DatabaseConnectionController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/EvidentaProductie.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/EvidentaProductie.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/ExcelExportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/ExcelExportController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/ProductListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/ProductListController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/ProductRecordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/ProductRecordController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnViewBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnViewBuilder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,5 +135,12 @@
       <updated>1728885586482</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnModel" memberName="presentationModel" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
 </project>

@@ -23,6 +23,9 @@ public class DBConnViewBuilder extends Parent implements Builder<Region> {
     private final StringProperty connectionStatus = new SimpleStringProperty("Conectarea la baza de date.");
     private final Consumer<Runnable> actionHandler;
 
+    private Label lblConnectionStatus = new Label();
+    private VBox inputBox = new VBox(8);
+
     public DBConnViewBuilder(DBConnModel.PresentationModel viewModel, Consumer<Runnable> actionHandler) {
         this.viewModel = viewModel;
         this.actionHandler = actionHandler;
@@ -30,7 +33,6 @@ public class DBConnViewBuilder extends Parent implements Builder<Region> {
 
     @Override
     public Region build() {
-        VBox inputBox = new VBox(8);
         inputBox.getChildren().addAll(createInputBox(), createConnStatusLabel(),createConnButton());
         inputBox.setAlignment(Pos.CENTER);
         inputBox.setPadding(new Insets(20));
@@ -69,6 +71,7 @@ public class DBConnViewBuilder extends Parent implements Builder<Region> {
 
     private Node createConnButton() {
         Button button = new Button("Conectare");
+//        button.disableProperty().bind(viewModel.connSuccessProperty());
         button.setOnAction(event -> {
             button.setDisable(true);
             actionHandler.accept(() -> {
@@ -78,4 +81,11 @@ public class DBConnViewBuilder extends Parent implements Builder<Region> {
         return button;
     }
 
+    public void showError() {
+        lblConnectionStatus.textProperty().set("Nu a reusit conectarea la baza de date! Va rugam sa verificati credentialele de conectare si sa reincercati!");
+        System.out.println(inputBox.getChildren().size());
+        inputBox.getChildren().add(2, lblConnectionStatus);
+        System.out.println(inputBox.getChildren().size());
+
+    }
 }

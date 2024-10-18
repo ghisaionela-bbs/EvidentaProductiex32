@@ -68,11 +68,10 @@ public class EvidentaProductie extends Application {
 
     public void start(Stage stage) throws Exception {
         ConfigApp.check_config();
-
-        Scene scene = new Scene(new DBConnController().getView());
+        DBConnController dbConnController = new DBConnController();
+        Scene scene = new Scene(dbConnController.getView());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("stylesheet2.css")).toExternalForm());
         stage.setScene(scene);
-
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
@@ -84,7 +83,6 @@ public class EvidentaProductie extends Application {
             }
         });
         stage.show();
-
 
     }
 

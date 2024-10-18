@@ -1,5 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.DBConn;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
@@ -12,7 +14,7 @@ import java.util.function.Consumer;
 
 public class DBConnModel {
     private final PresentationModel presentationModel = new PresentationModel();
-    private String domainObject = "Connection not established";
+//    private String domainObject = "Connection not established";
 
     void connectToDatabase(BiConsumer<Long, Long> progressUpdater) {
         try {
@@ -25,10 +27,10 @@ public class DBConnModel {
             throw new RuntimeException(e);
         }
     }
-
-    void integrateComplicatedResults() {
-        presentationModel.setTheResult(domainObject);
-    }
+//
+//    void integrateComplicatedResults() {
+//        presentationModel.setConnSuccess(domainObject);
+//    }
 
     public PresentationModel getPresentationModel() {
         return presentationModel;
@@ -38,7 +40,7 @@ public class DBConnModel {
         private final StringProperty url = new SimpleStringProperty("");
         private final StringProperty username = new SimpleStringProperty("");
         private final StringProperty password = new SimpleStringProperty("");
-        private final StringProperty theResult = new SimpleStringProperty("");
+        private final BooleanProperty connSuccess = new SimpleBooleanProperty(true);
 
         public String getUrl() {
             return url.get();
@@ -76,8 +78,16 @@ public class DBConnModel {
             this.password.set(password);
         }
 
-        public void setTheResult(String theResult) {
-            this.theResult.set(theResult);
+        public void setConnSuccess(Boolean success) {
+            this.connSuccess.set(success);
+        }
+
+        public BooleanProperty connSuccessProperty() {
+            return connSuccess;
+        }
+
+        public Boolean getConnSuccess() {
+            return connSuccess.get();
         }
     }
 

@@ -27,10 +27,14 @@ public class DBConnController {
 
         taskDBConnect.setOnSucceeded(evt -> {
             System.out.println("success");
-
 //            model.getPresentationModel().passwordProperty().unbind();
 //            model.integrateComplicatedResults();
             postRunGUIAction.run();
+        });
+        taskDBConnect.setOnFailed(evt -> {
+            System.out.println("failed");
+            model.getPresentationModel().setConnSuccess(false);
+            view.showError();
         });
         Thread bigTaskThread = new Thread(taskDBConnect);
         bigTaskThread.start();
