@@ -13,15 +13,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class DBConnModel {
-    private final PresentationModel presentationModel = new PresentationModel();
-//    private String domainObject = "Connection not established";
-
     void connectToDatabase(BiConsumer<Long, Long> progressUpdater) {
         try {
-            DBConnectionService.connectToDatabase(presentationModel.getUrl(), presentationModel.getUsername(), presentationModel.getPassword());
-            ConfigApp.setConfig(CONFIG_KEY.DBURL.name(), presentationModel.getUrl());
-            ConfigApp.setConfig(CONFIG_KEY.DBUSER.name(), presentationModel.getUsername());
-            ConfigApp.setConfig(CONFIG_KEY.DBPASS.name(), presentationModel.getPassword());
+            DBConnectionService.connectToDatabase(getUrl(), getUsername(), getPassword());
+            ConfigApp.setConfig(CONFIG_KEY.DBURL.name(), getUrl());
+            ConfigApp.setConfig(CONFIG_KEY.DBUSER.name(), getUsername());
+            ConfigApp.setConfig(CONFIG_KEY.DBPASS.name(), getPassword());
             ConfigApp.write_config();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -31,65 +28,50 @@ public class DBConnModel {
 //    void integrateComplicatedResults() {
 //        presentationModel.setConnSuccess(domainObject);
 //    }
+    private final StringProperty url = new SimpleStringProperty("");
+    private final StringProperty username = new SimpleStringProperty("");
+    private final StringProperty password = new SimpleStringProperty("");
 
-    public PresentationModel getPresentationModel() {
-        return presentationModel;
+    public String getUrl() {
+        return url.get();
     }
 
-    public static class PresentationModel {
-        private final StringProperty url = new SimpleStringProperty("");
-        private final StringProperty username = new SimpleStringProperty("");
-        private final StringProperty password = new SimpleStringProperty("");
-        private final BooleanProperty connSuccess = new SimpleBooleanProperty(true);
-
-        public String getUrl() {
-            return url.get();
-        }
-
-        public StringProperty urlProperty() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url.set(url);
-        }
-
-        public String getUsername() {
-            return username.get();
-        }
-
-        public StringProperty usernameProperty() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username.set(username);
-        }
-
-        public String getPassword() {
-            return this.password.get();
-        }
-
-        public StringProperty passwordProperty() {
-            return this.password;
-        }
-
-        public void setPassword(String password) {
-            this.password.set(password);
-        }
-
-        public void setConnSuccess(Boolean success) {
-            this.connSuccess.set(success);
-        }
-
-        public BooleanProperty connSuccessProperty() {
-            return connSuccess;
-        }
-
-        public Boolean getConnSuccess() {
-            return connSuccess.get();
-        }
+    public StringProperty urlProperty() {
+        return url;
     }
 
+    public void setUrl(String url) {
+        this.url.set(url);
+    }
+
+    public String getUsername() {
+        return username.get();
+    }
+
+    public StringProperty usernameProperty() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username.set(username);
+    }
+
+    public String getPassword() {
+        return this.password.get();
+    }
+
+    public StringProperty passwordProperty() {
+        return this.password;
+    }
+
+    public void setPassword(String password) {
+        this.password.set(password);
+    }
+
+    public void setConnectionCredentials(String url, String username, String password) {
+        this.url.set(url);
+        this.username.set(username);
+        this.password.set(password);
+    }
 
 }

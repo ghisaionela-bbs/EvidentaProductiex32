@@ -1,0 +1,11 @@
+.root {
+    -fx-font-size: 1em;
+}
+
+.grid-conn {
+    -fx-vgap: 4;
+    -fx-hgap: 4;
+    -fx-alignment: center;}
+
+.vbox-conn {
+}

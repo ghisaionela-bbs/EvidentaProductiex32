@@ -23,6 +23,7 @@ import javafx.util.converter.LongStringConverter;
 import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.SceneFactory;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.io.IOException;
@@ -67,10 +68,12 @@ public class EvidentaProductie extends Application {
 
     public void start(Stage stage) throws Exception {
         ConfigApp.check_config();
-        DBConnController dbConnController = new DBConnController();
-        Scene scene = new Scene(dbConnController.getView());
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("stylesheet2.css")).toExternalForm());
-        stage.setScene(scene);
+        SceneFactory sceneFactory = new SceneFactory(stage);
+
+//        DBConnController dbConnController = new DBConnController();
+//        Scene scene = new Scene(dbConnController.getView());
+//        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
+//        stage.setScene(scene);
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {

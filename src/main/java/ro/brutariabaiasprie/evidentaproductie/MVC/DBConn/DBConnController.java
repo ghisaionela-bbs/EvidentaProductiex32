@@ -1,25 +1,36 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.DBConn;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
-public class DBConnController {
-    private final DBConnViewBuilder view;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+public class DBConnController implements SceneController {
+    private final DBConnView view;
     private final DBConnModel model = new DBConnModel();
+    private final BiConsumer<Runnable, SceneType> sceneSwitActionHandler;
 
-    public DBConnController() {
-        model.getPresentationModel().setUrl((String) ConfigApp.getConfig(CONFIG_KEY.DBURL.name()));
-        model.getPresentationModel().setUsername((String) ConfigApp.getConfig(CONFIG_KEY.DBUSER.name()));
-        model.getPresentationModel().setPassword((String) ConfigApp.getConfig(CONFIG_KEY.DBPASS.name()));
-        view = new DBConnViewBuilder(model.getPresentationModel(), this::connectToDatabase);
+    public DBConnController(BiConsumer<Runnable, SceneType> sceneSwitActionHandler) {
+        this.sceneSwitActionHandler = sceneSwitActionHandler;
+        model.setUrl((String) ConfigApp.getConfig(CONFIG_KEY.DBURL.name()));
+        model.setUsername((String) ConfigApp.getConfig(CONFIG_KEY.DBUSER.name()));
+        model.setPassword((String) ConfigApp.getConfig(CONFIG_KEY.DBPASS.name()));
+        view = new DBConnView(this::connectToDatabase);
+        view.setConnectionCredentials(model.getUrl(), model.getUsername(), model.getPassword());
+        view.setOnActionBtnConn(this::connectToDatabase);
     }
 
     private void connectToDatabase(Runnable postRunGUIAction) {
         Task<Void> taskDBConnect = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
+                model.setConnectionCredentials(view.getDBConnectionUrl(), view.getDBConnectionUsername(), view.getDBConnectionPassword());
                 model.connectToDatabase(this::updateProgress);
                 return null;
             }
@@ -27,14 +38,25 @@ public class DBConnController {
 
         taskDBConnect.setOnSucceeded(evt -> {
             System.out.println("success");
-//            model.getPresentationModel().passwordProperty().unbind();
+            view.connectionStatus.set("Success.");
+            sceneSwitActionHandler.accept(() -> {}, SceneType.PRODUCTION);
 //            model.integrateComplicatedResults();
             postRunGUIAction.run();
         });
         taskDBConnect.setOnFailed(evt -> {
+            view.connectionStatus.set("A existat o eroare la conectare! Verificati credentialele de conectare si incercati din nou.");
             System.out.println("failed");
-            model.getPresentationModel().setConnSuccess(false);
-            view.showError();
+        });
+        taskDBConnect.setOnCancelled(evt -> {
+            System.out.println("cancelled");
+        });
+        taskDBConnect.setOnRunning(evt -> {
+            System.out.println("running");
+            view.connectionStatus.set("Se incearca conectarea la baza de date");
+        });
+        taskDBConnect.setOnScheduled(evt -> {
+            System.out.println("scheduled");
+            view.connectionStatus.set("Start");
         });
         Thread bigTaskThread = new Thread(taskDBConnect);
         bigTaskThread.start();
