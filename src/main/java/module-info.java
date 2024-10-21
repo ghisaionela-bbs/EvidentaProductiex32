@@ -11,7 +11,6 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires jxl;
     requires com.fasterxml.jackson.databind;
     requires java.sql;
-    requires org.jetbrains.annotations;
     requires java.desktop;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;

@@ -20,7 +20,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.util.converter.LongStringConverter;
-import org.jetbrains.annotations.NotNull;
 import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnController;
