@@ -1,13 +1,11 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.Production;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Calendar;
 
@@ -43,7 +41,6 @@ public class ProductionModel {
             String sql = "SELECT ip.ID, p.denumire, p.um, ip.cantitate, ip.datasiora FROM [dbo].[INREGISTRARI_PRODUSE] AS ip " +
                     "JOIN [dbo].[PRODUSE] AS p ON ip.ID_PRODUS = p.ID ORDER BY ip.datasiora DESC";
             Statement statement = connection.createStatement();
-            System.out.println(sql);
             ResultSet resultSet = statement.executeQuery(sql);
 
             productRecords.clear();

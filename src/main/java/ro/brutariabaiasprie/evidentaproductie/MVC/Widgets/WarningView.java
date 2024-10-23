@@ -12,7 +12,9 @@ import javafx.util.Builder;
 
 import java.util.function.Consumer;
 
-
+/**
+ * Widget for creating warning scenes
+ */
 public class WarningView extends Parent implements Builder<Region> {
     private final String message;
     private Consumer<Runnable> actionHandler;

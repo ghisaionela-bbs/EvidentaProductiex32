@@ -10,9 +10,10 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires org.apache.poi.ooxml;
     requires jxl;
     requires com.fasterxml.jackson.databind;
-    requires java.sql;
     requires java.desktop;
     requires org.dhatim.fastexcel.reader;
+    requires org.apache.logging.log4j;
+    requires java.sql;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie;
@@ -20,4 +21,6 @@ module ro.brutariabaiasprie.evidentaproductie {
     opens ro.brutariabaiasprie.evidentaproductie.DTO to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie.Data;
     opens ro.brutariabaiasprie.evidentaproductie.Data to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie.MVC;
+    opens ro.brutariabaiasprie.evidentaproductie.MVC to javafx.fxml;
 }

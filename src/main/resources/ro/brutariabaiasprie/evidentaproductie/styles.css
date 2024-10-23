@@ -42,3 +42,32 @@
 .den-prod-record-list-cell {
     -fx-font-weight: bold;
 }
+
+/*
+.tbl-product-record-view .column-header-background {
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+*/
+.tbl-product-record-view .table-cell {
+    -fx-padding: 10;
+    -fx-alignment: CENTER-RIGHT;
+}
+/*
+.tbl-product-record-view .table-row-cell:filled:focused:selected {
+    -fx-background-color: brown;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background: -fx-accent;
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-fill: white;
+}*/
+
+.tbl-product-record-view .table-row-cell:filled:focused:selected .text {
+    -fx-fill: -fx-selection-bar-text;
+}
+
+/*
+.tbl-product-record-view:row-selection .table-row-cell:filled:hover {
+    -fx-background-color: LIGHTSTEELBLUE;
+}*/

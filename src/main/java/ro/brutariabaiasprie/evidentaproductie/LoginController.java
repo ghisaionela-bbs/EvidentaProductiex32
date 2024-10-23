@@ -6,7 +6,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
@@ -17,7 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class LoginController implements IController {
+public class LoginController {
     Connection connection;
     Stage stage;
     private Parent root;
@@ -53,11 +52,19 @@ public class LoginController implements IController {
             }
 
             resultSet.next();
+            int ID = resultSet.getInt("ID");
+            int ID_ROLE = resultSet.getInt("ID_ROL");
             User user = new User();
-            user.setID(resultSet.getInt("ID"));
-            user.setUsername(resultSet.getString("nume_utilizator"));
-            user.setPassword(resultSet.getString("parola"));
-            user.setID_ROLE(resultSet.getInt("ID_ROL"));
+            user.setID(ID);
+            user.setID_ROLE(ID_ROLE);
+            user.setUsername(username);
+            user.setPassword(password);
+
+//            User user = new User();
+//            user.setID(resultSet.getInt("ID"));
+//            user.setUsername(resultSet.getString("nume_utilizator"));
+//            user.setPassword(resultSet.getString("parola"));
+//            user.setID_ROLE(resultSet.getInt("ID_ROL"));
 
             ConfigApp.setConfig(CONFIG_KEY.APPUSER.name(), user);
             ConfigApp.write_config();

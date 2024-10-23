@@ -7,22 +7,23 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
-import javafx.stage.Modality;
+import javafx.scene.text.Text;
+
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
-import ro.brutariabaiasprie.evidentaproductie.MVC.Widgets.WarningView;
+import ro.brutariabaiasprie.evidentaproductie.MVC.Widgets.WarningController;
 
-import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Objects;
+
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -257,40 +258,29 @@ public class ProductionView extends Parent implements Builder<Region> {
                     }
                     txtFldQuantity.setText(quantity.substring(0, quantity.length() - 1));
                 } else if ("Adauga +".equals(value)) {
-                    //Handle wargning screen for no product selected
+                    //Handle warning screen for no product selected
                     if(selectedProduct == null) {
-                        Stage warningStage = new Stage();
-                        WarningView warningView = new WarningView("Selectati produsul pentru care doriti sa adaugati inregistrarea!",
-                                new Consumer<Runnable>() {
-                                    @Override
-                                    public void accept(Runnable runnable) {
-                                        warningStage.close();
-                                    }
-                                });
-                        Scene warningScene = new Scene(warningView.build());
-                        warningScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
-
-                        warningStage.setTitle("Atentie!");
-                        warningStage.setScene(warningScene);
-                        warningStage.initOwner(stage);
-                        warningStage.initModality(Modality.APPLICATION_MODAL);
-                        warningStage.showAndWait();
-
-
-
+                        WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
+                        return;
                     }
                     //Handle warning for no quantity entered
-                    if(!(txtFldQuantity.getText().isEmpty() || txtFldQuantity.getText() == null)
-                            && selectedProduct != null) {
-                        Dictionary<String, Object> data = new Hashtable<>();
-                        data.put("product", selectedProduct);
-                        data.put("quantity", Double.valueOf(txtFldQuantity.getText()));
-
-                        leftSection.setDisable(true);
-                        productRecordAddActionHandler.accept(() -> {
-                            leftSection.setDisable(false);
-                        }, data);
+                    if(txtFldQuantity.getText().isEmpty() || txtFldQuantity.getText() == null) {
+                        WarningController warningController = new WarningController(stage, "Introduceti cantitatea pentru produsul:\n" + selectedProduct.getName());
+                        return;
                     }
+                    double quantity = Double.parseDouble(txtFldQuantity.getText());
+                    if(quantity <= 0) {
+                        WarningController warningController = new WarningController(stage, "Cantitatea trebuie sa fie mai mare de 0!");
+                        return;
+                    }
+                    //Add the product record
+                    Dictionary<String, Object> data = new Hashtable<>();
+                    data.put("product", selectedProduct);
+                    data.put("quantity", quantity);
+                    leftSection.setDisable(true);
+                    productRecordAddActionHandler.accept(() -> {
+                        leftSection.setDisable(false);
+                    }, data);
                 }
             }
         };
@@ -347,6 +337,87 @@ public class ProductionView extends Parent implements Builder<Region> {
     private TableView<ProductRecordDTO> createProductRecordTableView() {
         TableView<ProductRecordDTO> tableView = new TableView<>();
 
+        tableView.setPlaceholder(new Label("Nu exista inregistrari in baza de date."));
+
+        TableColumn<ProductRecordDTO, String> nameColumn = new TableColumn<>("Produs");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameColumn.setCellFactory(column -> {
+            TableCell<ProductRecordDTO, String> cell = new TableCell<ProductRecordDTO, String>()  {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if(empty) {
+                        setText(null);
+                    }
+                    else {
+                        Text txtName = new Text(item);
+                        txtName.getStyleClass().add("text");
+                        txtName.wrappingWidthProperty().bind(widthProperty());
+                        setGraphic(txtName);
+                        setWrapText(true);
+                        setText(item);
+                    }
+                }
+            };
+            return cell;
+        });
+        tableView.getColumns().add(nameColumn);
+
+        TableColumn<ProductRecordDTO, Double> quantityColumn = new TableColumn<>("Cantitate");
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        quantityColumn.setCellFactory(column -> {
+            TableCell<ProductRecordDTO, Double> cell = new TableCell<ProductRecordDTO, Double>()  {
+                @Override
+                protected void updateItem(Double item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if(empty) {
+                        setText(null);
+                    }
+                    else {
+                        setText(String.format("%.2f", item));
+                    }
+                }
+            };
+            return cell;
+        });
+        tableView.getColumns().add(quantityColumn);
+
+        TableColumn<ProductRecordDTO, String> unitMeasurementColumn = new TableColumn<>("UM");
+        unitMeasurementColumn.setCellValueFactory(new PropertyValueFactory<>("unitMeasurement"));
+        tableView.getColumns().add(unitMeasurementColumn);
+
+        TableColumn<ProductRecordDTO, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
+        dateAndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateAndTime"));
+        quantityColumn.setPrefWidth(100);
+        dateAndTimeColumn.setCellFactory(column -> {
+            TableCell<ProductRecordDTO, Timestamp> cell = new TableCell<ProductRecordDTO, Timestamp>() {
+                private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                @Override
+                protected void updateItem(Timestamp item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if(empty) {
+                        setText(null);
+                    }
+                    else {
+                        setText(format.format(item));
+                    }
+                }
+            };
+
+            return cell;
+        });
+        tableView.getColumns().add(dateAndTimeColumn);
+
+        tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40); // 40% width
+        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 25 ); // 30% width
+        unitMeasurementColumn.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
+        dateAndTimeColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 25 ); // 50% width
+
+
+        tableView.getStyleClass().add("tbl-product-record-view");
+        tableView.setItems(model.getProductRecords());
+
         return tableView;
     }
 
@@ -367,7 +438,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                             Label lblProductName = new Label(item.getName());
                             lblProductName.getStyleClass().add("den-prod-record-list-cell");
                             lblProductName.setWrapText(true);
-                            lblProductName.maxWidthProperty().bind(stage.widthProperty().divide(3.5));
+                            lblProductName.maxWidthProperty().bind(widthProperty().subtract(20));
                             Label lblProductDetails = new Label(item.getUnitMeasurement());
                             VBox container = new VBox();
                             container.getChildren().addAll(lblProductName, lblProductDetails);
@@ -375,7 +446,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                             container.setPadding(new Insets(10));
                             setText(null);
                             setGraphic(container);
-
+                            prefWidthProperty().bind(listView.widthProperty().subtract(20));
                         }
                     }
                 };
@@ -418,18 +489,19 @@ public class ProductionView extends Parent implements Builder<Region> {
         leftSection = new VBox(btnProductChoice, txtFldQuantity, numpad);
 //        leftSection.prefWidthProperty().bind(window.widthProperty().multiply(0.25));
         VBox.setVgrow(numpad, Priority.ALWAYS);
-        ListView<ProductRecordDTO> listView = createProductRecordListView();
-        listView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        leftSection.setMaxWidth(Region.USE_COMPUTED_SIZE);
-        leftSection.prefWidthProperty().bind(stage.widthProperty().divide(3));
-        leftSection.prefHeightProperty().bind(stage.widthProperty());
-        listView.maxWidthProperty().bind(stage.widthProperty().divide(3/2));
+//        ListView<ProductRecordDTO> listView = createProductRecordListView();
+//        listView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+//        leftSection.setMaxWidth(Region.USE_COMPUTED_SIZE);
+//        listView.maxWidthProperty().bind(stage.widthProperty().divide(3/2));
 
         lstViewProducts = createProductListView();
         lstViewProducts.maxWidthProperty().bind(stage.widthProperty().divide(3));
 
+        TableView<ProductRecordDTO> tableView = createProductRecordTableView();
+
         root.setLeft(leftSection);
-        root.setCenter(listView);
+//        root.setCenter(listView);
+        root.setCenter(tableView);
         root.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
         return root;
     }

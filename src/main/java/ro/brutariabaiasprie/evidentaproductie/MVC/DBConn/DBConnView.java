@@ -3,7 +3,6 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.DBConn;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -13,13 +12,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Builder;
+import ro.brutariabaiasprie.evidentaproductie.MVC.Widgets.WarningController;
 
 import java.util.function.Consumer;
 
+/**
+ * The view for the database connection scene
+ */
 public class DBConnView extends Parent implements Builder<Region> {
 //    private final DBConnModel model;
-    public final StringProperty connectionStatus = new SimpleStringProperty("Conectarea la baza de date.");
+    public final StringProperty connectionStatus = new SimpleStringProperty();
     private final Consumer<Runnable> actionHandler;
 
     private final VBox root = new VBox(8);
@@ -30,11 +34,21 @@ public class DBConnView extends Parent implements Builder<Region> {
     private Button btnConn = new Button();
     private final Label lblConnectionStatus = new Label();
     private GridPane inputBox = new GridPane();
+    private Stage stage;
 
-    public DBConnView(Consumer<Runnable> actionHandler) {
+    /**
+     * Constructs a DBConnView instance
+     * @param actionHandler - consumer for the connection action
+     */
+    public DBConnView(Stage stage, Consumer<Runnable> actionHandler) {
         this.actionHandler = actionHandler;
+        this.stage = stage;
     }
 
+    /**
+     * Builds the view
+     * @return the view
+     */
     @Override
     public Region build() {
         root.getChildren().addAll(createInputBox(), createConnStatusLabel(),createConnButton());
@@ -96,18 +110,14 @@ public class DBConnView extends Parent implements Builder<Region> {
     public void setOnActionBtnConn(Consumer<Runnable> actionHandler) {
         Platform.runLater(() -> {
             btnConn.setOnAction(event -> {
-                inputBox.setDisable(true);
-                btnConn.setDisable(true);
+//                inputBox.setDisable(true);
 //                btnConn.setDisable(true);
                 actionHandler.accept(() -> {
-                    inputBox.setDisable(false);
-                    btnConn.setDisable(false);
-
+//                    inputBox.setDisable(false);
 //                    btnConn.setDisable(false);
                 });
             });
         });
-
     }
 
     public void setConnectionCredentials(String url, String username, String password) {
@@ -119,11 +129,7 @@ public class DBConnView extends Parent implements Builder<Region> {
     }
 
     public void showError() {
-        lblConnectionStatus.textProperty().set("Nu a reusit conectarea la baza de date! Va rugam sa verificati credentialele de conectare si sa reincercati!");
-        System.out.println(inputBox.getChildren().size());
-        inputBox.getChildren().add(2, lblConnectionStatus);
-        System.out.println(inputBox.getChildren().size());
-
+        WarningController warningController = new WarningController(stage, "Conectarea la baza de date a esuat!\nVa rugam sa verificati credentialele de conectare si sa reincercati!");
     }
 
     public String getDBConnectionUrl() {
@@ -136,5 +142,9 @@ public class DBConnView extends Parent implements Builder<Region> {
 
     public String getDBConnectionPassword() {
         return txtFldPassword.getText();
+    }
+
+    public void fireConnectButton() {
+        btnConn.fire();
     }
 }

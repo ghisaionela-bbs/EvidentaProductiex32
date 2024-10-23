@@ -15,12 +15,12 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 import java.util.Dictionary;
 import java.util.function.BiConsumer;
 
-public class ProductionController extends Parent implements SceneController {
+public class ProductionController implements SceneController {
     private final ProductionView view;
     private final ProductionModel model = new ProductionModel();
     private final BiConsumer<Runnable, SceneType> sceneSwitActionHandler;
 
-    public ProductionController(BiConsumer<Runnable, SceneType> sceneSwitActionHandler, Stage window) {
+    public ProductionController(Stage window, BiConsumer<Runnable, SceneType> sceneSwitActionHandler) {
         model.loadProductRecords();
         this.view = new ProductionView(model, window, this::loadProducts, this::addProductRecordToDB);
         this.sceneSwitActionHandler = sceneSwitActionHandler;

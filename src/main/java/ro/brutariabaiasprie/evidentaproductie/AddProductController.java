@@ -5,9 +5,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 
-public class AddProductController implements IController {
+public class AddProductController  {
     @FXML
     TextField txtFldProductName;
 

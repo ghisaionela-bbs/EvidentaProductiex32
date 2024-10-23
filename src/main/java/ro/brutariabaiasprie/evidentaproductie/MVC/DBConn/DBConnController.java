@@ -1,10 +1,14 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.DBConn;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
+import javafx.stage.Stage;
+import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.SceneFactory;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
 import java.util.function.BiConsumer;
@@ -12,16 +16,20 @@ import java.util.function.BiConsumer;
 public class DBConnController implements SceneController {
     private final DBConnView view;
     private final DBConnModel model = new DBConnModel();
-    private final BiConsumer<Runnable, SceneType> sceneSwitActionHandler;
+    private final BiConsumer<Runnable, SceneType> sceneSwitchActionHandler;
 
-    public DBConnController(BiConsumer<Runnable, SceneType> sceneSwitActionHandler) {
-        this.sceneSwitActionHandler = sceneSwitActionHandler;
+    public DBConnController(Stage stage, BiConsumer<Runnable, SceneType> sceneSwitchActionHandler) {
+        this.sceneSwitchActionHandler = sceneSwitchActionHandler;
         model.setUrl((String) ConfigApp.getConfig(CONFIG_KEY.DBURL.name()));
         model.setUsername((String) ConfigApp.getConfig(CONFIG_KEY.DBUSER.name()));
         model.setPassword((String) ConfigApp.getConfig(CONFIG_KEY.DBPASS.name()));
-        view = new DBConnView(this::connectToDatabase);
+        view = new DBConnView(stage, this::connectToDatabase);
         view.setConnectionCredentials(model.getUrl(), model.getUsername(), model.getPassword());
         view.setOnActionBtnConn(this::connectToDatabase);
+
+        if(model.getUrl() != null && model.getUsername() != null && model.getPassword() != null) {
+            Platform.runLater(view::fireConnectButton);
+        }
     }
 
     private void connectToDatabase(Runnable postRunGUIAction) {
@@ -29,7 +37,7 @@ public class DBConnController implements SceneController {
             @Override
             protected Void call() throws Exception {
                 model.setConnectionCredentials(view.getDBConnectionUrl(), view.getDBConnectionUsername(), view.getDBConnectionPassword());
-                model.connectToDatabase(this::updateProgress);
+                model.connectToDatabase();
                 return null;
             }
         };
@@ -37,12 +45,14 @@ public class DBConnController implements SceneController {
         taskDBConnect.setOnSucceeded(evt -> {
 //            System.out.println("success");
             view.connectionStatus.set("Success.");
-            sceneSwitActionHandler.accept(() -> {}, SceneType.PRODUCTION);
+            sceneSwitchActionHandler.accept(() -> {}, SceneType.USERCONN);
 //            model.integrateComplicatedResults();
             postRunGUIAction.run();
         });
         taskDBConnect.setOnFailed(evt -> {
-            view.connectionStatus.set("A existat o eroare la conectare! Verificati credentialele de conectare si incercati din nou.");
+            view.showError();
+            view.connectionStatus.set("");
+            postRunGUIAction.run();
 //            System.out.println("failed");
         });
         taskDBConnect.setOnCancelled(evt -> {

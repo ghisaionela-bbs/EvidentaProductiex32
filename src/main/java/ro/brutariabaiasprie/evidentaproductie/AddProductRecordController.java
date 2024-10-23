@@ -12,7 +12,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
@@ -33,7 +32,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AddProductRecordController implements IController {
+public class AddProductRecordController  {
     Connection connection;
     ProductDTO productDTO;
     Stage stage;
@@ -141,7 +140,6 @@ public class AddProductRecordController implements IController {
         tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
         quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 50 ); // 50% width
         dateAndTimeColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 50 ); // 50% width
-
     }
 
     public void loadTableView() {

@@ -4,11 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
-
 import java.time.LocalDate;
 
-public class ExcelExportController implements IController {
+public class ExcelExportController {
     Boolean export = false;
 
     @FXML
