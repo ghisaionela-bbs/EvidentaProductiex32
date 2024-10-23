@@ -12,6 +12,7 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires com.fasterxml.jackson.databind;
     requires java.sql;
     requires java.desktop;
+    requires org.dhatim.fastexcel.reader;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie;

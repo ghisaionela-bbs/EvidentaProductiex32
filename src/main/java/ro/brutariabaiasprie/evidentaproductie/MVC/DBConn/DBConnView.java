@@ -22,16 +22,16 @@ public class DBConnView extends Parent implements Builder<Region> {
     public final StringProperty connectionStatus = new SimpleStringProperty("Conectarea la baza de date.");
     private final Consumer<Runnable> actionHandler;
 
+    private final VBox root = new VBox(8);
+
     private TextField txtFldUrl = new TextField();
     private TextField txtFldUsername = new TextField();
     private TextField txtFldPassword = new TextField();
     private Button btnConn = new Button();
     private final Label lblConnectionStatus = new Label();
-    private final VBox root = new VBox(8);
     private GridPane inputBox = new GridPane();
 
     public DBConnView(Consumer<Runnable> actionHandler) {
-//        this.model = viewModel;
         this.actionHandler = actionHandler;
     }
 
@@ -39,7 +39,6 @@ public class DBConnView extends Parent implements Builder<Region> {
     public Region build() {
         root.getChildren().addAll(createInputBox(), createConnStatusLabel(),createConnButton());
         root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(20));
         root.getStyleClass().add("vbox-conn");
         return root;
     }

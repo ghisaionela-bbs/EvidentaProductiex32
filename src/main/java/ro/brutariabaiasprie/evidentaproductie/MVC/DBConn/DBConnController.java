@@ -1,6 +1,5 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.DBConn;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
@@ -9,7 +8,6 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class DBConnController implements SceneController {
     private final DBConnView view;
@@ -37,7 +35,7 @@ public class DBConnController implements SceneController {
         };
 
         taskDBConnect.setOnSucceeded(evt -> {
-            System.out.println("success");
+//            System.out.println("success");
             view.connectionStatus.set("Success.");
             sceneSwitActionHandler.accept(() -> {}, SceneType.PRODUCTION);
 //            model.integrateComplicatedResults();
@@ -45,21 +43,21 @@ public class DBConnController implements SceneController {
         });
         taskDBConnect.setOnFailed(evt -> {
             view.connectionStatus.set("A existat o eroare la conectare! Verificati credentialele de conectare si incercati din nou.");
-            System.out.println("failed");
+//            System.out.println("failed");
         });
         taskDBConnect.setOnCancelled(evt -> {
             System.out.println("cancelled");
         });
         taskDBConnect.setOnRunning(evt -> {
-            System.out.println("running");
+//            System.out.println("running");
             view.connectionStatus.set("Se incearca conectarea la baza de date");
         });
         taskDBConnect.setOnScheduled(evt -> {
-            System.out.println("scheduled");
+//            System.out.println("scheduled");
             view.connectionStatus.set("Start");
         });
-        Thread bigTaskThread = new Thread(taskDBConnect);
-        bigTaskThread.start();
+        Thread dbTaskThread = new Thread(taskDBConnect);
+        dbTaskThread.start();
     }
 
     public Region getView() {

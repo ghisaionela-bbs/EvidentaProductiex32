@@ -15,32 +15,30 @@ import java.util.Scanner;
 public class ConfigApp {
     public static Map<String, Object> configuration = new Hashtable<>();
     private static File fileConfig;
-    private static String fileConfigPath = "\\configApp.txt";
+    private static String fileConfigPath = System.getProperty("user.dir") + "\\configApp.txt";
 
     public static void check_config() {
-        fileConfigPath = System.getProperty("user.dir") + fileConfigPath;
-
         try {
-            System.out.println("check config");
+//            System.out.println("check config");
             fileConfig = new File(fileConfigPath);
             if (fileConfig.createNewFile()) {
                 init_default_config();
                 write_config();
             } else {
-                System.out.println(fileConfig.getCanonicalPath());
+//                System.out.println(fileConfig.getCanonicalPath());
                 read_config();
-                System.out.println("File already exists.");
+//                System.out.println("File already exists.");
             }
 
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+//            System.out.println("An error occurred.");
             e.printStackTrace();
         }
     }
 
     public static void read_config() {
         try {
-            System.out.println("read config");
+//            System.out.println("read config");
             Scanner myReader = new Scanner(fileConfig);
             while (myReader.hasNextLine()) {
                 String line = myReader.nextLine();
@@ -56,7 +54,7 @@ public class ConfigApp {
             }
             myReader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
+//            System.out.println("An error occurred.");
             e.printStackTrace();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -65,7 +63,7 @@ public class ConfigApp {
 
     public static void write_config() {
         try {
-            System.out.println("write config");
+//            System.out.println("write config");
             FileWriter myWriter = new FileWriter(fileConfigPath);
             for (Map.Entry<String, Object> entry : configuration.entrySet()) {
                 String key = entry.getKey();
@@ -78,9 +76,9 @@ public class ConfigApp {
                 }
             }
             myWriter.close();
-            System.out.println("Successfully wrote to the file.");
+//            System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+//            System.out.println("An error occurred.");
             e.printStackTrace();
         }
     }
@@ -105,9 +103,5 @@ public class ConfigApp {
 
     public static void deleteConfig(String key) {
         configuration.remove(key);
-    }
-
-    public enum CONFIG_KEY {
-
     }
 }

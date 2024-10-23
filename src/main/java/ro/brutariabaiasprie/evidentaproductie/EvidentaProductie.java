@@ -1,36 +1,13 @@
 package ro.brutariabaiasprie.evidentaproductie;
 
-import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.*;
-import javafx.concurrent.Task;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Duration;
-import javafx.util.converter.LongStringConverter;
 import ro.brutariabaiasprie.evidentaproductie.Controllers.IController;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
-import ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.SceneFactory;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
-
-import java.io.IOException;
-import java.sql.*;
-import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class EvidentaProductie extends Application {
     Stage stage;
@@ -69,23 +46,6 @@ public class EvidentaProductie extends Application {
     public void start(Stage stage) throws Exception {
         ConfigApp.check_config();
         SceneFactory sceneFactory = new SceneFactory(stage);
-
-//        DBConnController dbConnController = new DBConnController();
-//        Scene scene = new Scene(dbConnController.getView());
-//        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
-//        stage.setScene(scene);
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent t) {
-                if(DBConnectionService.getConnection() != null) {
-                    DBConnectionService.close();
-                }
-                Platform.exit();
-                System.exit(0);
-            }
-        });
-        stage.show();
-
     }
 
     public static void main(String[] args) {

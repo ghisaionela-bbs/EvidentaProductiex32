@@ -1,5 +1,6 @@
 .root {
-    -fx-font-size: 1em;
+    -fx-font-size: 2em;
+    -fx-padding: 20;
 }
 
 .grid-conn {
@@ -8,4 +9,36 @@
     -fx-alignment: center;}
 
 .vbox-conn {
+}
+
+.aaaa {
+    -fx-font-size: 70;
+}
+
+.lbl-sel-prod {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.lbl-sel-prod-sub {
+    -fx-text-fill: blue;
+    -fx-font-color: blue;
+}
+
+.arrow-icon-sel-prod {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+}
+
+.txt-fld-quantity {
+    -fx-font-size: 2.5em;
+    -fx-padding: 0.5em;
+}
+
+.numpad .button {
+    -fx-font-size: 2em;
+}
+
+.den-prod-record-list-cell {
+    -fx-font-weight: bold;
 }

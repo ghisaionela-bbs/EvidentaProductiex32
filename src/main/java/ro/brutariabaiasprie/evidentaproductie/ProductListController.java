@@ -132,7 +132,8 @@ public class ProductListController implements IController {
             while (resultSet.next()) {
                 int productID = resultSet.getInt("ID");
                 String name = resultSet.getString("denumire");
-                ProductDTO product = new ProductDTO(productID, name);
+                String unitMeasurement = resultSet.getString("um");
+                ProductDTO product = new ProductDTO(productID, name, unitMeasurement);
                 listView.getItems().add(product);
             }
 

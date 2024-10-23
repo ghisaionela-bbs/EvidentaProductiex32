@@ -163,7 +163,7 @@ public class AddProductRecordController implements IController {
                 String name = resultSet.getString("denumire");
                 double quantity = resultSet.getDouble("cantitate");
                 Timestamp dateAndTime = resultSet.getTimestamp("datasiora");
-                ProductRecordDTO productRecordDTO = new ProductRecordDTO(productId, name, quantity, dateAndTime);
+                ProductRecordDTO productRecordDTO = new ProductRecordDTO(productId, name, "", quantity, dateAndTime);
                 tableView.getItems().add(productRecordDTO);
             }
         } catch (SQLException e) {
