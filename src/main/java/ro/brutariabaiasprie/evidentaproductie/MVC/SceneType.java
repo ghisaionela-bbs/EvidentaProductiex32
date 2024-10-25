@@ -4,6 +4,8 @@ public enum SceneType {
     DBCONN,
     USERCONN,
     PRODUCTION,
-    DASHBOARD,
-    DEFAULT
+    MANAGER,
+    MAIN_WINDOW,
+    DEFAULT,
+    ACCOUNT
 }

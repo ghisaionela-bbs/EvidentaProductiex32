@@ -14,6 +14,7 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires org.dhatim.fastexcel.reader;
     requires org.apache.logging.log4j;
     requires java.sql;
+    requires jdk.compiler;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie;
@@ -23,4 +24,6 @@ module ro.brutariabaiasprie.evidentaproductie {
     opens ro.brutariabaiasprie.evidentaproductie.Data to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie.MVC;
     opens ro.brutariabaiasprie.evidentaproductie.MVC to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie.MVC.Account;
+    opens ro.brutariabaiasprie.evidentaproductie.MVC.Account to javafx.fxml;
 }

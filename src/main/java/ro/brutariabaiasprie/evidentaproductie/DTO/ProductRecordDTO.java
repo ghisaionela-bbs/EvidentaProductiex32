@@ -3,18 +3,26 @@ package ro.brutariabaiasprie.evidentaproductie.DTO;
 import java.sql.Timestamp;
 
 public class ProductRecordDTO {
-    private int id;
+    private int ID;
     private String name;
     private String unitMeasurement;
     private double quantity;
-    private Timestamp dateAndTime;
+    private Timestamp dateAndTimeInserted;
 
-    public int getId() {
-        return id;
+    public ProductRecordDTO(int ID, String name, String unitMeasurement, double quantity, Timestamp dateAndTimeInserted) {
+        this.ID = ID;
+        this.name = name;
+        this.unitMeasurement = unitMeasurement;
+        this.quantity = quantity;
+        this.dateAndTimeInserted = dateAndTimeInserted;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
     public String getName() {
@@ -41,30 +49,22 @@ public class ProductRecordDTO {
         this.quantity = quantity;
     }
 
-    public Timestamp getDateAndTime() {
-        return dateAndTime;
+    public Timestamp getDateAndTimeInserted() {
+        return dateAndTimeInserted;
     }
 
-    public void setDateAndTime(Timestamp dateAndTime) {
-        this.dateAndTime = dateAndTime;
-    }
-
-    public ProductRecordDTO(int id, String name, String unitMeasurement, double quantity, Timestamp dateAndTime) {
-        this.id = id;
-        this.name = name;
-        this.unitMeasurement = unitMeasurement;
-        this.quantity = quantity;
-        this.dateAndTime = dateAndTime;
+    public void setDateAndTimeInserted(Timestamp dateAndTimeInserted) {
+        this.dateAndTimeInserted = dateAndTimeInserted;
     }
 
     @Override
     public String toString() {
         return "ProductRecordDTO{" +
-                "id=" + id +
+                "ID=" + ID +
                 ", name='" + name + '\'' +
                 ", unitMeasurement='" + unitMeasurement + '\'' +
                 ", quantity=" + quantity +
-                ", dateAndTime=" + dateAndTime +
+                ", dateAndTimeInserted=" + dateAndTimeInserted +
                 '}';
     }
 }

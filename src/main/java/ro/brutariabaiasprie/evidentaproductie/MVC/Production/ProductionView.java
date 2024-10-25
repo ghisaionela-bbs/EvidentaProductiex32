@@ -17,6 +17,9 @@ import javafx.util.Builder;
 import javafx.util.Callback;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Widgets.WarningController;
 
 import java.sql.Timestamp;
@@ -34,13 +37,16 @@ public class ProductionView extends Parent implements Builder<Region> {
     private final BiConsumer<Runnable, Dictionary<String, Object>> productRecordAddActionHandler;
     private ProductionModel model;
     private Stage stage;
+    private User user;
 
-    private final BorderPane root = new BorderPane();
+//    private final BorderPane root = new BorderPane();
+    private HBox root;
     private Label lblSelectedProductName;
     private TextField txtFldQuantity;
     private GridPane numpad;
     private VBox leftSection;
     private ListView<ProductDTO> lstViewProducts;
+    private Label arrowIcon;
 
     private ProductDTO selectedProduct;
 
@@ -50,32 +56,53 @@ public class ProductionView extends Parent implements Builder<Region> {
         this.productRecordAddActionHandler = productRecordAddActionHandler;
         this.model = model;
         this.stage = stage;
+        this.user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+    }
+
+    @Override
+    public Region build() {
+        Button btnProductChoice = createBtnProductChoice();
+        txtFldQuantity = createQuantityField();
+
+        numpad = createNumpad();
+        leftSection = new VBox(btnProductChoice, txtFldQuantity, numpad);
+
+        btnProductChoice.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
+        txtFldQuantity.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
+
+
+        VBox.setVgrow(numpad, Priority.ALWAYS);
+        lstViewProducts = createProductListView();
+        lstViewProducts.maxWidthProperty().bind(stage.widthProperty().divide(3));
+        TableView<ProductRecordDTO> tableView = createProductRecordTableView();
+        tableView.setMaxSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        HBox.setHgrow(tableView, Priority.ALWAYS);
+
+        root = new HBox();
+        root.getChildren().addAll(leftSection, tableView);
+        return root;
+    }
+
+    public Region getRoot() {
+        return root;
     }
 
     private Button createBtnProductChoice() {
-        HBox contentOfBtnProductChoice = new HBox();
-        VBox textContent = new VBox();
-
         lblSelectedProductName = new Label("Nici un produs selectat");
         lblSelectedProductName.getStyleClass().add("lbl-sel-prod");
         lblSelectedProductName.setWrapText(true);
         lblSelectedProductName.prefWidthProperty().bind(stage.widthProperty().divide(3.5));
-        textContent.getChildren().add(lblSelectedProductName);
 
-        Label lblSelectAnotherProduct = new Label("Selecteaza un alt produs >>");
-        lblSelectAnotherProduct.getStyleClass().add("lbl-sel-prod-sub");
-        textContent.getChildren().add(lblSelectAnotherProduct);
-        contentOfBtnProductChoice.getChildren().add(textContent);
-        contentOfBtnProductChoice.fillHeightProperty().set(false);
+        arrowIcon = new Label("▼");
+        arrowIcon.setAlignment(Pos.CENTER_RIGHT);
 
-        Label lblArrowIcon = new Label("▼");
-        lblArrowIcon.getStyleClass().add("arrow-icon-sel-prod");
-        contentOfBtnProductChoice.getChildren().add(lblArrowIcon);
-        contentOfBtnProductChoice.setFillHeight(false);
-        contentOfBtnProductChoice.setPrefHeight(0);
+
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().addAll(lblSelectedProductName, arrowIcon);
+        StackPane.setAlignment(arrowIcon, Pos.CENTER_RIGHT);
 
         Button btnProductChoice = new Button();
-        btnProductChoice.setGraphic(contentOfBtnProductChoice);
+        btnProductChoice.setGraphic(stackPane);
         btnProductChoice.getStyleClass().add("btn-sel-prod");
         btnProductChoice.prefWidthProperty().bind(stage.widthProperty().divide(3));
         btnProductChoice.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -88,10 +115,12 @@ public class ProductionView extends Parent implements Builder<Region> {
                         leftSection.setDisable(false);
                         leftSection.getChildren().addAll(txtFldQuantity, numpad);
                         leftSection.getChildren().remove(lstViewProducts);
+                        arrowIcon.setText("▼");
                     } else {
                         leftSection.setDisable(false);
                         leftSection.getChildren().removeAll(txtFldQuantity, numpad);
                         leftSection.getChildren().add(lstViewProducts);
+                        arrowIcon.setText("▲");
                     }
 
 
@@ -103,14 +132,19 @@ public class ProductionView extends Parent implements Builder<Region> {
 
     private TextField createQuantityField() {
         TextField txtFldQuantity = new TextField();
-        txtFldQuantity.setPromptText("0.00");
-        txtFldQuantity.setAlignment(Pos.CENTER_RIGHT);
+        txtFldQuantity.setPromptText("-.--");
         txtFldQuantity.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
 
                 if (newValue != null && !newValue.isEmpty()) {
+                    if(selectedProduct == null) {
+                        WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
+                        txtFldQuantity.clear();
+                        return;
+                    }
+
                     String filteredValue = newValue.replaceAll(" ", "");
                     Pattern pattern = Pattern.compile("(\\d{1,10}\\.\\d{1,2}|\\d{1,10}\\.|\\.\\d{1,2}|\\d{1,10})");
                     Matcher matcher = pattern.matcher(filteredValue);
@@ -126,6 +160,7 @@ public class ProductionView extends Parent implements Builder<Region> {
             }
         });
         txtFldQuantity.getStyleClass().add("txt-fld-quantity");
+        txtFldQuantity.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         return txtFldQuantity;
     }
 
@@ -157,6 +192,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         numDel.setOnAction(handleBtnNumpadOnAction());
         Button numAdd = new Button("Adauga +");
         numAdd.setOnAction(handleBtnNumpadOnAction());
+        numAdd.getStyleClass().add("numpad-button-add");
 
         numpad.add(num1, 0, 0);
         GridPane.setVgrow(num1, Priority.ALWAYS);
@@ -248,6 +284,11 @@ public class ProductionView extends Parent implements Builder<Region> {
             public void handle(ActionEvent event) {
                 Button node = (Button) event.getSource() ;
                 String value = node.getText();
+                //Handle warning screen for no product selected
+                if(selectedProduct == null) {
+                    WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
+                    return;
+                }
                 if("0123456789.".contains(value)) {
                     String quantity = txtFldQuantity.getText();
                     txtFldQuantity.setText(quantity + value);
@@ -258,11 +299,6 @@ public class ProductionView extends Parent implements Builder<Region> {
                     }
                     txtFldQuantity.setText(quantity.substring(0, quantity.length() - 1));
                 } else if ("Adauga +".equals(value)) {
-                    //Handle warning screen for no product selected
-                    if(selectedProduct == null) {
-                        WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
-                        return;
-                    }
                     //Handle warning for no quantity entered
                     if(txtFldQuantity.getText().isEmpty() || txtFldQuantity.getText() == null) {
                         WarningController warningController = new WarningController(stage, "Introduceti cantitatea pentru produsul:\n" + selectedProduct.getName());
@@ -280,6 +316,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                     leftSection.setDisable(true);
                     productRecordAddActionHandler.accept(() -> {
                         leftSection.setDisable(false);
+                        txtFldQuantity.textProperty().set("");
                     }, data);
                 }
             }
@@ -317,7 +354,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                             lblProductName.getStyleClass().add("den-prod-record-list-cell");
                             Label lblProductDetails = new Label(" Cantitate : " + String.format("%.2f", item.getQuantity()) + " " + item.getUnitMeasurement());
                             SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                            Label lblDateTime = new Label(" Data si ora: " + dateTimeFormatter.format(item.getDateAndTime()));
+                            Label lblDateTime = new Label(" Data si ora: " + dateTimeFormatter.format(item.getDateAndTimeInserted()));
                             HBox productCell = new HBox();
                             productCell.getChildren().addAll(lblProductName, lblProductDetails, lblDateTime, btnEdit);
 
@@ -387,7 +424,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         tableView.getColumns().add(unitMeasurementColumn);
 
         TableColumn<ProductRecordDTO, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
-        dateAndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateAndTime"));
+        dateAndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateAndTimeInserted"));
         quantityColumn.setPrefWidth(100);
         dateAndTimeColumn.setCellFactory(column -> {
             TableCell<ProductRecordDTO, Timestamp> cell = new TableCell<ProductRecordDTO, Timestamp>() {
@@ -408,12 +445,49 @@ public class ProductionView extends Parent implements Builder<Region> {
         });
         tableView.getColumns().add(dateAndTimeColumn);
 
-        tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 40); // 40% width
-        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 25 ); // 30% width
-        unitMeasurementColumn.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
-        dateAndTimeColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 25 ); // 50% width
+        int percentEditBtn = 0;
+        if(user.getID_ROLE() == 0 || user.getID_ROLE() == 1) {
+            TableColumn<ProductRecordDTO, Integer> editBtnColumn = new TableColumn<>();
+            editBtnColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+            editBtnColumn.setCellFactory(column -> {
+                TableCell<ProductRecordDTO, Integer> cell = new TableCell<ProductRecordDTO, Integer>()  {
+                    @Override
+                    protected void updateItem(Integer item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if(empty) {
+                            setText(null);
+                            setGraphic(null);
+                        }
+                        else {
+                            setText(null);
+                            Button btnEdit = new Button("\uD83D\uDD27");
+//                            btnEdit.setTextOverrun(OverrunStyle.CLIP);
+                            btnEdit.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
 
+                            btnEdit.setOnAction(event -> {
+                                WarningController warningController = new WarningController(stage, "Doresti sa editezi inregistrarea: " + item);
+                            });
+                            setGraphic(btnEdit);
+                        }
+                    }
+                };
+                return cell;
+            });
+            tableView.getColumns().add(editBtnColumn);
+            percentEditBtn = 10;
+            editBtnColumn.setMaxWidth(1f * Integer.MAX_VALUE * percentEditBtn);
+        }
+
+        int percentName = 40 - percentEditBtn;
+        int percentQuantity = 25;
+        int percentUnitMeasurement = 10;
+        int percentDateAndTime = 25;
+
+        tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * percentName); // 40% width
+        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * percentQuantity ); // 30% width
+        unitMeasurementColumn.setMaxWidth(1f * Integer.MAX_VALUE * percentUnitMeasurement); // 10% width
+        dateAndTimeColumn.setMaxWidth( 1f * Integer.MAX_VALUE * percentDateAndTime ); // 50% width
 
         tableView.getStyleClass().add("tbl-product-record-view");
         tableView.setItems(model.getProductRecords());
@@ -458,6 +532,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                 //Use ListView's getSelected Item
                 ProductDTO productDTO = listView.getSelectionModel().getSelectedItem();
                 handleListViewItemSelected(productDTO);
+                arrowIcon.setText("▼");
             }
         });
         //Setting up double tap for elements in listview
@@ -466,6 +541,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                 //Use ListView's getSelected Item
                 ProductDTO productDTO = listView.getSelectionModel().getSelectedItem();
                 handleListViewItemSelected(productDTO);
+                arrowIcon.setText("▼");
             }
         });
         listView.setItems(model.getProducts());
@@ -478,31 +554,6 @@ public class ProductionView extends Parent implements Builder<Region> {
         lblSelectedProductName.setText(product.getName());
         leftSection.getChildren().addAll(txtFldQuantity, numpad);
         leftSection.getChildren().remove(lstViewProducts);
-    }
-
-    @Override
-    public Region build() {
-        Button btnProductChoice = createBtnProductChoice();
-        txtFldQuantity = createQuantityField();
-        txtFldQuantity.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        numpad = createNumpad();
-        leftSection = new VBox(btnProductChoice, txtFldQuantity, numpad);
-//        leftSection.prefWidthProperty().bind(window.widthProperty().multiply(0.25));
-        VBox.setVgrow(numpad, Priority.ALWAYS);
-//        ListView<ProductRecordDTO> listView = createProductRecordListView();
-//        listView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-//        leftSection.setMaxWidth(Region.USE_COMPUTED_SIZE);
-//        listView.maxWidthProperty().bind(stage.widthProperty().divide(3/2));
-
-        lstViewProducts = createProductListView();
-        lstViewProducts.maxWidthProperty().bind(stage.widthProperty().divide(3));
-
-        TableView<ProductRecordDTO> tableView = createProductRecordTableView();
-
-        root.setLeft(leftSection);
-//        root.setCenter(listView);
-        root.setCenter(tableView);
-        root.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        return root;
+        txtFldQuantity.setPromptText("0.00 " + product.getUnitMeasurement());
     }
 }

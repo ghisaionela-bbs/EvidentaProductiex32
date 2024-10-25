@@ -9,7 +9,10 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -17,7 +20,9 @@ import javafx.util.Builder;
 import org.apache.logging.log4j.util.TriConsumer;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Widgets.WarningController;
 
-import java.util.function.Consumer;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class UserConnView extends Parent implements Builder<Region> {
     private final Stage stage;
@@ -28,7 +33,7 @@ public class UserConnView extends Parent implements Builder<Region> {
     private Button btnConn = new Button();
     private GridPane inputBox = new GridPane();
     public final StringProperty connectionStatus = new SimpleStringProperty();
-    private VBox root = new VBox(8);
+    private final VBox root = new VBox(8);
 
     public UserConnView(Stage stage, TriConsumer<Runnable, String, String> actionHandler) {
         this.stage = stage;
@@ -40,6 +45,7 @@ public class UserConnView extends Parent implements Builder<Region> {
         root.getChildren().addAll(createInputBox(), createConnStatusLabel(), createConnButton());
         root.setAlignment(Pos.CENTER);
         root.getStyleClass().add("vbox-conn");
+
         return root;
     }
 
@@ -91,6 +97,5 @@ public class UserConnView extends Parent implements Builder<Region> {
     public void fireConnectButton() {
         btnConn.fire();
     }
-
 
 }

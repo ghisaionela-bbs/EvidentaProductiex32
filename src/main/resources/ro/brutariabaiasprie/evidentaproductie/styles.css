@@ -1,46 +1,107 @@
+/*ROOT*/
 .root {
     -fx-font-size: 2em;
+}
+
+/*MODAL WINDOW*/
+.modal-window {
     -fx-padding: 20;
 }
+
+/* MAIN WINDOW */
+/* NAVIGATION MENU */
+.main-window .left-section, .main-window .main-navigation-menu {
+    -fx-background-color: BROWN;
+}
+.main-window .left-section .button, .main-window .main-navigation-menu .button {
+    -fx-background-color: BROWN;
+    -fx-text-fill: MISTYROSE;
+    -fx-text-alignment: center;
+    -fx-padding: 1em;
+}
+.main-window .left-section .button:hover, .main-window .main-navigation-menu .button:hover {
+    -fx-cursor: hand;
+    -fx-background-color: MAROON;
+}
+.main-window .left-section .button.active, .main-window .main-navigation-menu .button.active {
+    -fx-text-fill: WHITE;
+    -fx-background-color: MAROON;
+}
+/* CONTENT */
+.main-window .main-window-content {
+    -fx-padding: 1em;
+}
+/* CONTENT -> MANAGER VIEW */
+.main-window .tab-section-title {
+    -fx-font-size: 1.5em;
+}
+
 
 .grid-conn {
     -fx-vgap: 4;
     -fx-hgap: 4;
-    -fx-alignment: center;}
-
-.vbox-conn {
-}
-
-.aaaa {
-    -fx-font-size: 70;
+    -fx-alignment: CENTER;
 }
 
 .lbl-sel-prod {
-    -fx-font-size: 1.5em;
+    -fx-font-size: 1.2em;
     -fx-font-weight: bold;
+    -fx-text-alignment: CENTER;
+    -fx-alignment: CENTER;
 }
 
-.lbl-sel-prod-sub {
-    -fx-text-fill: blue;
-    -fx-font-color: blue;
-}
-
-.arrow-icon-sel-prod {
-    -fx-font-size: 2em;
-    -fx-font-weight: bold;
+.lbl-sel-prod .text {
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
 }
 
 .txt-fld-quantity {
     -fx-font-size: 2.5em;
     -fx-padding: 0.5em;
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: WHITE;
+    -fx-text-alignment: CENTER;
+    -fx-alignment: CENTER;
+    /*
+    -fx-border-style: hidden hidden solid hidden;
+    -fx-border-width: 0.1em;
+    -fx-border-color: WHITE;
+    */
+}
+
+.numpad {
+    -fx-background-color: #2b2b2b;
 }
 
 .numpad .button {
     -fx-font-size: 2em;
+    -fx-font-weight: bold;
+    -fx-background-color: #575757;
+    -fx-text-fill: WHITE;
+    -fx-border-radius: 1em;
+    -fx-background-radius: 1em;
+    -fx-border-color: BLACK;
 }
 
-.den-prod-record-list-cell {
-    -fx-font-weight: bold;
+.numpad .button:hover {
+    -fx-background-color: #474747;
+    -fx-cursor: hand;
+}
+
+.numpad .button:pressed {
+    -fx-background-color: #2b2b2b;
+}
+
+.numpad .numpad-button-add {
+    -fx-background-color: MAROON;
+}
+
+.numpad .numpad-button-add:hover{
+    -fx-background-color: #300000;
+}
+
+.numpad .numpad-button-add:pressed{
+    -fx-background-color: #200000;
 }
 
 /*
@@ -54,14 +115,13 @@
     -fx-padding: 10;
     -fx-alignment: CENTER-RIGHT;
 }
-/*
+
 .tbl-product-record-view .table-row-cell:filled:focused:selected {
-    -fx-background-color: brown;
+    -fx-background-color: BROWN;
     -fx-background-insets: 0, 1, 2;
     -fx-background: -fx-accent;
     -fx-text-fill: -fx-selection-bar-text;
-    -fx-fill: white;
-}*/
+}
 
 .tbl-product-record-view .table-row-cell:filled:focused:selected .text {
     -fx-fill: -fx-selection-bar-text;

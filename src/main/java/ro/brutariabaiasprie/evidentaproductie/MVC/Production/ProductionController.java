@@ -65,6 +65,10 @@ public class ProductionController implements SceneController {
 
     @Override
     public Region getView() {
-        return view.build();
+        if(view.getRoot() != null) {
+            return view.getRoot();
+        } else {
+            return view.build();
+        }
     }
 }

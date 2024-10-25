@@ -54,7 +54,7 @@ public class UserConnModel {
                 int ID_ROL = resultSet.getInt("ID_ROL");
                 User user = new User();
                 user.setID(ID);
-                user.setID_ROLE(user.getID_ROLE());
+                user.setID_ROLE(ID_ROL);
                 user.setUsername(username);
                 user.setPassword(password);
                 ConfigApp.setConfig(CONFIG_KEY.APPUSER.name(), user);

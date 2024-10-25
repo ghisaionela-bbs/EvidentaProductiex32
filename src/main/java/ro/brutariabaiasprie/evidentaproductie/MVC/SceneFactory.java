@@ -1,5 +1,6 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC;
 
+import com.sun.tools.javac.Main;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -9,6 +10,8 @@ import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.MainWindowController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.Manager.ManagerController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Production.ProductionController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.UserConn.UserConnController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
@@ -63,7 +66,12 @@ public class SceneFactory {
                 break;
             case USERCONN:
                 controller = new UserConnController(primaryStage, this::switchScene);
-            case DASHBOARD:
+                break;
+            case MANAGER:
+                controller = new ManagerController(primaryStage);
+                break;
+            case MAIN_WINDOW:
+                controller = new MainWindowController(primaryStage, this::disconnect);
                 break;
             case DEFAULT:
                 int user_role = ((User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name())).getID_ROLE();
@@ -73,7 +81,7 @@ public class SceneFactory {
                     controller = new ProductionController(primaryStage, this::switchScene);
                 }
         }
-//        primaryStage.getScene().setRoot(new ProductionController(primaryStage, this::switchScene).getView());
+
         primaryStage.getScene().setRoot(controller.getView());
         runnable.run();
 //        if(Platform.isFxApplicationThread()){
@@ -84,5 +92,18 @@ public class SceneFactory {
 //            runnable.run();
 //
 //        });
+
+
     }
+
+    private Runnable disconnect() {
+        ConfigApp.deleteConfig(CONFIG_KEY.APPUSER.name());
+        ConfigApp.write_config();
+        primaryStage.getScene().setRoot(new UserConnController(primaryStage, this::switchScene).getView());
+        return null;
+    }
+
+//    private void disconnect(SceneType sceneType) {
+//        ConfigApp.deleteConfig(ConfigApp);
+//    }
 }

@@ -40,6 +40,7 @@ public class WarningView extends Parent implements Builder<Region> {
 
         container.setSpacing(10);
         container.getChildren().addAll(lblMessage, btnOk);
+        container.getStyleClass().add("modal-window");
 
         return container;
     }

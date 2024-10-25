@@ -4,6 +4,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.*;
@@ -38,10 +41,21 @@ public class ProductionModel {
         try {
             Connection connection = DBConnectionService.getConnection();
 
-            String sql = "SELECT ip.ID, p.denumire, p.um, ip.cantitate, ip.datasiora FROM [dbo].[INREGISTRARI_PRODUSE] AS ip " +
-                    "JOIN [dbo].[PRODUSE] AS p ON ip.ID_PRODUS = p.ID ORDER BY ip.datasiora DESC";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+            String whereCond = "";
+            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+            if(user.getID_ROLE() != 0 || user.getID_ROLE() != 1) {
+                whereCond = "WHERE ip.ID_UTILIZATOR_I = ? ";
+            }
+
+            String sql = "SELECT ip.ID, p.denumire, p.um, ip.cantitate, ip.datasiora_i FROM [dbo].[INREGISTRARI_PRODUSE] AS ip " +
+                    "JOIN [dbo].[PRODUSE] AS p ON ip.ID_PRODUS = p.ID " +
+                    whereCond +
+                    "ORDER BY ip.datasiora_i DESC";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            if(user.getID_ROLE() != 0 || user.getID_ROLE() != 1) {
+                statement.setInt(1, user.getID());
+            }
+            ResultSet resultSet = statement.executeQuery();
 
             productRecords.clear();
             while(resultSet.next()) {
@@ -49,7 +63,7 @@ public class ProductionModel {
                 String name = resultSet.getString("denumire");
                 String unitMeasurement = resultSet.getString("um");
                 double quantity = resultSet.getDouble("cantitate");
-                Timestamp dateAndTime = resultSet.getTimestamp("datasiora");
+                Timestamp dateAndTime = resultSet.getTimestamp("datasiora_i");
                 ProductRecordDTO productRecordDTO = new ProductRecordDTO(productId, name, unitMeasurement, quantity, dateAndTime);
                 productRecords.add(productRecordDTO);
             }
@@ -88,7 +102,7 @@ public class ProductionModel {
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
-            String sql = "INSERT INTO [dbo].[INREGISTRARI_PRODUSE] (ID_PRODUS, cantitate, datasiora, ID_UTILIZATOR) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO [dbo].[INREGISTRARI_PRODUSE] (ID_PRODUS, cantitate, datasiora_i, ID_UTILIZATOR_I) VALUES (?, ?, ?, ?)";
 
             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, product.getId());

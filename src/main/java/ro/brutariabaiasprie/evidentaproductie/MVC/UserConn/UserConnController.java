@@ -44,7 +44,7 @@ public class UserConnController implements SceneController {
             }
         };
         taskDBLookUp.setOnSucceeded(evt -> {
-            sceneSwitchActionHandler.accept(() -> {}, SceneType.DEFAULT);
+            sceneSwitchActionHandler.accept(() -> {}, SceneType.MAIN_WINDOW);
             runnable.run();
         });
         taskDBLookUp.setOnFailed(evt -> {
