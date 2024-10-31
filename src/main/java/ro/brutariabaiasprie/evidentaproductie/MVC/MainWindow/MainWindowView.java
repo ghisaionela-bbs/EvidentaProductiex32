@@ -11,6 +11,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Builder;
+import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
 import java.util.function.Consumer;
@@ -23,7 +24,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
     }
     private final MainWindowModel model;
 
-    private final BorderPane layout = new BorderPane();
+    private final BorderPane root = new BorderPane();
     private VBox navigationMenu;
     private Button accountButton;
     private Button managerButton;
@@ -44,24 +45,34 @@ public class MainWindowView extends Parent implements Builder<Region> {
         accountButton = createNavBarMenuButton("\uD83D\uDC64\nCont", SceneType.ACCOUNT);
         managerButton = createNavBarMenuButton("\uD83D\uDCCA\nAdministrare", SceneType.MANAGER);
         productionButton = createNavBarMenuButton("\uD83C\uDFED\nProductie", SceneType.PRODUCTION);
+        if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
+            accountButton.setText("\uD83D\uDC64");
+            managerButton.setText("\uD83D\uDCCA");
+            productionButton.setText("\uD83C\uDFED");
+        } else {
+            accountButton.setText("\uD83D\uDC64\nCont");
+            managerButton.setText("\uD83D\uDCCA\nAdministrare");
+            productionButton.setText("\uD83C\uDFED\nProductie");
+        }
+
         navigationMenu.getChildren().add(accountButton);
         if(model.getCONNECTED_USER().getID_ROLE() == 0 || model.getCONNECTED_USER().getID_ROLE() == 1) {
             navigationMenu.getChildren().add(managerButton);
         }
         navigationMenu.getChildren().add(productionButton);
-        layout.setLeft(navigationMenu);
+        root.setLeft(navigationMenu);
         //SETTING UP THE WINDOW RESIZE LISTENERS
         createStageResizeListeners();
         //SETTING UP THE STYLES
         navigationMenu.getStyleClass().add("main-navigation-menu");
-        layout.getStyleClass().add("main-window");
-        return layout;
+        root.getStyleClass().add("main-window");
+        return root;
     }
 
     private void createStageResizeListeners() {
         ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
             System.out.println(PARENT_STAGE.getWidth());
-            if(PARENT_STAGE.getWidth() < 1000.0) {
+            if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
                 accountButton.setText("\uD83D\uDC64");
                 managerButton.setText("\uD83D\uDCCA");
                 productionButton.setText("\uD83C\uDFED");
@@ -92,12 +103,19 @@ public class MainWindowView extends Parent implements Builder<Region> {
         return button;
     }
 
-    public void setCenter(Node node) {
-        node.getStyleClass().add("main-window-content");
-        layout.setCenter(node);
+    public void setCenter(Node content) {
+        content.getStyleClass().add("main-window-content");
+        root.setCenter(content);
     }
 
     public void openDefaultTab() {
-        productionButton.fire();
+        switch (model.getCONNECTED_USER().getID_ROLE()){
+            case 0: case 1:
+                managerButton.fire();
+                break;
+            default:
+                productionButton.fire();
+                break;
+        }
     }
 }

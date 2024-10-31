@@ -1,41 +1,254 @@
 /*ROOT*/
 .root {
     -fx-font-size: 2em;
+    COLOR_BRAND_BROWN: #4F2C1D;
+    COLOR_BRAND_BROWN_90: rgba(68, 44, 29, 0.9);
+    COLOR_BRAND_BROWN_80: rgba(68, 44, 29, 0.8);
+    COLOR_BRAND_BROWN_70: rgba(68, 44, 29, 0.7);
+    COLOR_BRAND_BROWN_60: rgba(68, 44, 29, 0.6);
+    COLOR_BRAND_BROWN_50: rgba(68, 44, 29, 0.5);
+    COLOR_BRAND_BROWN_40: rgba(68, 44, 29, 0.4);
+    COLOR_BRAND_BROWN_30: rgba(68, 44, 29, 0.3);
+    COLOR_BRAND_BROWN_30: rgba(68, 44, 29, 0.2);
+    COLOR_BRAND_BROWN_10: rgba(68, 44, 29, 0.1);
+    COLOR_DARK_BROWN: #372014;
+    COLOR_DARK_BROWN_90: rgba(55, 32, 20, 0.9);
+    COLOR_DARK_BROWN_80: rgba(55, 32, 20, 0.8);
+    COLOR_DARK_BROWN_70: rgba(55, 32, 20, 0.7);
+    COLOR_DARK_BROWN_60: rgba(55, 32, 20, 0.6);
+    COLOR_DARK_BROWN_50: rgba(55, 32, 20, 0.5);
+    COLOR_DARK_BROWN_40: rgba(55, 32, 20, 0.4);
+    COLOR_DARK_BROWN_30: rgba(55, 32, 20, 0.3);
+    COLOR_DARK_BROWN_30: rgba(55, 32, 20, 0.2);
+    COLOR_DARK_BROWN_10: rgba(55, 32, 20, 0.1);
+    COLOR_GREEN: #00464A;
+    COLOR_GREEN_90: rgba(0, 70, 74, 0.9);
+    COLOR_GREEN_80: rgba(0, 70, 74, 0.8);
+    COLOR_GREEN_70: rgba(0, 70, 74, 0.7);
+    COLOR_GREEN_60: rgba(0, 70, 74, 0.6);
+    COLOR_GREEN_50: rgba(0, 70, 74, 0.5);
+    COLOR_GREEN_40: rgba(0, 70, 74, 0.4);
+    COLOR_GREEN_30: rgba(0, 70, 74, 0.3);
+    COLOR_GREEN_30: rgba(0, 70, 74, 0.2);
+    COLOR_GREEN_10: rgba(0, 70, 74, 0.1);
+    COLOR_PURPLE: #BABAFF;
+    COLOR_PURPLE_90: rgba(186, 186, 255, 0.9);
+    COLOR_PURPLE_80: rgba(186, 186, 255, 0.8);
+    COLOR_PURPLE_70: rgba(186, 186, 255, 0.7);
+    COLOR_PURPLE_60: rgba(186, 186, 255, 0.6);
+    COLOR_PURPLE_50: rgba(186, 186, 255, 0.5);
+    COLOR_PURPLE_40: rgba(186, 186, 255, 0.4);
+    COLOR_PURPLE_30: rgba(186, 186, 255, 0.3);
+    COLOR_PURPLE_30: rgba(186, 186, 255, 0.2);
+    COLOR_PURPLE_10: rgba(186, 186, 255, 0.1);
+    COLOR_WHITE: #FFFFFF;
+    COLOR_WHITE_90: rgba(255, 255, 255, 0.9);
+    COLOR_WHITE_80: rgba(255, 255, 255, 0.8);
+    COLOR_WHITE_70: rgba(255, 255, 255, 0.7);
+    COLOR_WHITE_60: rgba(255, 255, 255, 0.6);
+    COLOR_WHITE_50: rgba(255, 255, 255, 0.5);
+    COLOR_WHITE_40: rgba(255, 255, 255, 0.4);
+    COLOR_WHITE_30: rgba(255, 255, 255, 0.3);
+    COLOR_WHITE_30: rgba(255, 255, 255, 0.2);
+    COLOR_WHITE_10: rgba(255, 255, 255, 0.1);
 }
+
+/* GENERAL CLASSES*/
+/* buttons */
+.filled-button {
+    -fx-background-color: COLOR_BRAND_BROWN;
+    -fx-text-fill: COLOR_WHITE;
+    -fx-text-alignment: CENTER;
+    -fx-cursor: HAND;
+}
+.filled-button:hover {
+    -fx-background-color: derive(COLOR_BRAND_BROWN, -40%);
+}
+.filled-button:pressed {
+    -fx-background-color: derive(COLOR_BRAND_BROWN, -50%);
+}
+.filled-button.secondary {
+    -fx-background-color: COLOR_WHITE;
+    -fx-text-fill: COLOR_BRAND_BROWN;
+}
+.filled-button.secondary:hover {
+    -fx-background-color: derive(COLOR_WHITE, -10%);
+}
+.filled-button.secondary:pressed {
+    -fx-background-color: derive(COLOR_WHITE, -20%);
+}
+.ghost-button {
+    -fx-background-color: COLOR_WHITE;
+    -fx-background-radius: 2em;
+    -fx-text-fill: COLOR_BRAND_BROWN;
+    -fx-text-alignment: CENTER;
+    -fx-border-color: COLOR_BRAND_BROWN;
+    -fx-border-radius: 2em;
+    -fx-cursor: HAND;
+}
+.ghost-button:hover {
+    -fx-background-color: COLOR_BRAND_BROWN;
+    -fx-text-fill: COLOR_WHITE;
+}
+.ghost-button:pressed {
+    -fx-background-color: derive(COLOR_BRAND_BROWN, -50%);
+}
+.padded-button {
+    -fx-padding: 1em;
+}
+
+.excel-import-table,
+.excel-import-table .table-row-cell {
+    -fx-background-color: derive(COLOR_WHITE, -10%);
+}
+.excel-import-table .column-header-background {
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+.excel-import-preview {
+    -fx-background-color: derive(COLOR_WHITE, -10%);
+}
+.excel-import-preview .selected{
+    -fx-background-color: COLOR_WHITE;
+}
+.scroll-bar > .corner {
+    -fx-background-color: #2c365d ;
+}
+.virtual-flow > .corner {
+    -fx-background-color: #2c365d ;
+}
+/* scroll-bar */
+.scroll-bar {
+    -fx-background-color: TRANSPARENT;
+    -fx-pref-width: 0.5em;
+}
+.scroll-bar .thumb {
+    -fx-background-color: COLOR_BRAND_BROWN;
+}
+.scroll-bar .track {
+    -fx-background-color: TRANSPARENT;
+}
+.scroll-bar .corner {
+    -fx-background-color: TRANSPARENT;
+}
+.scroll-bar .increment-button,
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-button,
+.scroll-bar .decrement-arrow {
+    -fx-pref-width: 0;
+    -fx-pref-heigh: 0;
+    -fx-padding: 0 0 0 0;
+}
+
 
 /*MODAL WINDOW*/
 .modal-window {
     -fx-padding: 20;
+    -fx-spacing: 0.2em;
+}
+
+.modal-window .grid-form {
+   -fx-vgap: 4;
+   -fx-hgap: 4;
+}
+/* PLACE ORDER VIEW */
+.place-order-view .order-details {
+    -fx-padding: 0.1em;
+    -fx-spacing: 0.1em;
+    -fx-alignment: CENTER;
+}
+.place-order-view .order-details .section-title {
+    -fx-text-fill:  COLOR_BRAND_BROWN;
+}
+.place-order-view .tile-pane {
+    -fx-hgap: 0.2em;
+    -fx-vgap: 0.2em;
+}
+.place-order-view .tile-pane .product-tile {
+    -fx-padding: 0.25em;
+    -fx-background-color: COLOR_WHITE;
+    -fx-background-radius: 0.5em;
+    -fx-border-radius: 0.5em;
+    -fx-border-color: COLOR_BRAND_BROWN;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+    -fx-text-fill: COLOR_BRAND_BROWN;
+    -fx-font-weight: BOLD;
+}
+.place-order-view .tile-pane .product-tile:hover {
+    -fx-background-color: derive(COLOR_WHITE, -10%);
+    -fx-cursor: hand;
+}
+.place-order-view .tile-pane .product-tile:pressed {
+    -fx-background-color:  COLOR_BRAND_BROWN;
+    -fx-text-fill: COLOR_WHITE;
 }
 
 /* MAIN WINDOW */
 /* NAVIGATION MENU */
 .main-window .left-section, .main-window .main-navigation-menu {
-    -fx-background-color: BROWN;
+    -fx-background-color: COLOR_WHITE;
 }
 .main-window .left-section .button, .main-window .main-navigation-menu .button {
-    -fx-background-color: BROWN;
-    -fx-text-fill: MISTYROSE;
+    -fx-background-color: COLOR_WHITE;
+    -fx-text-fill: COLOR_BRAND_BROWN_80;
     -fx-text-alignment: center;
     -fx-padding: 1em;
 }
 .main-window .left-section .button:hover, .main-window .main-navigation-menu .button:hover {
     -fx-cursor: hand;
-    -fx-background-color: MAROON;
+    -fx-background-color: COLOR_WHITE;
+    -fx-text-fill: COLOR_BRAND_BROWN;
 }
 .main-window .left-section .button.active, .main-window .main-navigation-menu .button.active {
-    -fx-text-fill: WHITE;
-    -fx-background-color: MAROON;
+    -fx-text-fill: COLOR_WHITE;
+    -fx-background-color: COLOR_BRAND_BROWN;
 }
 /* CONTENT */
 .main-window .main-window-content {
     -fx-padding: 1em;
 }
-/* CONTENT -> MANAGER VIEW */
-.main-window .tab-section-title {
+/* CONTENT -> MANAGER VIEW -> TAB*/
+.main-window .tab-header-area {
+    -fx-border-width: 0 0 0.3em 0;
+    -fx-border-color: COLOR_BRAND_BROWN;
+}
+.main-window .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
+}
+.main-window .tab{
+    -fx-background-insets: 0 1 0 1,0,0;
+    -fx-background-color: COLOR_WHITE;
+    -fx-border-color: COLOR_BRAND_BROWN;
+    -fx-border-radius: 10 10 0 0;
+    -fx-background-radius: 10 10 0 0;
+}
+.main-window .tab .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: COLOR_BRAND_BROWN;
+}
+.main-window .tab:hover {
+    -fx-cursor: hand;
+    -fx-background-color: derive(COLOR_WHITE, -10%);
+}
+.main-window .tab-pane .tab:selected{
+    -fx-background-color: COLOR_BRAND_BROWN;
+}
+.main-window .tab:selected .tab-label {
+    -fx-background-color: COLOR_BRAND_BROWN;
+    -fx-text-fill: COLOR_WHITE;
+}
+.main-window .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+     -fx-border-width: 0;
+}
+/* CONTENT -> MANAGER VIEW -> TAB CONTENT*/
+.main-window .tab-section-header{
+    -fx-padding: 0.2em 0 0.2em 0;
+}
+.main-window .tab-section-header .tab-section-title{
     -fx-font-size: 1.5em;
 }
-
 
 .grid-conn {
     -fx-vgap: 4;
@@ -58,8 +271,8 @@
 .txt-fld-quantity {
     -fx-font-size: 2.5em;
     -fx-padding: 0.5em;
-    -fx-background-color: #2b2b2b;
-    -fx-text-fill: WHITE;
+    -fx-background-color: COLOR_WHITE;
+    -fx-text-fill: COLOR_DARK_BROWN;
     -fx-text-alignment: CENTER;
     -fx-alignment: CENTER;
     /*
@@ -70,38 +283,45 @@
 }
 
 .numpad {
-    -fx-background-color: #2b2b2b;
+    -fx-background-color: COLOR_WHITE;
+    -fx-hgap: 0.1em;
+    -fx-vgap: 0.1em;
 }
 
 .numpad .button {
     -fx-font-size: 2em;
     -fx-font-weight: bold;
-    -fx-background-color: #575757;
-    -fx-text-fill: WHITE;
+    -fx-background-color: COLOR_WHITE;
+    -fx-text-fill: COLOR_DARK_BROWN_80;
     -fx-border-radius: 1em;
+    -fx-border-color: COLOR_DARK_BROWN_50;
     -fx-background-radius: 1em;
-    -fx-border-color: BLACK;
 }
 
 .numpad .button:hover {
-    -fx-background-color: #474747;
+    -fx-background-color: derive(COLOR_WHITE, -10%);
     -fx-cursor: hand;
+    -fx-text-fill: COLOR_DARK_BROWN;
 }
 
 .numpad .button:pressed {
-    -fx-background-color: #2b2b2b;
+    -fx-background-color: derive(COLOR_WHITE, -20%);
+    -fx-text-fill: COLOR_DARK_BROWN;
 }
 
 .numpad .numpad-button-add {
-    -fx-background-color: MAROON;
+    -fx-background-color: COLOR_GREEN;
+    -fx-text-fill: COLOR_WHITE_80;
 }
 
 .numpad .numpad-button-add:hover{
-    -fx-background-color: #300000;
+    -fx-background-color: derive(COLOR_GREEN, -10%);
+    -fx-text-fill: COLOR_WHITE;
 }
 
 .numpad .numpad-button-add:pressed{
-    -fx-background-color: #200000;
+    -fx-background-color: derive(COLOR_GREEN, -20%);
+    -fx-text-fill: COLOR_WHITE;
 }
 
 /*

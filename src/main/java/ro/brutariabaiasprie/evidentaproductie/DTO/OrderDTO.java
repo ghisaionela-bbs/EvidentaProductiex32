@@ -1,18 +1,22 @@
 package ro.brutariabaiasprie.evidentaproductie.DTO;
 
-import java.sql.Timestamp;
-
 public class OrderDTO {
     private int ID;
     private int PRODUCT_ID;
+    private String productName;
     private double quantity;
-    private Timestamp dateAndTimeInserted;
+    private String unitMeasurement;
+    private double completed;
+    private double remainder;
 
-    public OrderDTO(int ID, int PRODUCT_ID, double quantity, Timestamp dateAndTimeInserted) {
+    public OrderDTO(int ID, int PRODUCT_ID, String productName, double quantity, String unitMeasurement, double completed, double remainder) {
         this.ID = ID;
         this.PRODUCT_ID = PRODUCT_ID;
+        this.productName = productName;
         this.quantity = quantity;
-        this.dateAndTimeInserted = dateAndTimeInserted;
+        this.unitMeasurement = unitMeasurement;
+        this.completed = completed;
+        this.remainder = remainder;
     }
 
     public int getID() {
@@ -31,6 +35,14 @@ public class OrderDTO {
         this.PRODUCT_ID = PRODUCT_ID;
     }
 
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
     public double getQuantity() {
         return quantity;
     }
@@ -39,11 +51,40 @@ public class OrderDTO {
         this.quantity = quantity;
     }
 
-    public Timestamp getDateAndTimeInserted() {
-        return dateAndTimeInserted;
+    public String getUnitMeasurement() {
+        return unitMeasurement;
     }
 
-    public void setDateAndTimeInserted(Timestamp dateAndTimeInserted) {
-        this.dateAndTimeInserted = dateAndTimeInserted;
+    public void setUnitMeasurement(String unitMeasurement) {
+        this.unitMeasurement = unitMeasurement;
+    }
+
+    public double getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(double completed) {
+        this.completed = completed;
+    }
+
+    public double getRemainder() {
+        return remainder;
+    }
+
+    public void setRemainder(double remainder) {
+        this.remainder = remainder;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDTO{" +
+                "ID=" + ID +
+                ", PRODUCT_ID=" + PRODUCT_ID +
+                ", productName='" + productName + '\'' +
+                ", quantity=" + quantity +
+                ", unitMeasurement='" + unitMeasurement + '\'' +
+                ", completed=" + completed +
+                ", remainder=" + remainder +
+                '}';
     }
 }

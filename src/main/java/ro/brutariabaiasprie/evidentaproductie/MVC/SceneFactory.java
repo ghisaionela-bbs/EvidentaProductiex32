@@ -1,19 +1,19 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC;
 
-import com.sun.tools.javac.Main;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
-import ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.DBConn.DBConnController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.MainWindowController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.Manager.ManagerController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.Production.ProductionController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.UserConn.UserConnController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager.ManagerController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production.ProductionController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn.UserConnController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.util.Objects;
@@ -35,6 +35,11 @@ public class SceneFactory {
         this.primaryStage = primaryStage;
         scene = new Scene(new DBConnController(primaryStage, this::switchScene).getView());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
+
+        Image icon16x16 = new Image("app-icon-16x16.png");
+        Image icon32x32 = new Image("app-icon-32x32.png");
+        Image icon64x64 = new Image("app-icon-64x64.png");
+        primaryStage.getIcons().addAll(icon16x16, icon32x32, icon64x64);
         primaryStage.setTitle("Evidenta Productie");
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -61,9 +66,6 @@ public class SceneFactory {
             case DBCONN:
                 controller = new DBConnController(primaryStage, this::switchScene);
                 break;
-            case PRODUCTION:
-                controller = new ProductionController(primaryStage, this::switchScene);
-                break;
             case USERCONN:
                 controller = new UserConnController(primaryStage, this::switchScene);
                 break;
@@ -76,9 +78,9 @@ public class SceneFactory {
             case DEFAULT:
                 int user_role = ((User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name())).getID_ROLE();
                 if(user_role == 1) {
-                    controller = new ProductionController(primaryStage, this::switchScene);
+                    controller = new ProductionController(primaryStage);
                 } else {
-                    controller = new ProductionController(primaryStage, this::switchScene);
+                    controller = new ProductionController(primaryStage);
                 }
         }
 

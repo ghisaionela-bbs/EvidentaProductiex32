@@ -6,17 +6,16 @@ import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
-import ro.brutariabaiasprie.evidentaproductie.MVC.Account.AccountController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.Manager.ManagerController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.Production.ProductionController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Account.AccountController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.DBConn.DBConnController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager.ManagerController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production.ProductionController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
-import ro.brutariabaiasprie.evidentaproductie.MVC.UserConn.UserConnController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn.UserConnController;
 
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 
 public class MainWindowController implements SceneController {
     private final Stage PARENT_STAGE;
@@ -34,7 +33,7 @@ public class MainWindowController implements SceneController {
         this.view = new MainWindowView(this.model, parentStage, this::setCenter);
         this.disconnectActionHandler = disconnectActionHandler;
         Platform.runLater(() ->{
-            productionController = new ProductionController(PARENT_STAGE, this::switchScene);
+            productionController = new ProductionController(PARENT_STAGE);
             this.view.openDefaultTab();
         });
     }
@@ -63,9 +62,9 @@ public class MainWindowController implements SceneController {
             case DEFAULT:
                 int user_role = ((User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name())).getID_ROLE();
                 if(user_role == 1) {
-                    controller = new ProductionController(PARENT_STAGE, this::switchScene);
+                    controller = new ProductionController(PARENT_STAGE);
                 } else {
-                    controller = new ProductionController(PARENT_STAGE, this::switchScene);
+                    controller = new ProductionController(PARENT_STAGE);
                 }
         }
         view.setCenter(Objects.requireNonNull(controller).getView());
