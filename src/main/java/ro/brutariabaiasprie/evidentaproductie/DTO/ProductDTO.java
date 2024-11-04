@@ -1,18 +1,18 @@
 package ro.brutariabaiasprie.evidentaproductie.DTO;
 
 public class ProductDTO {
-    int id;
+    int ID;
     String name;
     String unitMeasurement;
 
-    public ProductDTO(int id, String name, String unitMeasurement) {
-        this.id = id;
+    public ProductDTO(int ID, String name, String unitMeasurement) {
+        this.ID = ID;
         this.name = name;
         this.unitMeasurement = unitMeasurement;
     }
 
-    public int getId() {
-        return id;
+    public int getID() {
+        return ID;
     }
 
     public String getName() {
@@ -23,6 +23,6 @@ public class ProductDTO {
 
     @Override
     public String toString() {
-        return id + ": " + name;
+        return ID + ": " + name;
     }
 }

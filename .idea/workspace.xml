@@ -13,65 +13,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="837d3ee9-ac9b-4d92-975d-3cc0e66fbe14" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/artifacts/EvidentaProductie_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/OrderItemDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Data/ACTION_TYPE.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Data/Globals.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Components/FlowGridPane.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Components/SceneButton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewProduct/AddNewProductController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewProduct/AddNewProductModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewProduct/AddNewProductView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/Dialogues/ConfirmationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/Dialogues/ConfirmationView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/Dialogues/WarningController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelExport/ExcelExportController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelExport/ExcelExportModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelExport/ExcelExportView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelImport/ExcelImportController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelImport/ExcelImportModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelImport/ExcelImportView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ModalWindow.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/QuantityPrompt/QuantityPromptController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/QuantityPrompt/QuantityPromptModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/QuantityPrompt/QuantityPromptView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/app-icon-16x16.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/app-icon-32x32.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/app-icon-64x64.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/app-icon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/OrderItemReportDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/OrderResultsDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Exceptions/OrderItemNotFound.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Exceptions/OrderNotFound.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/Dialogues/ChoiceController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/Dialogues/ChoiceView.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/EditProductRecord/EditProductRecordController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/EditProductRecord/EditProductRecordModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/EditProductRecord/EditProductRecordView.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/OrderAssociation/OrderAssociationController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/OrderAssociation/OrderAssociationModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/OrderAssociation/OrderAssociationView.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ProductTableSelection/ProductTableSelectionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ProductTableSelection/ProductTableSelectionModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ProductTableSelection/ProductTableSelectionView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/OrderDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/OrderDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Account/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Account/AccountController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Account/AccountModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Account/AccountModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Account/AccountView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Account/AccountView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Admin/AdminController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Admin/AdminModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Admin/AdminView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ConnectionWindows/DBConn/DBConnController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ConnectionWindows/DBConn/DBConnModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/DBConn/DBConnView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ConnectionWindows/DBConn/DBConnView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/MainWindowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/MainWindowController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/MainWindowView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/MainWindowView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Manager/ManagerController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Manager/ManagerModel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Manager/ManagerView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Production/ProductionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Production/ProductionModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Production/ProductionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/SceneFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/SceneFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/UserConn/UserConnController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ConnectionWindows/UserConn/UserConnController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/UserConn/UserConnModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ConnectionWindows/UserConn/UserConnModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/UserConn/UserConnView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ConnectionWindows/UserConn/UserConnView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Widgets/WarningController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/Widgets/WarningView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/Dialogues/WarningView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/ProductDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/ProductDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/ProductRecordDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/DTO/ProductRecordDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Data/ACTION_TYPE.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Data/ACTION_TYPE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Account/AccountView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Account/AccountView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Manager/ManagerView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindowContent/Production/ProductionView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/AddNewOrder/AddNewOrderView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelExport/ExcelExportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/ExcelExport/ExcelExportController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/stylesheet.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/stylesheet2.css" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,10 +58,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Exception" />
-        <option value="FxmlFile" />
         <option value="Enum" />
         <option value="Interface" />
+        <option value="FxmlFile" />
+        <option value="Exception" />
         <option value="Class" />
       </list>
     </option>
@@ -123,6 +100,7 @@
     "Maven.EvidentaProductie [clean].executor": "Run",
     "Maven.EvidentaProductie [install].executor": "Run",
     "Maven.EvidentaProductie [org.apache.maven.plugins:maven-clean-plugin:2.5:clean].executor": "Run",
+    "Maven.EvidentaProductie [org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile].executor": "Run",
     "Maven.EvidentaProductie [org.apache.maven.plugins:maven-install-plugin:2.4:help].executor": "Run",
     "Maven.EvidentaProductie [org.apache.maven.plugins:maven-install-plugin:2.4:install].executor": "Run",
     "Maven.EvidentaProductie [validate].executor": "Run",
@@ -133,14 +111,17 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "mvc",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/computer/IdeaProjects/EvidentaProductie/src/main/resources",
-    "project.structure.last.edited": "Artifacts",
+    "last_opened_file_path": "C:/Users/computer/.m2/repository/org/kordamp/ikonli/ikonli-materialdesign2-pack/12.3.1/ikonli-materialdesign2-pack-12.3.1.jar",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.4384411",
     "settings.editor.selected.configurable": "project.propCompiler"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\computer\IdeaProjects\EvidentaProductie\src\main\resources" />
     </key>
@@ -216,6 +197,17 @@
       <updated>1728885586482</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

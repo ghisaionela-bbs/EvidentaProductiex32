@@ -16,10 +16,10 @@ public class ExcelExportController extends ModalWindow {
     private final ExcelExportModel model = new ExcelExportModel();
     private final ExcelExportView view;
     private final Stage stage;
-    private Stage PARENT_STAGE;
+    private final Stage PARENT_STAGE;
 
     public ExcelExportController(Stage owner) {
-        this.PARENT_STAGE = owner;
+        PARENT_STAGE = owner;
         stage = new Stage();
         view = new ExcelExportView(this::onWindowAction);
         Scene scene = new Scene(view.build());

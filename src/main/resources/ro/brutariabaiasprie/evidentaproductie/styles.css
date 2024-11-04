@@ -77,6 +77,10 @@
 .filled-button.secondary:pressed {
     -fx-background-color: derive(COLOR_WHITE, -20%);
 }
+.filled-button .ikonli-font-icon {
+    -fx-icon-color: COLOR_WHITE;
+    -fx-icon-size: 1em;
+}
 .ghost-button {
     -fx-background-color: COLOR_WHITE;
     -fx-background-radius: 2em;
@@ -93,9 +97,18 @@
 .ghost-button:pressed {
     -fx-background-color: derive(COLOR_BRAND_BROWN, -50%);
 }
+.ghost-button .ikonli-font-icon {
+    -fx-icon-color: COLOR_BRAND_BROWN;
+}
+.ghost-button:hover .ikonli-font-icon {
+    -fx-icon-color: COLOR_WHITE;
+    -fx-alignment: RIGHT;
+}
 .padded-button {
     -fx-padding: 1em;
 }
+
+
 
 .excel-import-table,
 .excel-import-table .table-row-cell {
@@ -205,6 +218,7 @@
     -fx-text-fill: COLOR_WHITE;
     -fx-background-color: COLOR_BRAND_BROWN;
 }
+
 /* CONTENT */
 .main-window .main-window-content {
     -fx-padding: 1em;
@@ -242,13 +256,36 @@
 .main-window .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
      -fx-border-width: 0;
 }
-/* CONTENT -> MANAGER VIEW -> TAB CONTENT*/
+/* CONTENT -> MANAGER VIEW -> TAB CONTENT */
 .main-window .tab-section-header{
     -fx-padding: 0.2em 0 0.2em 0;
 }
 .main-window .tab-section-header .tab-section-title{
     -fx-font-size: 1.5em;
 }
+/* CONTENT -> MANAGER VIEW -> TABLE VIEW */
+.main-window .main-table-view {
+    -fx-background-color: TRANSPARENT;
+}
+.main-window .main-table-vire .column-header {
+    -fx-background-color: TRANSPARENT;
+}
+.table-view .main-table-view .column-header .label{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+.main-window .main-table-view .column-header-background {
+    -fx-background-color: TRANSPARENT;
+    -fx-text-fill: COLOR_BRAND_BROWN;
+}
+.table-view .main-table-view .column-header-background .label{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+.main-window .main-table-view .column-header-background .filler {
+    -fx-background-color: TRANSPARENT;
+}
+
 
 .grid-conn {
     -fx-vgap: 4;
@@ -335,7 +372,7 @@
     -fx-padding: 10;
     -fx-alignment: CENTER-RIGHT;
 }
-
+/*
 .tbl-product-record-view .table-row-cell:filled:focused:selected {
     -fx-background-color: BROWN;
     -fx-background-insets: 0, 1, 2;
@@ -347,7 +384,7 @@
     -fx-fill: -fx-selection-bar-text;
 }
 
-/*
+
 .tbl-product-record-view:row-selection .table-row-cell:filled:hover {
     -fx-background-color: LIGHTSTEELBLUE;
 }*/

@@ -1,5 +1,6 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -10,11 +11,14 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
+import org.kordamp.ikonli.javafx.FontIcon;
+import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
@@ -22,12 +26,12 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.OrderAssociationController;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -35,52 +39,70 @@ import java.util.regex.Pattern;
 
 public class ProductionView extends Parent implements Builder<Region> {
     private final Consumer<Runnable> productSelectionActionHandler;
-    private final BiConsumer<Runnable, Dictionary<String, Object>> productRecordAddActionHandler;
+    private final BiConsumer<Runnable, Double> productRecordAddActionHandler;
+    private final Consumer<ProductDTO> searchOrderForProductHandler;
+    private final BiConsumer<ProductDTO, OrderDTO> setSelectedProductHandler;
+    private final Consumer<ProductRecordDTO> editProductRecordHandler;
+
     private ProductionModel model;
     private Stage stage;
     private User user;
 
-//    private final BorderPane root = new BorderPane();
     private HBox root;
-    private Label lblSelectedProductName;
-    private TextField txtFldQuantity;
+    private TextField quantityTextField;
     private GridPane numpad;
     private VBox leftSection;
-    private ListView<ProductDTO> lstViewProducts;
+    private ListView<ProductDTO> productsListView;
     private Label arrowIcon;
+    private Label orderLabel;
 
-    private ProductDTO selectedProduct;
+    public Stage getStage() {
+        return stage;
+    }
 
-
-    public ProductionView(ProductionModel model, Stage stage, Consumer<Runnable> productSelectionActionHandler, BiConsumer<Runnable, Dictionary<String, Object>> productRecordAddActionHandler) {
+    public ProductionView(ProductionModel model, Stage stage,
+                          Consumer<Runnable> productSelectionActionHandler,
+                          BiConsumer<Runnable, Double>  productRecordAddActionHandler,
+                          Consumer<ProductDTO> searchOrderForProductHandler,
+                          BiConsumer<ProductDTO, OrderDTO> setSelectedProductHandler, Consumer<ProductRecordDTO> editProductRecordHandler) {
         this.productSelectionActionHandler = productSelectionActionHandler;
         this.productRecordAddActionHandler = productRecordAddActionHandler;
         this.model = model;
         this.stage = stage;
+        this.searchOrderForProductHandler = searchOrderForProductHandler;
+        this.setSelectedProductHandler = setSelectedProductHandler;
+        this.editProductRecordHandler = editProductRecordHandler;
         this.user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
     }
 
     @Override
     public Region build() {
         Button btnProductChoice = createBtnProductChoice();
-        txtFldQuantity = createQuantityField();
+        quantityTextField = createQuantityField();
 
         numpad = createNumpad();
-        leftSection = new VBox(btnProductChoice, txtFldQuantity, numpad);
+
+        leftSection = new VBox(btnProductChoice, quantityTextField, numpad);
 
         btnProductChoice.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
-        txtFldQuantity.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
+        quantityTextField.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
 
 
         VBox.setVgrow(numpad, Priority.ALWAYS);
-        lstViewProducts = createProductListView();
-        lstViewProducts.maxWidthProperty().bind(stage.widthProperty().divide(3));
+        productsListView = createProductListView();
+        productsListView.maxWidthProperty().bind(stage.widthProperty().divide(3));
+
+        Label titleLabel = new Label("Inregistrari introduse");
         TableView<ProductRecordDTO> tableView = createProductRecordTableView();
         tableView.setMaxSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        HBox.setHgrow(tableView, Priority.ALWAYS);
+        VBox.setVgrow(tableView, Priority.ALWAYS);
+
+        VBox records = new VBox(titleLabel, tableView);
+        records.setAlignment(Pos.CENTER);
+        HBox.setHgrow(records, Priority.ALWAYS);
 
         root = new HBox();
-        root.getChildren().addAll(leftSection, tableView);
+        root.getChildren().addAll(leftSection, records);
         return root;
     }
 
@@ -89,17 +111,57 @@ public class ProductionView extends Parent implements Builder<Region> {
     }
 
     private Button createBtnProductChoice() {
-        lblSelectedProductName = new Label("Nici un produs selectat");
-        lblSelectedProductName.getStyleClass().add("lbl-sel-prod");
-        lblSelectedProductName.setWrapText(true);
-        lblSelectedProductName.prefWidthProperty().bind(stage.widthProperty().divide(3.5));
+        VBox infoContainer = new VBox();
+
+        Label selectedProductNameLabel = new Label();
+        selectedProductNameLabel.textProperty().bind(Bindings.createStringBinding(() ->
+        {
+            String text = "Nici un produs selectat";
+            if(model.getSelectedProduct() != null) {
+                text = model.getSelectedProduct().getName();
+            }
+            return text;
+        }, model.selectedProductProperty()));
+
+        selectedProductNameLabel.getStyleClass().add("lbl-sel-prod");
+        selectedProductNameLabel.setWrapText(true);
+
+        orderLabel = new Label();
+        orderLabel.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> ov, String t, String t1) {
+                if(model.getAssociatedOrder() == null && model.getSelectedProduct() != null) {
+                    orderLabel.textFillProperty().set(Color.RED);
+                } else {
+                    orderLabel.textFillProperty().set(Color.BLACK);
+                }
+            }
+        });
+        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        orderLabel.textProperty().bind(Bindings.createStringBinding(() ->
+                {
+                    if(model.getAssociatedOrder() == null) {
+                        if(model.getSelectedProduct() == null) {
+                            return "";
+                        }
+                        return "Nici o comanda asociata!";
+                    }
+                    OrderDTO order = model.getAssociatedOrder();
+                    return "Asociat la comanda: " + order.getID() + " din " + dateTimeFormatter.format(order.getDateAndTimeInserted());
+
+                },
+                model.associatedOrderProperty()
+        ));
+        orderLabel.wrapTextProperty().set(true);
+
+        infoContainer.getChildren().addAll(selectedProductNameLabel, orderLabel);
+        infoContainer.setAlignment(Pos.CENTER);
 
         arrowIcon = new Label("▼");
         arrowIcon.setAlignment(Pos.CENTER_RIGHT);
 
-
         StackPane stackPane = new StackPane();
-        stackPane.getChildren().addAll(lblSelectedProductName, arrowIcon);
+        stackPane.getChildren().addAll(infoContainer, arrowIcon);
         StackPane.setAlignment(arrowIcon, Pos.CENTER_RIGHT);
 
         Button btnProductChoice = new Button();
@@ -112,18 +174,17 @@ public class ProductionView extends Parent implements Builder<Region> {
             public void handle(ActionEvent event) {
                 leftSection.setDisable(true);
                 productSelectionActionHandler.accept(() -> {
-                    if(leftSection.getChildren().contains(lstViewProducts)) {
+                    if(leftSection.getChildren().contains(productsListView)) {
                         leftSection.setDisable(false);
-                        leftSection.getChildren().addAll(txtFldQuantity, numpad);
-                        leftSection.getChildren().remove(lstViewProducts);
+                        leftSection.getChildren().addAll(quantityTextField, numpad);
+                        leftSection.getChildren().remove(productsListView);
                         arrowIcon.setText("▼");
                     } else {
                         leftSection.setDisable(false);
-                        leftSection.getChildren().removeAll(txtFldQuantity, numpad);
-                        leftSection.getChildren().add(lstViewProducts);
+                        leftSection.getChildren().removeAll(quantityTextField, numpad);
+                        leftSection.getChildren().add(productsListView);
                         arrowIcon.setText("▲");
                     }
-
 
                 });
             }
@@ -132,17 +193,25 @@ public class ProductionView extends Parent implements Builder<Region> {
     }
 
     private TextField createQuantityField() {
-        TextField txtFldQuantity = new TextField();
-        txtFldQuantity.setPromptText("-.--");
-        txtFldQuantity.textProperty().addListener(new ChangeListener<String>() {
+        TextField quantityTextField = new TextField();
+        quantityTextField.promptTextProperty().bind(Bindings.createStringBinding(() ->
+        {
+            String text = "-.--";
+            if(model.getSelectedProduct() != null) {
+                text = "0.00 " + model.getSelectedProduct().getUnitMeasurement();
+            }
+            return text;
+        }, model.selectedProductProperty()));
+
+        quantityTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
 
                 if (newValue != null && !newValue.isEmpty()) {
-                    if(selectedProduct == null) {
+                    if(model.getSelectedProduct() == null) {
                         WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
-                        txtFldQuantity.clear();
+                        quantityTextField.clear();
                         return;
                     }
 
@@ -151,18 +220,18 @@ public class ProductionView extends Parent implements Builder<Region> {
                     Matcher matcher = pattern.matcher(filteredValue);
                     if (matcher.find())
                     {
-                        txtFldQuantity.setText(matcher.group(0));
+                        quantityTextField.setText(matcher.group(0));
                     } else {
-                        txtFldQuantity.clear();
+                        quantityTextField.clear();
                     }
                 } else {
-                    txtFldQuantity.clear();
+                    quantityTextField.clear();
                 }
             }
         });
-        txtFldQuantity.getStyleClass().add("txt-fld-quantity");
-        txtFldQuantity.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        return txtFldQuantity;
+        quantityTextField.getStyleClass().add("txt-fld-quantity");
+        quantityTextField.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        return quantityTextField;
     }
 
     private GridPane createNumpad() {
@@ -295,46 +364,44 @@ public class ProductionView extends Parent implements Builder<Region> {
                 Button node = (Button) event.getSource() ;
                 String value = node.getText();
                 //Handle warning screen for no product selected
-                if(selectedProduct == null) {
+                if(model.getSelectedProduct() == null) {
                     WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
                     return;
                 }
-                //TODO - WARNING FOR NO ORDER
                 if("0123456789.".contains(value)) {
-                    String quantity = txtFldQuantity.getText();
-                    txtFldQuantity.setText(quantity + value);
+                    String quantity = quantityTextField.getText();
+                    quantityTextField.setText(quantity + value);
                 } else if ("⌫".equals(value)) {
-                    String quantity = txtFldQuantity.getText();
+                    String quantity = quantityTextField.getText();
                     if (quantity.isEmpty()){
                         return;
                     }
-                    txtFldQuantity.setText(quantity.substring(0, quantity.length() - 1));
+                    quantityTextField.setText(quantity.substring(0, quantity.length() - 1));
                 } else if ("Adauga +".equals(value)) {
                     //Handle warning for no quantity entered
-                    if(txtFldQuantity.getText().isEmpty() || txtFldQuantity.getText() == null) {
-                        WarningController warningController = new WarningController(stage, "Introduceti cantitatea pentru produsul:\n" + selectedProduct.getName());
+                    if(quantityTextField.getText().isEmpty() || quantityTextField.getText() == null) {
+                        WarningController warningController = new WarningController(stage, "Introduceti cantitatea pentru produsul:\n" +
+                                model.getSelectedProduct().getName());
                         return;
                     }
-                    double quantity = Double.parseDouble(txtFldQuantity.getText());
+                    double quantity = Double.parseDouble(quantityTextField.getText());
                     if(quantity <= 0) {
                         WarningController warningController = new WarningController(stage, "Cantitatea trebuie sa fie mai mare de 0!");
                         return;
                     }
                     //Ask for confirmation
                     ConfirmationController confirmationController = new ConfirmationController(stage, "Confirmati introducere inregistrare",
-                            "Doriti sa introduceti " + quantity + " " + selectedProduct.getUnitMeasurement() + " pentru produsul\n" + selectedProduct.getName());
+                            "Doriti sa introduceti " + quantity + " " + model.getSelectedProduct().getUnitMeasurement() +
+                                    " pentru produsul\n" + model.getSelectedProduct().getName());
                     if(!confirmationController.isSUCCESS()){
                         return;
                     }
                     //Add the product record
-                    Dictionary<String, Object> data = new Hashtable<>();
-                    data.put("product", selectedProduct);
-                    data.put("quantity", quantity);
                     leftSection.setDisable(true);
                     productRecordAddActionHandler.accept(() -> {
                         leftSection.setDisable(false);
-                        txtFldQuantity.textProperty().set("");
-                    }, data);
+                        quantityTextField.textProperty().set("");
+                    }, quantity);
                 }
             }
         };
@@ -349,49 +416,49 @@ public class ProductionView extends Parent implements Builder<Region> {
         };
     }
 
-    private ListView<ProductRecordDTO> createProductRecordListView() {
-        ListView<ProductRecordDTO> listView = new ListView<>();
-
-        listView.setCellFactory(new Callback<ListView<ProductRecordDTO>, ListCell<ProductRecordDTO>>() {
-            @Override
-            public ListCell<ProductRecordDTO> call(ListView<ProductRecordDTO> param) {
-                return new ListCell<ProductRecordDTO>() {
-
-                    @Override
-                    protected void updateItem(ProductRecordDTO item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item == null || empty) {
-                            setText(null);
-                            setGraphic(null);
-                        } else {
-                            Button btnEdit = new Button("✎");
-                            btnEdit.setOnAction(handleBtnEditRecordOnAction(item));
-
-                            Label lblProductName = new Label(item.getName());
-                            lblProductName.getStyleClass().add("den-prod-record-list-cell");
-                            Label lblProductDetails = new Label(" Cantitate : " + String.format("%.2f", item.getQuantity()) + " " + item.getUnitMeasurement());
-                            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                            Label lblDateTime = new Label(" Data si ora: " + dateTimeFormatter.format(item.getDateAndTimeInserted()));
-                            HBox productCell = new HBox();
-                            productCell.getChildren().addAll(lblProductName, lblProductDetails, lblDateTime, btnEdit);
-
-                            productCell.setSpacing(10);
-                            productCell.setPadding(new Insets(10));
-                            setText(null);
-                            setGraphic(productCell);
-                        }
-                    }
-                };
-            }
-        });
-        listView.setItems(model.getProductRecords());
-        return listView;
-    }
+//    private ListView<ProductRecordDTO> createProductRecordListView() {
+//        ListView<ProductRecordDTO> listView = new ListView<>();
+//
+//        listView.setCellFactory(new Callback<ListView<ProductRecordDTO>, ListCell<ProductRecordDTO>>() {
+//            @Override
+//            public ListCell<ProductRecordDTO> call(ListView<ProductRecordDTO> param) {
+//                return new ListCell<ProductRecordDTO>() {
+//
+//                    @Override
+//                    protected void updateItem(ProductRecordDTO item, boolean empty) {
+//                        super.updateItem(item, empty);
+//                        if (item == null || empty) {
+//                            setText(null);
+//                            setGraphic(null);
+//                        } else {
+//                            Button btnEdit = new Button("✎");
+//                            btnEdit.setOnAction(handleBtnEditRecordOnAction(item));
+//
+//                            Label lblProductName = new Label(item.getName());
+//                            lblProductName.getStyleClass().add("den-prod-record-list-cell");
+//                            Label lblProductDetails = new Label(" Cantitate : " + String.format("%.2f", item.getQuantity()) + " " + item.getUnitMeasurement());
+//                            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+//                            Label lblDateTime = new Label(" Data si ora: " + dateTimeFormatter.format(item.getDateAndTimeInserted()));
+//                            HBox productCell = new HBox();
+//                            productCell.getChildren().addAll(lblProductName, lblProductDetails, lblDateTime, btnEdit);
+//
+//                            productCell.setSpacing(10);
+//                            productCell.setPadding(new Insets(10));
+//                            setText(null);
+//                            setGraphic(productCell);
+//                        }
+//                    }
+//                };
+//            }
+//        });
+//        listView.setItems(model.getProductRecords());
+//        return listView;
+//    }
 
     private TableView<ProductRecordDTO> createProductRecordTableView() {
         TableView<ProductRecordDTO> tableView = new TableView<>();
 
-        tableView.setPlaceholder(new Label("Nu exista inregistrari in baza de date."));
+        tableView.setPlaceholder(new Label("Nu exista inregistrari."));
 
         TableColumn<ProductRecordDTO, String> nameColumn = new TableColumn<>("Produs");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -435,9 +502,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         TableColumn<ProductRecordDTO, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
         dateAndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateAndTimeInserted"));
         quantityColumn.setPrefWidth(100);
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         dateAndTimeColumn.setCellFactory(column -> new TableCell<>() {
-            private final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-
             @Override
             protected void updateItem(Timestamp item, boolean empty) {
                 super.updateItem(item, empty);
@@ -463,13 +529,18 @@ public class ProductionView extends Parent implements Builder<Region> {
                         setGraphic(null);
                     } else {
                         setText(null);
-                        Button btnEdit = new Button("\uD83D\uDD27");
-                        btnEdit.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
 
-                        btnEdit.setOnAction(event -> {
-                            WarningController warningController = new WarningController(stage, "Doresti sa editezi inregistrarea: " + item);
+                        Button editButton = new Button();
+                        editButton.setGraphic(new FontIcon("mdi2s-square-edit-outline"));
+
+                        editButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
+                        editButton.getStyleClass().add("edit-button");
+                        editButton.getStyleClass().add("filled-button");
+
+                        editButton.setOnAction(event -> {
+                            editProductRecordHandler.accept(getTableRow().getItem());
                         });
-                        setGraphic(btnEdit);
+                        setGraphic(editButton);
                     }
                 }
             });
@@ -501,7 +572,9 @@ public class ProductionView extends Parent implements Builder<Region> {
             @Override
             public ListCell<ProductDTO> call(ListView<ProductDTO> param) {
                 return new ListCell<ProductDTO>() {
-
+                    {
+                        setPrefWidth(0);
+                    }
                     @Override
                     protected void updateItem(ProductDTO item, boolean empty) {
                         super.updateItem(item, empty);
@@ -512,7 +585,6 @@ public class ProductionView extends Parent implements Builder<Region> {
                             Label lblProductName = new Label(item.getName());
                             lblProductName.getStyleClass().add("den-prod-record-list-cell");
                             lblProductName.setWrapText(true);
-                            lblProductName.maxWidthProperty().bind(widthProperty().subtract(20));
                             Label lblProductDetails = new Label(item.getUnitMeasurement());
                             VBox container = new VBox();
                             container.getChildren().addAll(lblProductName, lblProductDetails);
@@ -520,7 +592,6 @@ public class ProductionView extends Parent implements Builder<Region> {
                             container.setPadding(new Insets(10));
                             setText(null);
                             setGraphic(container);
-                            prefWidthProperty().bind(listView.widthProperty().subtract(20));
                         }
                     }
                 };
@@ -550,11 +621,17 @@ public class ProductionView extends Parent implements Builder<Region> {
     }
 
     private void handleListViewItemSelected(ProductDTO product) {
-        //TODO - WARNING FOR PRODUCT WITH NOT ORDER
-        selectedProduct = product;
-        lblSelectedProductName.setText(product.getName());
-        leftSection.getChildren().addAll(txtFldQuantity, numpad);
-        leftSection.getChildren().remove(lstViewProducts);
-        txtFldQuantity.setPromptText("0.00 " + product.getUnitMeasurement());
+        searchOrderForProductHandler.accept(product);
     }
+
+    public void handleOrderSearchForProduct(ProductDTO product, boolean isFound) {
+        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, product);
+        if(orderAssociationController.isSUCCESS()) {
+            leftSection.getChildren().addAll(quantityTextField, numpad);
+            leftSection.getChildren().remove(productsListView);
+            setSelectedProductHandler.accept(product, orderAssociationController.getOrder());
+        }
+
+    }
+
 }

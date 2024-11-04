@@ -6,6 +6,7 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.core;
     requires org.kordamp.bootstrapfx.core;
     requires org.apache.poi.ooxml;
     requires jxl;
@@ -15,6 +16,7 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires org.apache.logging.log4j;
     requires java.sql;
     requires jdk.compiler;
+    requires org.dhatim.fastexcel;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie;

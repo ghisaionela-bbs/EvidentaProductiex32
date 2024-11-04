@@ -20,7 +20,7 @@ public class AccountView extends Parent implements Builder<Region> {
     private final AccountModel model;
     private Stage PARENT_STAGE;
     private VBox root;
-    private Callable<Runnable> disconnectHandler;
+    private final Callable<Runnable> disconnectHandler;
 
     public AccountView(AccountModel model, Stage parentStage, Callable<Runnable> disconnectHandler) {
         this.model = model;

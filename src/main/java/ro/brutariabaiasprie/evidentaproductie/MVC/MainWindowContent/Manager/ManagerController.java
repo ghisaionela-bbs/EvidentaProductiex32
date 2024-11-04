@@ -13,11 +13,30 @@ public class ManagerController implements SceneController {
 
     public ManagerController(Stage parentStage) {
         this.PARENT_STAGE = parentStage;
-        this.view = new ManagerView(this.model, parentStage, this::refreshProducts);
+        this.view = new ManagerView(this.model, parentStage, this::refreshProducts, this::refreshOrders);
         Platform.runLater(() -> {
             model.loadProducts();
             model.loadOrders();
         });
+    }
+
+    private void refreshOrders() {
+        Task<Void> taskDBload = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        model.loadOrders();
+                    }
+                });
+                return null;
+            }
+        };
+
+        Thread dbTaskThread = new Thread(taskDBload);
+        dbTaskThread.setDaemon(true);
+        dbTaskThread.start();
     }
 
     private void refreshProducts() {

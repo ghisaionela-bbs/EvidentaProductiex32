@@ -1,15 +1,19 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewOrder;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderItemDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
@@ -21,16 +25,23 @@ public class AddNewOrderView extends Parent implements Builder<Region> {
     private final AddNewOrderModel model;
     private final Consumer<ACTION_TYPE> actionHandler;
     private final Consumer<ProductDTO> addProductToOrderActionHandler;
+    private final Consumer<OrderItemDTO> deleteOrderItemHandler;
     private BorderPane root;
-    private Stage stage;
-    private Stage PARENT_STAGE;
+    private final Stage stage;
+    private final Stage PARENT_STAGE;
 
-    public AddNewOrderView(AddNewOrderModel model, Stage stage, Stage PARENT_STAGE, Consumer<ACTION_TYPE> actionHandler, Consumer<ProductDTO> addProductToOrderActionHandler) {
+    public AddNewOrderView(AddNewOrderModel model,
+                           Stage stage,
+                           Stage PARENT_STAGE,
+                           Consumer<ACTION_TYPE> actionHandler,
+                           Consumer<ProductDTO> addProductToOrderActionHandler,
+                           Consumer<OrderItemDTO> deleteOrderItemHandler) {
         this.model = model;
         this.stage = stage;
         this.actionHandler = actionHandler;
         this.addProductToOrderActionHandler = addProductToOrderActionHandler;
         this.PARENT_STAGE = PARENT_STAGE;
+        this.deleteOrderItemHandler = deleteOrderItemHandler;
     }
 
     @Override
@@ -79,10 +90,12 @@ public class AddNewOrderView extends Parent implements Builder<Region> {
         Label orderInfo = new Label("Detalii comanda:");
         orderInfo.getStyleClass().add("section-title");
 
-        Button placeOrderButton = new Button("Plaseaza comanda");
+        SceneButton placeOrderButton = new SceneButton("Plaseaza comanda", ACTION_TYPE.CONFIRMATION);
         placeOrderButton.setMaxWidth(Double.MAX_VALUE);
         placeOrderButton.getStyleClass().add("filled-button");
         placeOrderButton.getStyleClass().add("padded-button");
+        placeOrderButton.setOnAction(event-> actionHandler.accept(placeOrderButton.getActionType()));
+
         SceneButton cancelButton = new SceneButton("Anuleaza", ACTION_TYPE.CANCELLATION);
         cancelButton.setMaxWidth(Double.MAX_VALUE);
         cancelButton.getStyleClass().add("filled-button");
@@ -118,20 +131,30 @@ public class AddNewOrderView extends Parent implements Builder<Region> {
 
                             Label quantityLabel = new Label(String.format("%.2f", item.getQuantity()));
                             Label unitMeasurementLabel = new Label(item.getUnitMeasurement());
-                            Button editButton = new Button("\uD83D\uDD8B");
 
-                            FlowPane flowPane = new FlowPane(quantityLabel, unitMeasurementLabel, editButton);
+//                            Button editButton = new Button();
+//                            editButton.setGraphic(new FontIcon("mdi2s-square-edit-outline"));
+//                            editButton.getStyleClass().add("filled-button");
+
+                            Button deleteButton = new Button();
+                            deleteButton.setGraphic(new FontIcon("mdi2d-delete"));
+                            deleteButton.getStyleClass().add("filled-button");
+                            deleteButton.setOnAction(new EventHandler<ActionEvent>() {
+                                @Override
+                                public void handle(ActionEvent event) {
+                                    deleteOrderItemHandler.accept(item);
+                                }
+                            });
+
+                            FlowPane flowPane = new FlowPane(quantityLabel, unitMeasurementLabel, deleteButton);
                             flowPane.setAlignment(Pos.CENTER_RIGHT);
-//
-//                            HBox quantityContainer = new HBox(quantityLabel, unitMeasurementLabel, editButton);
-//                            quantityContainer.setAlignment(Pos.CENTER_RIGHT);
+                            flowPane.setHgap(10);
 
                             VBox container = new VBox(productNameTextFlow, flowPane);
 
                             setText(null);
                             setGraphic(container);
                         }
-
                     }
                 };
             }
