@@ -7,5 +7,6 @@ public enum SceneType {
     MANAGER,
     MAIN_WINDOW,
     DEFAULT,
-    ACCOUNT
+    ACCOUNT,
+    DASHBOARD
 }

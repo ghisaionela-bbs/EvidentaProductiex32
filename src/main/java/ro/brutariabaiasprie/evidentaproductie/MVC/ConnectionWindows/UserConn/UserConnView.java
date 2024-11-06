@@ -2,6 +2,8 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -14,7 +16,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
+
+import java.io.IOException;
 
 public class UserConnView extends Parent implements Builder<Region> {
     private final Stage stage;
@@ -44,15 +49,45 @@ public class UserConnView extends Parent implements Builder<Region> {
     private Node createInputBox() {
         Label lblUsername = new Label("Utilizator:");
         txtFldUsername = new TextField();
+        Button userNameKeyboardButton = new Button();
+        userNameKeyboardButton.setGraphic(new FontIcon("mdi2k-keyboard"));
+        userNameKeyboardButton.getStyleClass().add("filled-button");
+        userNameKeyboardButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    Runtime.getRuntime().exec("C:/windows/sysnative/cmd /c C:/Windows/system32/osk.exe");
+                    txtFldUsername.requestFocus();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         Label lblPassword = new Label("Parola:");
         txtFldPassword = new TextField();
+        Button passwordKeyboardButton = new Button();
+        passwordKeyboardButton.setGraphic(new FontIcon("mdi2k-keyboard"));
+        passwordKeyboardButton.getStyleClass().add("filled-button");
+        passwordKeyboardButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    Runtime.getRuntime().exec("C:/windows/sysnative/cmd /c C:/Windows/system32/osk.exe");
+                    txtFldPassword.requestFocus();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         GridPane gridPane = new GridPane();
         gridPane.add(lblUsername, 0, 0);
         gridPane.add(txtFldUsername, 1, 0);
+        gridPane.add(userNameKeyboardButton, 2, 0);
         gridPane.add(lblPassword, 0, 1);
         gridPane.add(txtFldPassword, 1, 1);
+        gridPane.add(passwordKeyboardButton, 2, 1);
         gridPane.getStyleClass().add("grid-conn");
         inputBox = gridPane;
         return inputBox;

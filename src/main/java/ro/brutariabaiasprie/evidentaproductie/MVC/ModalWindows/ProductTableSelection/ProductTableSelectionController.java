@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.OrderAssociationView;
 
 import java.util.Objects;
 

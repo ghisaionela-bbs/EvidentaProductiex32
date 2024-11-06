@@ -22,35 +22,20 @@ import java.util.function.Consumer;
 public class OrderAssociationView extends Parent implements Builder<Region> {
     private final OrderAssociationModel model;
     private final Consumer<ACTION_TYPE> actionHandler;
-    private final Consumer<Boolean> noOrderHandler;
-    private final Stage PARENT_STAGE;
-    private final Stage stage;
 
-    private StackPane body;
-    private Node loadingSection;
-    private Node ordersSection;
     private TableView<OrderResultsDTO> orderTableView;
 
-    public OrderAssociationView(OrderAssociationModel model, Stage stage, Stage PARENT_STAGE, Consumer<ACTION_TYPE> actionHandler, Consumer<Boolean> noOrderHandler) {
+    public OrderAssociationView(OrderAssociationModel model, Consumer<ACTION_TYPE> actionHandler) {
         this.model = model;
         this.actionHandler = actionHandler;
-        this.PARENT_STAGE = PARENT_STAGE;
-        this.noOrderHandler = noOrderHandler;
-        this.stage = stage;
     }
 
     @Override
     public Region build() {
         VBox root = new VBox();
-        root.setPrefSize(PARENT_STAGE.getWidth() * 0.5, PARENT_STAGE.getHeight() * 0.5);
+        Node ordersSection = createOrdersSection();
 
-        loadingSection = createLoadingSection();
-        ordersSection = createOrdersSection();
-
-        body = new StackPane(createOrdersSection(), loadingSection);
-        VBox.setVgrow(body, Priority.ALWAYS);
-
-        root.getChildren().addAll(body, createButtonsContainer());
+        root.getChildren().addAll(ordersSection, createButtonsContainer());
         root.getStyleClass().add("modal-window");
         return root;
     }
@@ -69,14 +54,6 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
         buttonsContainer.setSpacing(8);
         buttonsContainer.setAlignment(Pos.CENTER);
         return buttonsContainer;
-    }
-
-    private Node createLoadingSection() {
-        Label loadingSectionLabel = new Label("Va rugam asteptati.\nSe cauta comenzi pentru produsul " + model.getProduct().getName());
-        loadingSectionLabel.setAlignment(Pos.CENTER);
-        loadingSectionLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        loadingSectionLabel.setStyle("-fx-background-color: COLOR_WHITE;");
-        return loadingSectionLabel;
     }
 
     private Node createOrdersSection() {
@@ -132,31 +109,15 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
         unitMeasurementColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 10 );
 
         orderTableView.setItems(model.getOrderSearchResults());
+        orderTableView.getSelectionModel().select(0);
 
         container.getChildren().addAll(infoLabel, orderTableView);
 
         return container;
     }
 
-    public void showOrderResults() {
-        body.getChildren().remove(loadingSection);
-        if(!model.getOrderSearchResults().isEmpty()) {
-            orderTableView.getSelectionModel().select(0);
-        }
-    }
-
     public OrderResultsDTO getSelectedOrder() {
-        if (body.getChildren().contains(loadingSection)) {
-            return null;
-        }
         return orderTableView.getSelectionModel().getSelectedItem();
-    }
-
-    public void showNoOrderFoundWindow() {
-        ConfirmationController confirmation = new ConfirmationController(stage, "Atentie!",
-                "Nu s-au gasit comenzi pentru produsul: " + model.getProduct().getName() +
-                "\nDoriti sa introduceti inregistrari pentru acest produs fara comanda?");
-        noOrderHandler.accept(confirmation.isSUCCESS());
     }
 
 }

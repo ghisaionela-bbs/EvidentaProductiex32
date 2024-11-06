@@ -1,6 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production;
 
 import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
@@ -10,6 +11,9 @@ import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.EditProductRecord.EditProductRecordController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
+import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
+
+import java.sql.Timestamp;
 
 public class ProductionController implements SceneController {
     private final ProductionView view;
@@ -23,6 +27,19 @@ public class ProductionController implements SceneController {
                 this::searchOrderForProduct,
                 this::setSelectedProduct,
                 this::editProductRecordHandler);
+        DBConnectionService.getModifiedTables().addListener(new MapChangeListener<String, Timestamp>() {
+            @Override
+            public void onChanged(Change<? extends String, ? extends Timestamp> change) {
+                if(change.wasAdded()) {
+                    if(change.getKey().equals("PRODUSE")) {
+                        model.loadProducts();
+                    }
+                    if(change.getKey().equals("INREGISTRARI_PRODUSE")) {
+                        model.loadProductRecords();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -71,8 +88,6 @@ public class ProductionController implements SceneController {
 
     private void editProductRecordHandler(ProductRecordDTO productRecord) {
         EditProductRecordController editProductRecordController = new EditProductRecordController(view.getStage(), productRecord);
-        if(editProductRecordController.isSUCCESS()) {
-        }
     }
 
     private void searchOrderForProduct(ProductDTO productDTO) {

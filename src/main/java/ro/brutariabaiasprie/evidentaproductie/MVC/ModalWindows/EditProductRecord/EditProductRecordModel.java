@@ -3,19 +3,22 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.EditProductRecor
 import javafx.beans.property.*;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Exceptions.OrderItemNotFound;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class EditProductRecordModel {
     private final ObjectProperty<ProductRecordDTO> productRecord = new SimpleObjectProperty<>();
     private final StringProperty productName = new SimpleStringProperty();
     private final StringProperty unitMeasurement = new SimpleStringProperty();
     private final SimpleObjectProperty<Integer> orderID = new SimpleObjectProperty<>();
+    private double quantity;
 
     private ProductDTO product;
 
@@ -80,6 +83,14 @@ public class EditProductRecordModel {
         this.productRecord.get().setORDER_ID(orderID);
     }
 
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
+
     public void setProduct(ProductDTO product) {
         this.product = product;
         this.productRecord.get().setPRODUCT_ID(product.getID());
@@ -106,6 +117,37 @@ public class EditProductRecordModel {
             return true;
         } catch (OrderItemNotFound e) {
             return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateProductRecord(double quantity) {
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "UPDATE [dbo].[INREGISTRARI_PRODUSE] SET " +
+                    "ID_PRODUS = ?, " +
+                    "cantitate = ?, " +
+                    "datasiora_m = ?, " +
+                    "ID_UTILIZATOR_M = ?, " +
+                    "ID_COMANDA = ? " +
+                    "WHERE ID = ?";
+
+            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+
+            Calendar calendar = Calendar.getInstance();
+            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, product.getID());
+            statement.setDouble(2, quantity);
+            statement.setTimestamp(3, timestamp);
+            statement.setInt(4, user.getID());
+            statement.setObject(5, orderID.get(), java.sql.Types.INTEGER);
+            statement.setInt(6, productRecord.get().getID());
+
+            statement.executeUpdate();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

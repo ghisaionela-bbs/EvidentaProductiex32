@@ -1,26 +1,27 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues;
+package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddProductGroup;
 
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportView;
 
-import java.util.Map;
 import java.util.Objects;
 
-public class ChoiceController {
-    private final Stage stage;
-    private Object chosenOption;
+public class AddProductGroupController {
+    private Stage stage;
+    private AddProductGroupModel model;
+    private AddProductGroupView view;
 
-    public ChoiceController(Stage owner, String windowTitle, String message, Map<Object, String> options){
+
+    public AddProductGroupController(Stage owner) {
         stage = new Stage();
-        ChoiceView view = new ChoiceView(message, options, this::onWindowAction);
-
+        model = new AddProductGroupModel();
+        view = new AddProductGroupView(model);
         Scene scene = new Scene(view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
 
-        stage.setTitle(windowTitle);
-
+        stage.setTitle("Adauga o grupa de produs");
         Image icon16x16 = new Image("app-icon-16x16.png");
         Image icon32x32 = new Image("app-icon-32x32.png");
         Image icon64x64 = new Image("app-icon-64x64.png");
@@ -29,14 +30,5 @@ public class ChoiceController {
         stage.initOwner(owner);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
-    }
-
-    protected void onWindowAction(Object option) {
-        this.chosenOption = option;
-        stage.close();
-    }
-
-    public Object getChosenOption() {
-        return chosenOption;
     }
 }

@@ -1,5 +1,4 @@
 module ro.brutariabaiasprie.evidentaproductie {
-    requires javafx.controls;
     requires javafx.fxml;
 
     requires org.controlsfx.controls;
@@ -11,12 +10,12 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires org.apache.poi.ooxml;
     requires jxl;
     requires com.fasterxml.jackson.databind;
-    requires java.desktop;
     requires org.dhatim.fastexcel.reader;
     requires org.apache.logging.log4j;
     requires java.sql;
     requires jdk.compiler;
     requires org.dhatim.fastexcel;
+    requires java.desktop;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie;

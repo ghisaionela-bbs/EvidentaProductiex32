@@ -262,4 +262,11 @@ public class EditProductRecordView extends Parent implements Builder<Region> {
         numpad.getStyleClass().add("numpad");
         return numpad;
     }
+
+    public double getQuantity() {
+        if(quantityTextField.getText() == null) {
+            return 0;
+        }
+        return Double.parseDouble(quantityTextField.getText());
+    }
 }

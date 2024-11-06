@@ -1,5 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewProduct;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -8,9 +10,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Builder;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 public class AddNewProductView extends Parent implements Builder<Region> {
@@ -31,6 +35,20 @@ public class AddNewProductView extends Parent implements Builder<Region> {
 
         Label productNameLabel = new Label("Denumire:");
         productNameTextField = new TextField();
+        Button productNameKeyboardButton = new Button();
+        productNameKeyboardButton.setGraphic(new FontIcon("mdi2k-keyboard"));
+        productNameKeyboardButton.getStyleClass().add("filled-button");
+        productNameKeyboardButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    Runtime.getRuntime().exec("C:/windows/sysnative/cmd /c C:/Windows/system32/osk.exe");
+                    productNameTextField.requestFocus();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         Label unitMeasurementLabel = new Label("Unitatea de masura:");
         unitMeasurementGroup = new ToggleGroup();
@@ -45,6 +63,7 @@ public class AddNewProductView extends Parent implements Builder<Region> {
         GridPane gridPane = new GridPane();
         gridPane.add(productNameLabel, 0, 0, 1, 1);
         gridPane.add(productNameTextField, 1, 0, 2, 1);
+        gridPane.add(productNameKeyboardButton, 3, 0);
         gridPane.add(unitMeasurementLabel, 0, 1);
         gridPane.add(kilogramsButton, 1, 1);
         gridPane.add(pieceButton, 2, 1);

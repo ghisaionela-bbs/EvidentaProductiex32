@@ -1,10 +1,14 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 
 import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
+import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
+
+import java.sql.Timestamp;
 
 public class ManagerController implements SceneController {
     private final Stage PARENT_STAGE;
@@ -17,6 +21,18 @@ public class ManagerController implements SceneController {
         Platform.runLater(() -> {
             model.loadProducts();
             model.loadOrders();
+        });
+        DBConnectionService.getModifiedTables().addListener(new MapChangeListener<String, Timestamp>() {
+            @Override
+            public void onChanged(Change<? extends String, ? extends Timestamp> change) {
+                if(change.wasAdded()) {
+                    if (change.getKey().equals("PRODUSE")) {
+                        model.loadProducts();
+                    } else if (change.getKey().equals("COMENZI")) {
+                        model.loadOrders();
+                    }
+                }
+            }
         });
     }
 

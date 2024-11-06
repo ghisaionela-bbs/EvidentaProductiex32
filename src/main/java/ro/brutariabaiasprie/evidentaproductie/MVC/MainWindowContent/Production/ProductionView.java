@@ -11,7 +11,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import javafx.stage.Stage;
@@ -31,7 +30,6 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -44,9 +42,9 @@ public class ProductionView extends Parent implements Builder<Region> {
     private final BiConsumer<ProductDTO, OrderDTO> setSelectedProductHandler;
     private final Consumer<ProductRecordDTO> editProductRecordHandler;
 
-    private ProductionModel model;
-    private Stage stage;
-    private User user;
+    private final ProductionModel model;
+    private final Stage stage;
+    private final User user;
 
     private HBox root;
     private TextField quantityTextField;
@@ -55,6 +53,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     private ListView<ProductDTO> productsListView;
     private Label arrowIcon;
     private Label orderLabel;
+    private HBox quantityInputContainer;
 
     public Stage getStage() {
         return stage;
@@ -79,10 +78,30 @@ public class ProductionView extends Parent implements Builder<Region> {
     public Region build() {
         Button btnProductChoice = createBtnProductChoice();
         quantityTextField = createQuantityField();
+        quantityTextField.setMaxWidth(Region.USE_COMPUTED_SIZE);
+        Label unitMeasurementLabel = new Label();
+        unitMeasurementLabel.textProperty().bind(Bindings.createStringBinding(() ->
+        {
+            String text = "";
+            if(model.getSelectedProduct() != null) {
+                text = model.getSelectedProduct().getUnitMeasurement();
+            }
+            return text;
+        }, model.selectedProductProperty()));
+        HBox.setHgrow(quantityTextField, Priority.ALWAYS);
+        unitMeasurementLabel.getStyleClass().add("unit-measurement-indicator");
+        unitMeasurementLabel.setMaxWidth(Region.USE_COMPUTED_SIZE);
+
+
+        quantityInputContainer = new HBox(quantityTextField, unitMeasurementLabel);
+        quantityInputContainer.setAlignment(Pos.CENTER);
+        quantityInputContainer.setSpacing(8);
+        quantityInputContainer.getStyleClass().add("production-quantity-input");
 
         numpad = createNumpad();
 
-        leftSection = new VBox(btnProductChoice, quantityTextField, numpad);
+        leftSection = new VBox(btnProductChoice, quantityInputContainer, numpad);
+        leftSection.getStyleClass().add("production-input-section");
 
         btnProductChoice.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
         quantityTextField.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
@@ -103,6 +122,7 @@ public class ProductionView extends Parent implements Builder<Region> {
 
         root = new HBox();
         root.getChildren().addAll(leftSection, records);
+        root.setSpacing(8);
         return root;
     }
 
@@ -114,6 +134,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         VBox infoContainer = new VBox();
 
         Label selectedProductNameLabel = new Label();
+        selectedProductNameLabel.getStyleClass().add("product-name");
         selectedProductNameLabel.textProperty().bind(Bindings.createStringBinding(() ->
         {
             String text = "Nici un produs selectat";
@@ -123,29 +144,17 @@ public class ProductionView extends Parent implements Builder<Region> {
             return text;
         }, model.selectedProductProperty()));
 
-        selectedProductNameLabel.getStyleClass().add("lbl-sel-prod");
         selectedProductNameLabel.setWrapText(true);
 
         orderLabel = new Label();
-        orderLabel.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> ov, String t, String t1) {
-                if(model.getAssociatedOrder() == null && model.getSelectedProduct() != null) {
-                    orderLabel.textFillProperty().set(Color.RED);
-                } else {
-                    orderLabel.textFillProperty().set(Color.BLACK);
-                }
-            }
-        });
         SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         orderLabel.textProperty().bind(Bindings.createStringBinding(() ->
                 {
                     if(model.getAssociatedOrder() == null) {
-                        if(model.getSelectedProduct() == null) {
-                            return "";
-                        }
-                        return "Nici o comanda asociata!";
+                        orderLabel.getStyleClass().add("warning");
+                        return "!!! Nici o comanda asociata !!!";
                     }
+                    orderLabel.getStyleClass().remove("warning");
                     OrderDTO order = model.getAssociatedOrder();
                     return "Asociat la comanda: " + order.getID() + " din " + dateTimeFormatter.format(order.getDateAndTimeInserted());
 
@@ -153,6 +162,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                 model.associatedOrderProperty()
         ));
         orderLabel.wrapTextProperty().set(true);
+        orderLabel.getStyleClass().add("select-product-button-order-info");
 
         infoContainer.getChildren().addAll(selectedProductNameLabel, orderLabel);
         infoContainer.setAlignment(Pos.CENTER);
@@ -166,7 +176,7 @@ public class ProductionView extends Parent implements Builder<Region> {
 
         Button btnProductChoice = new Button();
         btnProductChoice.setGraphic(stackPane);
-        btnProductChoice.getStyleClass().add("btn-sel-prod");
+        btnProductChoice.getStyleClass().add("production-product-selection-button");
         btnProductChoice.prefWidthProperty().bind(stage.widthProperty().divide(3));
         btnProductChoice.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         btnProductChoice.setOnAction(new EventHandler<ActionEvent>() {
@@ -176,12 +186,12 @@ public class ProductionView extends Parent implements Builder<Region> {
                 productSelectionActionHandler.accept(() -> {
                     if(leftSection.getChildren().contains(productsListView)) {
                         leftSection.setDisable(false);
-                        leftSection.getChildren().addAll(quantityTextField, numpad);
+                        leftSection.getChildren().addAll(quantityInputContainer, numpad);
                         leftSection.getChildren().remove(productsListView);
                         arrowIcon.setText("▼");
                     } else {
                         leftSection.setDisable(false);
-                        leftSection.getChildren().removeAll(quantityTextField, numpad);
+                        leftSection.getChildren().removeAll(quantityInputContainer, numpad);
                         leftSection.getChildren().add(productsListView);
                         arrowIcon.setText("▲");
                     }
@@ -194,20 +204,12 @@ public class ProductionView extends Parent implements Builder<Region> {
 
     private TextField createQuantityField() {
         TextField quantityTextField = new TextField();
-        quantityTextField.promptTextProperty().bind(Bindings.createStringBinding(() ->
-        {
-            String text = "-.--";
-            if(model.getSelectedProduct() != null) {
-                text = "0.00 " + model.getSelectedProduct().getUnitMeasurement();
-            }
-            return text;
-        }, model.selectedProductProperty()));
+        quantityTextField.promptTextProperty().set("----------.--");
 
         quantityTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
-
                 if (newValue != null && !newValue.isEmpty()) {
                     if(model.getSelectedProduct() == null) {
                         WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
@@ -407,15 +409,6 @@ public class ProductionView extends Parent implements Builder<Region> {
         };
     }
 
-    private EventHandler<ActionEvent> handleBtnEditRecordOnAction(ProductRecordDTO productRecordDTO) {
-        return new EventHandler<>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println(productRecordDTO);
-            }
-        };
-    }
-
 //    private ListView<ProductRecordDTO> createProductRecordListView() {
 //        ListView<ProductRecordDTO> listView = new ListView<>();
 //
@@ -468,6 +461,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                 super.updateItem(item, empty);
                 if (empty) {
                     setText(null);
+                    setGraphic(null);
                 } else {
                     Text txtName = new Text(item);
                     txtName.getStyleClass().add("text");
@@ -627,7 +621,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     public void handleOrderSearchForProduct(ProductDTO product, boolean isFound) {
         OrderAssociationController orderAssociationController = new OrderAssociationController(stage, product);
         if(orderAssociationController.isSUCCESS()) {
-            leftSection.getChildren().addAll(quantityTextField, numpad);
+            leftSection.getChildren().addAll(quantityInputContainer, numpad);
             leftSection.getChildren().remove(productsListView);
             setSelectedProductHandler.accept(product, orderAssociationController.getOrder());
         }

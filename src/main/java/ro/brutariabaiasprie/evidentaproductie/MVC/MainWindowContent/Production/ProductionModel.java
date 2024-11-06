@@ -81,8 +81,7 @@ public class ProductionModel {
                     "JOIN [dbo].[PRODUSE] AS p ON ip.ID_PRODUS = p.ID " +
                     whereCond +
                     "ORDER BY ip.datasiora_i DESC";
-            System.out.println(user);
-            System.out.println(sql);
+
             PreparedStatement statement = connection.prepareStatement(sql);
             if(user.getID_ROLE() != 0 && user.getID_ROLE() != 1) {
                 statement.setInt(1, user.getID());
@@ -159,23 +158,11 @@ public class ProductionModel {
             if(associatedOrder.get() != null) {
                 statement.setInt(5, associatedOrder.get().getID());
             }
-            statement.execute();
+            statement.executeUpdate();
 
             ResultSet key = statement.getGeneratedKeys();
             key.next();
             int ID = key.getInt(1);
-
-            ProductRecordDTO productRecordDTO;
-            if(associatedOrder.get() != null) {
-                productRecordDTO = new ProductRecordDTO(ID, selectedProduct.get().getID(), selectedProduct.get().getName(),
-                        selectedProduct.get().getUnitMeasurement(), quantity, timestamp, user.getID(), associatedOrder.get().getID());
-            } else {
-                productRecordDTO = new ProductRecordDTO(ID,  selectedProduct.get().getID(), selectedProduct.get().getName(),
-                        selectedProduct.get().getUnitMeasurement(), quantity, timestamp, user.getID(), null);
-            }
-
-            productRecords.add(0, productRecordDTO);
-
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

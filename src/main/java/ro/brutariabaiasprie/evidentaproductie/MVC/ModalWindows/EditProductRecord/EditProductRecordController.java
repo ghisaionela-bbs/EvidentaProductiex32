@@ -15,18 +15,15 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ProductTableSelection.ProductTableSelectionController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ProductTableSelection.ProductTableSelectionView;
 
-import java.awt.*;
 import java.util.*;
 
 public class EditProductRecordController extends ModalWindow {
     private final EditProductRecordModel model;
     private final EditProductRecordView view;
     private final Stage stage;
-    private final Stage PARENT_STAGE;
     private boolean SUCCESS = false;
 
     public EditProductRecordController(Stage owner, ProductRecordDTO productRecord) {
-        PARENT_STAGE = owner;
         stage = new Stage();
         model = new EditProductRecordModel(productRecord);
         view = new EditProductRecordView(model, stage, this::onWindowAction, this::changeOrderHandler, this::changeProductHandler);
@@ -46,39 +43,60 @@ public class EditProductRecordController extends ModalWindow {
 
     private void changeOrderHandler() {
         OrderAssociationController orderAssociationController = new OrderAssociationController(stage, model.getProduct());
+        if(orderAssociationController.isSUCCESS()) {
+            if(orderAssociationController.getOrder() == null) {
+                model.setOrderID(null);
+            } else {
+                model.setOrderID(orderAssociationController.getOrder().getID());
+            }
+        }
     }
 
     private void changeProductHandler() {
         ProductTableSelectionController productSelection = new ProductTableSelectionController(stage);
         if(productSelection.isSUCCESS()) {
             ProductDTO product = productSelection.getSelectedProduct();
+            //Set the product in the end
+            model.setProduct(product);
+            //If product record has order associated to it
             if(model.getProductRecord().getORDER_ID() != null) {
-                if(!model.checkOrderItems(product)){
+                //If there are no order items for the selected product in the current order
+                if(!model.checkOrderItems(product)) {
+                    //Ask if you want to select another order for the record
                     Map<Object, String> options = new TreeMap<>();
                     options.put(0, "Da");
                     options.put(1, "Nu");
                     ChoiceController choiceController = new ChoiceController(stage, "Confimati",
                             "Produsul acesta nu apare in comanda asociata la inregistrarea curenta.\n" +
                                     "Doriti sa asociati inregistrarea la o alta comanda care contine produsul?",
-                                    options);
-                    if((Integer) choiceController.getChosenOption() == 0) {
-                        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, model.getProduct());
+                            options);
+                    if ((Integer) choiceController.getChosenOption() == 0) {
+                        changeOrderHandler();
                     }
-                    model.setProduct(product);
-                } else {
-                    model.setProduct(product);
+                }
+            //If there is no order for the selected record
+            } else {
+                //Ask if you want to select an order for the record
+                Map<Object, String> options = new TreeMap<>();
+                options.put(0, "Da");
+                options.put(1, "Nu");
+                ChoiceController choiceController = new ChoiceController(stage, "Confimati",
+                        "Inregistrarea aceasta nu este asociata la nici o comanda.\n" +
+                                "Doriti sa asociati inregistrarea la o comanda?",
+                        options);
+                if ((Integer) choiceController.getChosenOption() == 0) {
+                    changeOrderHandler();
                 }
             }
-
-
         }
     }
-
 
     @Override
     protected void onWindowAction(ACTION_TYPE actionType) {
         if(actionType == ACTION_TYPE.CONFIRMATION) {
             SUCCESS = true;
+            model.updateProductRecord(view.getQuantity());
+            stage.close();
         } else {
             stage.close();
         }

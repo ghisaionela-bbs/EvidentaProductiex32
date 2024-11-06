@@ -11,6 +11,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Builder;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
@@ -29,6 +30,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
     private Button accountButton;
     private Button managerButton;
     private Button productionButton;
+    private Button dashBoardButton;
 
     private final Consumer<SceneType> actionHandler;
 
@@ -42,6 +44,8 @@ public class MainWindowView extends Parent implements Builder<Region> {
     public Region build() {
         //SETTING UP THE NAVIGATION MENU
         navigationMenu = new VBox();
+        dashBoardButton = createNavBarMenuButton("Tablou\nde bord", SceneType.DASHBOARD);
+        dashBoardButton.setGraphic(new FontIcon("mdi2m-monitor-dashboard"));
         accountButton = createNavBarMenuButton("\uD83D\uDC64\nCont", SceneType.ACCOUNT);
         managerButton = createNavBarMenuButton("\uD83D\uDCCA\nAdministrare", SceneType.MANAGER);
         productionButton = createNavBarMenuButton("\uD83C\uDFED\nProductie", SceneType.PRODUCTION);
@@ -49,16 +53,19 @@ public class MainWindowView extends Parent implements Builder<Region> {
             accountButton.setText("\uD83D\uDC64");
             managerButton.setText("\uD83D\uDCCA");
             productionButton.setText("\uD83C\uDFED");
+            dashBoardButton.setText("");
         } else {
             accountButton.setText("\uD83D\uDC64\nCont");
             managerButton.setText("\uD83D\uDCCA\nAdministrare");
             productionButton.setText("\uD83C\uDFED\nProductie");
+            dashBoardButton.setText("Tablou\nde bord");
         }
 
         navigationMenu.getChildren().add(accountButton);
-        if(model.getCONNECTED_USER().getID_ROLE() == 0 || model.getCONNECTED_USER().getID_ROLE() == 1) {
-            navigationMenu.getChildren().add(managerButton);
+        if(model.getCONNECTED_USER().getID_ROLE() == 0) {
+            navigationMenu.getChildren().add(dashBoardButton);
         }
+        navigationMenu.getChildren().add(managerButton);
         navigationMenu.getChildren().add(productionButton);
         root.setLeft(navigationMenu);
         //SETTING UP THE WINDOW RESIZE LISTENERS
@@ -71,15 +78,16 @@ public class MainWindowView extends Parent implements Builder<Region> {
 
     private void createStageResizeListeners() {
         ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
-            System.out.println(PARENT_STAGE.getWidth());
             if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
                 accountButton.setText("\uD83D\uDC64");
                 managerButton.setText("\uD83D\uDCCA");
                 productionButton.setText("\uD83C\uDFED");
+                dashBoardButton.setText("");
             } else {
                 accountButton.setText("\uD83D\uDC64\nCont");
                 managerButton.setText("\uD83D\uDCCA\nAdministrare");
                 productionButton.setText("\uD83C\uDFED\nProductie");
+                dashBoardButton.setText("Tablou\nde bord");
             }
         };
 
@@ -110,7 +118,10 @@ public class MainWindowView extends Parent implements Builder<Region> {
 
     public void openDefaultTab() {
         switch (model.getCONNECTED_USER().getID_ROLE()){
-            case 0: case 1:
+            case 0:
+                dashBoardButton.fire();
+                break;
+            case 1:
                 managerButton.fire();
                 break;
             default:

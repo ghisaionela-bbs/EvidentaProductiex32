@@ -2,22 +2,28 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderItemDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderItemReportDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
+import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.*;
-import java.util.Calendar;
 
 public class ManagerModel {
+    private final User CONNECTED_USER;
     ObservableList<ProductDTO> products;
     ObservableList<OrderItemReportDTO> orders;
 
     public ManagerModel() {
+        CONNECTED_USER = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
         this.products = FXCollections.observableArrayList();
         this.orders = FXCollections.observableArrayList();
+    }
+
+    public User getCONNECTED_USER() {
+        return CONNECTED_USER;
     }
 
     public ObservableList<ProductDTO> getProducts() {
@@ -89,21 +95,6 @@ public class ManagerModel {
                     "LEFT JOIN INREGISTRARI_PRODUSE AS ip ON ip.ID_COMANDA = c.ID AND ic.ID_PRODUS = ip.ID_PRODUS " +
                     "GROUP BY c.ID, ic.ID, c.datasiora_i, p.ID, p.denumire, p.um, ic.cantitate " +
                     "ORDER BY datasiora_i ASC";
-//            String sql = "SELECT c.ID AS ID_COMANDA, " +
-//                    "ic.ID AS ID_ITEM_COMANDA, " +
-//                    "c.datasiora_i, " +
-//                    "p.ID AS ID_PRODUS, " +
-//                    "p.denumire, " +
-//                    "p.um, " +
-//                    "ic.cantitate, " +
-//                    "SUM(COALESCE(ip.cantitate, 0.00)) AS realizat, " +
-//                    "ic.cantitate - SUM((COALESCE(ip.cantitate, 0.00))) AS rest " +
-//                    "FROM COMENZI AS c " +
-//                    "LEFT JOIN ITEME_COMENZI AS ic ON c.ID = ic.ID_COMANDA " +
-//                    "LEFT JOIN PRODUSE AS p ON p.ID = ic.ID_PRODUS " +
-//                    "LEFT JOIN INREGISTRARI_PRODUSE AS ip ON ip.ID_COMANDA = c.ID AND ic.ID_PRODUS = ip.ID_PRODUS " +
-//                    "GROUP BY c.ID, ic.ID, c.datasiora_i, p.ID, p.denumire, p.um, ic.cantitate " +
-//                    "ORDER BY c.datasiora_i ASC";
 
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
@@ -132,90 +123,5 @@ public class ManagerModel {
         }
     }
 
-//    public void loadOrders() {
-//        try{
-//            Connection connection = DBConnectionService.getConnection();
-//            String sql = "SELECT c.ID, " +
-//                    "c.ID_PRODUS, " +
-//                    "p.denumire, " +
-//                    "c.cantitate, " +
-//                    "p.um, " +
-//                    "SUM(COALESCE(ip.cantitate, 0.00)) AS realizat, " +
-//                    "c.cantitate - SUM(COALESCE(ip.cantitate, 0.00)) AS rest " +
-//                    "FROM [dbo].[COMENZI] AS c " +
-//                    "LEFT JOIN [dbo].[PRODUSE] AS p ON c.ID_PRODUS = p.ID " +
-//                    "LEFT JOIN [dbo].[INREGISTRARI_PRODUSE] AS ip ON c.ID_PRODUS = ip.ID_COMANDA " +
-//                    "WHERE CAST(c.datasiora_i AS DATE) = CAST(? AS DATE) " +
-//                    "GROUP BY c.ID, c.ID_PRODUS, p.denumire, c.cantitate, p.um";
-////            String sql = "SELECT " +
-////                    "p.ID AS ID_PRODUS, " +
-////                    "p.denumire, " +
-////                    "p.um, " +
-////                    "c.ID AS ID_COMANDA, " +
-////                    "COALESCE(c.cantitate, 0.00) AS cantitate, " +
-////                    "SUM(ip.cantitate) AS realizat, " +
-////                    "COALESCE(c.cantitate, 0.00) - SUM(ip.cantitate) AS rest " +
-////                    "FROM " +
-////                    "PRODUSE AS p " +
-////                    "LEFT JOIN " +
-////                    "COMENZI AS c ON p.ID = c.ID_PRODUS " +
-////                    "LEFT JOIN " +
-////                    "INREGISTRARI_PRODUSE AS ip ON p.ID = ip.ID_PRODUS " +
-////                    "WHERE CAST(c.datasiora_i AS DATE) = CAST(? AS DATE) " +
-////                    "GROUP BY p.ID, p.denumire, p.um, c.cantitate, c.ID " +
-////                    "UNION " +
-////                    "SELECT " +
-////                    "p.ID AS ID_PRODUS, " +
-////                    "p.denumire, " +
-////                    "p.um, " +
-////                    "-1 AS ID_COMANDA, " +
-////                    "0.00 AS cantitate, " +
-////                    "( " +
-////                    "SELECT COALESCE( " +
-////                    "SUM(ip.cantitate), " +
-////                    "0.00) " +
-////                    "FROM INREGISTRARI_PRODUSE AS ip WHERE ip.ID_PRODUS = p.ID AND CAST(? AS DATE) = CAST(ip.datasiora_i AS DATE) " +
-////                    ") AS realizat, " +
-////                    "0.00 - ( " +
-////                    "SELECT COALESCE( " +
-////                    "SUM(ip.cantitate), " +
-////                    "0.00) " +
-////                    "FROM INREGISTRARI_PRODUSE AS ip WHERE ip.ID_PRODUS = p.ID AND CAST(? AS DATE) = CAST(ip.datasiora_i AS DATE) " +
-////                    ") AS rest " +
-////                    "FROM " +
-////                    "PRODUSE AS p " +
-////                    "LEFT JOIN " +
-////                    "COMENZI AS c ON p.ID = c.ID_PRODUS " +
-////                    "LEFT JOIN " +
-////                    "INREGISTRARI_PRODUSE AS ip ON p.ID = ip.ID_PRODUS " +
-////                    "WHERE c.ID_PRODUS IS NULL " +
-////                    "ORDER BY cantitate DESC, p.denumire ASC";
-//            PreparedStatement statement = connection.prepareStatement(sql);
-//
-//            Calendar calendar = Calendar.getInstance();
-//            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
-//            statement.setTimestamp(1, timestamp);
-////            statement.setTimestamp(2, timestamp);
-////            statement.setTimestamp(3, timestamp);
-//
-//            orders.clear();
-//            ResultSet resultSet = statement.executeQuery();
-//
-//            while(resultSet.next()) {
-//                int ID = resultSet.getInt("ID");
-//                int ID_PRODUS = resultSet.getInt("ID_PRODUS");
-//                String productName = resultSet.getString("denumire");
-//                String unitMeasurement = resultSet.getString("um");
-//                double quantity = resultSet.getDouble("cantitate");
-//                double completed = resultSet.getDouble("realizat");
-//                double remainder = resultSet.getDouble("rest");
-//
-//                OrderDTO order = new OrderDTO(ID, ID_PRODUS, productName, quantity, unitMeasurement,completed, remainder);
-//                orders.add(order);
-//            }
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+
 }

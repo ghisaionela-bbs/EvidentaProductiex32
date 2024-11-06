@@ -116,7 +116,7 @@
           <groupId>org.kordamp.ikonli</groupId>
           <artifactId>ikonli-materialdesign2-pack</artifactId>
           <version>12.3.1</version>
-      </dependency>
+      </dependency><!-- https://mvnrepository.com/artifact/org.comtel2000/fx-onscreen-keyboard-swing -->
   </dependencies>
 
   <build>

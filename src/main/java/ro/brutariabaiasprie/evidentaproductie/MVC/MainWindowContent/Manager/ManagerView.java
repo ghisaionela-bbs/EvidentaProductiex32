@@ -25,8 +25,6 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewProduct.Add
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class ManagerView extends Parent implements Builder<Region> {
     private final Stage PARENT_STAGE;
@@ -60,7 +58,6 @@ public class ManagerView extends Parent implements Builder<Region> {
 
     private void createStageResizeListeners() {
         ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
-            System.out.println(PARENT_STAGE.getWidth());
             if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
                 addProductButton.setText("➕");
                 importProductsButton.setText("\uD83D\uDCE5");
@@ -83,18 +80,21 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         Tab ordersTab = createOrdersTab();
         ordersTab.setClosable(false);
+        tabPane.getTabs().add(ordersTab);
 
-        Tab productsTab = createProductsTab();
-        productsTab.setClosable(false);
+        if(model.getCONNECTED_USER().getID_ROLE() == 0 || model.getCONNECTED_USER().getID_ROLE() == 1) {
+            Tab productsTab = createProductsTab();
+            productsTab.setClosable(false);
+            tabPane.getTabs().add(productsTab);
+        }
 
-        tabPane.getTabs().addAll(ordersTab, productsTab);
         VBox.setVgrow(tabPane, Priority.ALWAYS);
         return tabPane;
     }
 
     //region Products Tab
     private Tab createProductsTab() {
-        Tab productsTab =  new Tab("Produse");
+        Tab productsTab = new Tab("Produse");
         VBox contentContainer = new VBox();
 
         contentContainer.getChildren().addAll(createProductsSectionHeader(), createProductsTable());
@@ -206,33 +206,37 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersSectionTitle.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(ordersSectionTitle, Priority.ALWAYS);
 
-        addOrderButton = new Button();
-        addOrderButton.setOnAction(event -> {
-            AddNewOrderController orderController = new AddNewOrderController(PARENT_STAGE);
-            Platform.runLater(() -> {
-                if(orderController.isSUCCESS()) {
-                    refreshOrdersHandler.run();
-                }
+        sectionHeaderContainer.getChildren().addAll(ordersSectionTitle);
+
+        if(model.getCONNECTED_USER().getID_ROLE() == 0 || model.getCONNECTED_USER().getID_ROLE() == 1) {
+            addOrderButton = new Button();
+            addOrderButton.setOnAction(event -> {
+                AddNewOrderController orderController = new AddNewOrderController(PARENT_STAGE);
+                Platform.runLater(() -> {
+                    if(orderController.isSUCCESS()) {
+                        refreshOrdersHandler.run();
+                    }
+                });
             });
-        });
-        excelExportButton = new Button();
-        excelExportButton.setOnAction(event -> {
-            ExcelExportController excelExportController = new ExcelExportController(PARENT_STAGE);
-        });
+            excelExportButton = new Button();
+            excelExportButton.setOnAction(event -> {
+                ExcelExportController excelExportController = new ExcelExportController(PARENT_STAGE);
+            });
 
-        excelExportButton.setTooltip(new Tooltip("Exporta inregistrarile realizate intr-un excel."));
-        if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
-            addOrderButton.setText("➕");
-            excelExportButton.setText("");
-        } else {
-            addOrderButton.setText("➕ Adauga o comanda");
-            excelExportButton.setText("Exporta realizari in excel");
-            excelExportButton.setGraphic(new FontIcon("mdi2m-microsoft-excel"));
+            excelExportButton.setTooltip(new Tooltip("Exporta inregistrarile realizate intr-un excel."));
+            if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
+                addOrderButton.setText("➕");
+                excelExportButton.setText("");
+            } else {
+                addOrderButton.setText("➕ Adauga o comanda");
+                excelExportButton.setText("Exporta realizari in excel");
+                excelExportButton.setGraphic(new FontIcon("mdi2m-microsoft-excel"));
+            }
+            addOrderButton.getStyleClass().add("ghost-button");
+            excelExportButton.getStyleClass().add("ghost-button");
+            sectionHeaderContainer.getChildren().addAll(addOrderButton, excelExportButton);
         }
-        addOrderButton.getStyleClass().add("ghost-button");
-        excelExportButton.getStyleClass().add("ghost-button");
 
-        sectionHeaderContainer.getChildren().addAll(ordersSectionTitle, addOrderButton, excelExportButton);
         sectionHeaderContainer.getStyleClass().add("tab-section-header");
         return sectionHeaderContainer;
     }

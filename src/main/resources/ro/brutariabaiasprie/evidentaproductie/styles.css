@@ -108,7 +108,28 @@
     -fx-padding: 1em;
 }
 
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: COLOR_BRAND_BROWN;
+}
+.spinner .increment-arrow-button .increment-arrow,
+.spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: COLOR_WHITE_90;
+}
 
+.spinner .increment-arrow-button:hover .increment-arrow,
+.spinner .decrement-arrow-button:hover .decrement-arrow {
+    -fx-background-color: COLOR_WHITE;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: derive(COLOR_BRAND_BROWN, -40%);
+}
+.spinner .increment-arrow-button:pressed,
+.spinner .decrement-arrow-button:pressed {
+    -fx-background-color: derive(COLOR_BRAND_BROWN, -50%);
+}
 
 .excel-import-table,
 .excel-import-table .table-row-cell {
@@ -221,7 +242,27 @@
 
 /* CONTENT */
 .main-window .main-window-content {
-    -fx-padding: 1em;
+    -fx-padding: 0.5em;
+}
+/* CONTENT -> PRODUCTION VIEW */
+.main-window .main-window-content .production-input-section .production-product-selection-button{
+    -fx-background-color: COLOR_WHITE;
+    -fx-background-radius: 0.2em;
+    -fx-font-color: COLOR_BRAND_BROWN;
+    -fx-border-color: COLOR_BRAND_BROWN;
+    -fx-border-radius: 0.2em;
+    -fx-border-width: 0.1em;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.5, 0.0, 0.0);
+}
+.main-window .main-window-content .production-product-selection-button .label{
+    -fx-text-fill: COLOR_BRAND_BROWN;
+}
+.main-window .main-window-content .production-product-selection-button .label.warning{
+    -fx-text-fill: RED;
+}
+.main-window .main-window-content .production-product-selection-button .product-name {
+    -fx-font-weight: BOLD;
 }
 /* CONTENT -> MANAGER VIEW -> TAB*/
 .main-window .tab-header-area {
@@ -304,23 +345,27 @@
     -fx-alignment: CENTER;
     -fx-text-alignment: CENTER;
 }
-
+.production-quantity-input {
+    -fx-background-color: COLOR_WHITE;
+    -fx-font-size: 1.5em;
+}
 .txt-fld-quantity {
-    -fx-font-size: 2.5em;
     -fx-padding: 0.5em;
     -fx-background-color: COLOR_WHITE;
     -fx-text-fill: COLOR_DARK_BROWN;
     -fx-text-alignment: CENTER;
     -fx-alignment: CENTER;
-    /*
-    -fx-border-style: hidden hidden solid hidden;
-    -fx-border-width: 0.1em;
-    -fx-border-color: WHITE;
-    */
+}
+.production-quantity-input .unit-measurement-indicator {
+    -fx-background-color: COLOR_WHITE;
+    -fx-text-fill: COLOR_DARK_BROWN;
+    -fx-text-alignment: CENTER;
+    -fx-alignment: CENTER;
+    -fx-padding: 0 1em 0 0;
 }
 
 .numpad {
-    -fx-background-color: COLOR_WHITE;
+    -fx-background-color: transparent;
     -fx-hgap: 0.1em;
     -fx-vgap: 0.1em;
 }
@@ -334,17 +379,28 @@
     -fx-border-color: COLOR_DARK_BROWN_50;
     -fx-background-radius: 1em;
 }
+.numpad .button .ikonli-font-icon {
+     -fx-icon-color: COLOR_DARK_BROWN_80;
+     -fx-icon-size: 1em;
+ }
 
 .numpad .button:hover {
     -fx-background-color: derive(COLOR_WHITE, -10%);
     -fx-cursor: hand;
     -fx-text-fill: COLOR_DARK_BROWN;
 }
-
+.numpad .button:hover .ikonli-font-icon {
+     -fx-icon-color: COLOR_DARK_BROWN;
+     -fx-icon-size: 1em;
+ }
 .numpad .button:pressed {
     -fx-background-color: derive(COLOR_WHITE, -20%);
     -fx-text-fill: COLOR_DARK_BROWN;
 }
+.numpad .button:pressed .ikonli-font-icon {
+     -fx-icon-color: COLOR_DARK_BROWN;
+     -fx-icon-size: 1em;
+ }
 
 .numpad .numpad-button-add {
     -fx-background-color: COLOR_GREEN;

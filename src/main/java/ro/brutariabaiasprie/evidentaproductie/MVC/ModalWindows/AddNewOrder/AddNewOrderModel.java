@@ -72,7 +72,7 @@ public class AddNewOrderModel {
             PreparedStatement orderStatement = connection.prepareStatement(orderSql, Statement.RETURN_GENERATED_KEYS);
             orderStatement.setTimestamp(1, timestamp);
             orderStatement.setInt(2, user.getID());
-            orderStatement.execute();
+            orderStatement.executeUpdate();
 
             ResultSet key = orderStatement.getGeneratedKeys();
             key.next();

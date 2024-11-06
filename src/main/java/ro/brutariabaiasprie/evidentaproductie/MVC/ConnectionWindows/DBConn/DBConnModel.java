@@ -105,6 +105,7 @@ public class DBConnModel {
     void connectToDatabase() throws IOException {
         try {
             DBConnectionService.connectToDatabase(getUrl(), getUsername(), getPassword());
+            DBConnectionService.startSync();
             ConfigApp.setConfig(CONFIG_KEY.DBURL.name(), getUrl());
             ConfigApp.setConfig(CONFIG_KEY.DBUSER.name(), getUsername());
             ConfigApp.setConfig(CONFIG_KEY.DBPASS.name(), getPassword());
