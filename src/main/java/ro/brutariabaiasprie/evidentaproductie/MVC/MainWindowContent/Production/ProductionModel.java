@@ -23,6 +23,7 @@ public class ProductionModel {
     private final ObjectProperty<ProductDTO> selectedProduct = new SimpleObjectProperty<>();
 //    private final IntegerProperty associatedOrder = new SimpleIntegerProperty(-1);
     private final ObjectProperty<OrderDTO> associatedOrder = new SimpleObjectProperty<>();
+    private final ObservableList<Order> orders = FXCollections.observableArrayList();
 
     public ProductionModel() {
         this.productRecords = FXCollections.observableArrayList();
@@ -76,11 +77,11 @@ public class ProductionModel {
                 whereCond = "WHERE ip.ID_UTILIZATOR_I = ? ";
             }
 
-            String sql = "SELECT ip.ID, p.ID AS PRODUCT_ID, p.denumire, p.um, ip.cantitate, ip.datasiora_i, ip.ID_UTILIZATOR_I, ip.ID_COMANDA " +
-                    "FROM [dbo].[INREGISTRARI_PRODUSE] AS ip " +
-                    "JOIN [dbo].[PRODUSE] AS p ON ip.ID_PRODUS = p.ID " +
+            String sql = "SELECT r.ID, p.ID AS PRODUCT_ID, p.denumire, p.um, r.cantitate, r.datasiora_i, r.ID_UTILIZATOR_I, r.ID_COMANDA " +
+                    "FROM REALIZARI AS r " +
+                    "JOIN PRODUSE AS p ON r.ID_PRODUS = p.ID " +
                     whereCond +
-                    "ORDER BY ip.datasiora_i DESC";
+                    "ORDER BY r.datasiora_i DESC";
 
             PreparedStatement statement = connection.prepareStatement(sql);
             if(user.getID_ROLE() != 0 && user.getID_ROLE() != 1) {
@@ -116,7 +117,7 @@ public class ProductionModel {
         try {
             Connection connection = DBConnectionService.getConnection();
 
-            String sql = "SELECT * FROM [dbo].[PRODUSE]";
+            String sql = "SELECT * FROM PRODUSE";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql);
 
@@ -174,16 +175,14 @@ public class ProductionModel {
 
         String sql = "SELECT " +
                 "c.ID AS ORDER_ID, " +
-                "ic.ID AS ORDER_ITEM_ID, " +
                 "p.ID AS PRODUCT_ID, " +
+                "c.cantitate " +
                 "c.datasiora_i, " +
                 "p.denumire, " +
-                "ic.cantitate, " +
                 "p.um " +
-                "FROM [dbo].[COMENZI] AS c " +
-                "LEFT JOIN [dbo].[ITEME_COMENZI] AS ic ON c.ID = ic.ID_COMANDA " +
-                "LEFT JOIN [dbo].[PRODUSE] AS p ON p.ID = ic.ID_PRODUS " +
-                "WHERE ic.ID_PRODUS = ?";
+                "FROM COMENZI AS c " +
+                "LEFT JOIN PRODUSE AS p ON p.ID = c.ID_PRODUS " +
+                "WHERE c.ID_PRODUS = ?";
 
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setInt(1, product.getID());
@@ -208,6 +207,34 @@ public class ProductionModel {
         return new OrderResultsDTO(ORDER_ID, orderDateAndTime, productName, quantity, unitMeasurement);
     }
 
+    public void loadOrders() {
+        try  {
+            Connection connection = DBConnectionService.getConnection();
 
+            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+
+            String selectCond = "";
+            String whereCond = " WHERE 1=1 ";
+            if(user.getID_ROLE() != 1){
+                whereCond = " AND u.ID_GRUPA = ? ";
+            }
+
+            String sql = "SELECT " +
+                    "   c.ID, " +
+                    "   p.denumire, " +
+                    "   c.cantitate, " +
+                    "   c.datasiora_i, " +
+                    "   c.ID_UTILIZATOR_I, " +
+                    "   c.inchisa " +
+                    "FROM COMENZI c " +
+                    "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS, " +
+                    "UTILIZATORI u " +
+                    "WHERE u.ID_GRUPA = p.ID_GRUPA";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            orders.clear();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

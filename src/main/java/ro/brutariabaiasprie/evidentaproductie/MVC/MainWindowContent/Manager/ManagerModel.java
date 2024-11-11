@@ -36,8 +36,14 @@ public class ManagerModel {
 
     public void loadProducts() {
         try {
+            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+            String selectCond = "";
+            String whereCond = "";
+            if(user.getID_ROLE() != 1) {
+            }
+
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT * FROM [dbo].[PRODUSE]";
+            String sql = "SELECT * FROM PRODUSE";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
 
@@ -75,7 +81,7 @@ public class ManagerModel {
                     "    NULL AS cantitate, " +
                     "    SUM(ip.cantitate) AS realizat, " +
                     "    0.00 - SUM(ip.cantitate) AS rest " +
-                    "FROM INREGISTRARI_PRODUSE ip " +
+                    "FROM REALIZARI r " +
                     "LEFT JOIN PRODUSE p ON p.ID = ip.ID_PRODUS " +
                     "WHERE ip.ID_COMANDA IS NULL " +
                     "GROUP BY p.ID, p.denumire, p.um " +

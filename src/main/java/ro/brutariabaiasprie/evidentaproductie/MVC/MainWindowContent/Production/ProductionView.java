@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -17,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
+import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
@@ -46,7 +48,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     private final Stage stage;
     private final User user;
 
-    private HBox root;
+    private TabPane root;
     private TextField quantityTextField;
     private GridPane numpad;
     private VBox leftSection;
@@ -120,9 +122,10 @@ public class ProductionView extends Parent implements Builder<Region> {
         records.setAlignment(Pos.CENTER);
         HBox.setHgrow(records, Priority.ALWAYS);
 
-        root = new HBox();
-        root.getChildren().addAll(leftSection, records);
-        root.setSpacing(8);
+        TabPane root = new TabPane(createOrdersTab(), createRecordsTab());
+//        root = new HBox();
+//        root.getChildren().addAll(leftSection, records);
+//        root.setSpacing(8);
         return root;
     }
 
@@ -628,4 +631,20 @@ public class ProductionView extends Parent implements Builder<Region> {
 
     }
 
+    private Tab createOrdersTab() {
+        Tab ordersTab = new Tab("Comenzi");
+        ordersTab.setClosable(false);
+        return ordersTab;
+    }
+
+    private Tab createRecordsTab() {
+        Tab recordsTab = new Tab("Realizari");
+        recordsTab.setClosable(false);
+        return recordsTab;
+    }
+
+    private Node createOrdersListview() {
+        ListView<Order> listView = new ListView<>();
+        return listView;
+    }
 }

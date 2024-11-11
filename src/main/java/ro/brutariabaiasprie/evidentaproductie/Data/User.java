@@ -5,6 +5,7 @@ public class  User {
     private int ID_ROLE;
     private String username;
     private String password;
+    private Integer ID_GROUP;
 
     public int getID() {
         return ID;
@@ -38,6 +39,14 @@ public class  User {
         this.password = password;
     }
 
+    public Integer getID_GROUP() {
+        return ID_GROUP;
+    }
+
+    public void setID_GROUP(Integer ID_GROUP) {
+        this.ID_GROUP = ID_GROUP;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -45,6 +54,7 @@ public class  User {
                 ", ID_ROLE=" + ID_ROLE +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", ID_GROUP=" + ID_GROUP +
                 '}';
     }
 }

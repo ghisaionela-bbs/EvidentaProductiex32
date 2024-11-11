@@ -44,7 +44,7 @@ public class UserConnModel {
     public void findUser(String username, String password) throws UserNotFound{
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT * FROM [dbo].[UTILIZATORI] WHERE nume_utilizator = ? AND parola = ?";
+            String sql = "SELECT * FROM UTILIZATORI WHERE nume_utilizator = ? AND parola = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, username);
             statement.setString(2, password);
@@ -52,11 +52,13 @@ public class UserConnModel {
             if(resultSet.next()) {
                 int ID = resultSet.getInt("ID");
                 int ID_ROL = resultSet.getInt("ID_ROL");
+                int ID_GROUP = resultSet.getInt("ID_GRUPA");
                 User user = new User();
                 user.setID(ID);
                 user.setID_ROLE(ID_ROL);
                 user.setUsername(username);
                 user.setPassword(password);
+                user.setID_GROUP(ID_GROUP);
                 ConfigApp.setConfig(CONFIG_KEY.APPUSER.name(), user);
                 ConfigApp.write_config();
             } else {
