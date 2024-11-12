@@ -5,49 +5,113 @@ import javafx.beans.property.*;
 import java.sql.Timestamp;
 
 public class Order {
-    private IntegerProperty idProperty = new SimpleIntegerProperty();
-    private ObjectProperty<Timestamp> insertedDateTimeProperty = new SimpleObjectProperty<>();
-    private IntegerProperty insertedIdUser = new SimpleIntegerProperty();
-    private ObjectProperty<Timestamp> modifiedDateTimeProperty = new SimpleObjectProperty<>();
-    private IntegerProperty modifiedIdUser = new SimpleIntegerProperty();
-    private BooleanProperty closedProperty = new SimpleBooleanProperty();
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final IntegerProperty productId = new SimpleIntegerProperty();
+    private final SimpleStringProperty productName = new SimpleStringProperty();
+    private final SimpleStringProperty unitMeasurement = new SimpleStringProperty();
+    private final DoubleProperty quantity = new SimpleDoubleProperty();
+    private final DoubleProperty completed = new SimpleDoubleProperty();
+    private final DoubleProperty remainder = new SimpleDoubleProperty();
+    private final ObjectProperty<Timestamp> insertedDateTime = new SimpleObjectProperty<>();
+    private final IntegerProperty insertedIdUser = new SimpleIntegerProperty();
+    private final ObjectProperty<Timestamp> modifiedDateTime = new SimpleObjectProperty<>();
+    private final IntegerProperty modifiedIdUser = new SimpleIntegerProperty();
+    private final BooleanProperty closed = new SimpleBooleanProperty();
 
-    public Order(IntegerProperty idProperty,
-                 ObjectProperty<Timestamp> insertedDateTimeProperty,
-                 IntegerProperty insertedIdUser,
-                 ObjectProperty<Timestamp> modifiedDateTimeProperty,
-                 IntegerProperty modifiedIdUser,
-                 BooleanProperty closedProperty) {
-        this.idProperty = idProperty;
-        this.insertedDateTimeProperty = insertedDateTimeProperty;
-        this.insertedIdUser = insertedIdUser;
-        this.modifiedDateTimeProperty = modifiedDateTimeProperty;
-        this.modifiedIdUser = modifiedIdUser;
-        this.closedProperty = closedProperty;
+    public int getId() {
+        return id.get();
     }
 
-    public int getIdProperty() {
-        return idProperty.get();
+    public IntegerProperty idProperty() {
+        return id;
     }
 
-    public IntegerProperty idPropertyProperty() {
-        return idProperty;
+    public void setId(int id) {
+        this.id.set(id);
     }
 
-    public void setIdProperty(int idProperty) {
-        this.idProperty.set(idProperty);
+    public int getProductId() {
+        return productId.get();
     }
 
-    public Timestamp getInsertedDateTimeProperty() {
-        return insertedDateTimeProperty.get();
+    public IntegerProperty productIdProperty() {
+        return productId;
     }
 
-    public ObjectProperty<Timestamp> insertedDateTimePropertyProperty() {
-        return insertedDateTimeProperty;
+    public void setProductId(int productId) {
+        this.productId.set(productId);
     }
 
-    public void setInsertedDateTimeProperty(Timestamp insertedDateTimeProperty) {
-        this.insertedDateTimeProperty.set(insertedDateTimeProperty);
+    public String getProductName() {
+        return productName.get();
+    }
+
+    public SimpleStringProperty productNameProperty() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName.set(productName);
+    }
+
+    public String getUnitMeasurement() {
+        return unitMeasurement.get();
+    }
+
+    public SimpleStringProperty unitMeasurementProperty() {
+        return unitMeasurement;
+    }
+
+    public void setUnitMeasurement(String unitMeasurement) {
+        this.unitMeasurement.set(unitMeasurement);
+    }
+
+    public double getQuantity() {
+        return quantity.get();
+    }
+
+    public DoubleProperty quantityProperty() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity.set(quantity);
+    }
+
+    public double getCompleted() {
+        return completed.get();
+    }
+
+    public DoubleProperty completedProperty() {
+        return completed;
+    }
+
+    public void setCompleted(double completed) {
+        this.completed.set(completed);
+    }
+
+    public double getRemainder() {
+        return remainder.get();
+    }
+
+    public DoubleProperty remainderProperty() {
+        return remainder;
+    }
+
+    public void setRemainder(double remainder) {
+        this.remainder.set(remainder);
+    }
+
+    public Timestamp getInsertedDateTime() {
+        return insertedDateTime.get();
+    }
+
+    public ObjectProperty<Timestamp> insertedDateTimeProperty() {
+        return insertedDateTime;
+    }
+
+    public void setInsertedDateTime(Timestamp insertedDateTime) {
+        this.insertedDateTime.set(insertedDateTime);
     }
 
     public int getInsertedIdUser() {
@@ -62,16 +126,16 @@ public class Order {
         this.insertedIdUser.set(insertedIdUser);
     }
 
-    public Timestamp getModifiedDateTimeProperty() {
-        return modifiedDateTimeProperty.get();
+    public Timestamp getModifiedDateTime() {
+        return modifiedDateTime.get();
     }
 
-    public ObjectProperty<Timestamp> modifiedDateTimePropertyProperty() {
-        return modifiedDateTimeProperty;
+    public ObjectProperty<Timestamp> modifiedDateTimeProperty() {
+        return modifiedDateTime;
     }
 
-    public void setModifiedDateTimeProperty(Timestamp modifiedDateTimeProperty) {
-        this.modifiedDateTimeProperty.set(modifiedDateTimeProperty);
+    public void setModifiedDateTime(Timestamp modifiedDateTime) {
+        this.modifiedDateTime.set(modifiedDateTime);
     }
 
     public int getModifiedIdUser() {
@@ -86,15 +150,15 @@ public class Order {
         this.modifiedIdUser.set(modifiedIdUser);
     }
 
-    public boolean isClosedProperty() {
-        return closedProperty.get();
+    public boolean isClosed() {
+        return closed.get();
     }
 
-    public BooleanProperty closedPropertyProperty() {
-        return closedProperty;
+    public BooleanProperty closedProperty() {
+        return closed;
     }
 
-    public void setClosedProperty(boolean closedProperty) {
-        this.closedProperty.set(closedProperty);
+    public void setClosed(boolean closed) {
+        this.closed.set(closed);
     }
 }

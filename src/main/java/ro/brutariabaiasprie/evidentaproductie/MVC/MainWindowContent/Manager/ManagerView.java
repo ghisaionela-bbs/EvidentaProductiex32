@@ -1,22 +1,19 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import org.kordamp.ikonli.javafx.FontIcon;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderItemReportDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
+import ro.brutariabaiasprie.evidentaproductie.DTO.*;
 import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewOrder.AddNewOrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportController;
@@ -25,12 +22,17 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewProduct.Add
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.function.Consumer;
 
 public class ManagerView extends Parent implements Builder<Region> {
     private final Stage PARENT_STAGE;
     private final ManagerModel model;
     private final Runnable refreshProductsHandler;
     private final Runnable refreshOrdersHandler;
+    private Runnable addGroupHandler;
+    private Consumer<Group> editGroupHandler;
+    private Consumer<Product> editProductHandler;
+    private Consumer<Order> editOrderHandler;
 
     //products tab
     private Button addProductButton;
@@ -44,6 +46,18 @@ public class ManagerView extends Parent implements Builder<Region> {
         this.PARENT_STAGE = parentStage;
         this.refreshProductsHandler = refreshProductsHandler;
         this.refreshOrdersHandler = refreshOrdersHandler;
+    }
+
+    public void setAddGroupHandler(Runnable addGroupHandler) {
+        this.addGroupHandler = addGroupHandler;
+    }
+
+    public void setEditProductHandler(Consumer<Product> editProductHandler) {
+        this.editProductHandler = editProductHandler;
+    }
+
+    public void setEditOrderHandler(Consumer<Order> editOrderHandler) {
+        this.editOrderHandler = editOrderHandler;
     }
 
     @Override
@@ -87,6 +101,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             productsTab.setClosable(false);
             tabPane.getTabs().add(productsTab);
         }
+
+        tabPane.getTabs().add(createGroupsTab());
 
         VBox.setVgrow(tabPane, Priority.ALWAYS);
         return tabPane;
@@ -144,11 +160,11 @@ public class ManagerView extends Parent implements Builder<Region> {
         return sectionHeaderContainer;
     }
 
-    private TableView<ProductDTO> createProductsTable() {
-        TableView<ProductDTO> productsTableView = new TableView<>();
+    private TableView<Product> createProductsTable() {
+        TableView<Product> productsTableView = new TableView<>();
 
-        TableColumn<ProductDTO, String> productNameColumn = new TableColumn<>("Denumire");
-        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<Product, String> productNameColumn = new TableColumn<>("Denumire");
+        productNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getName()));
         productNameColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -168,13 +184,40 @@ public class ManagerView extends Parent implements Builder<Region> {
         });
         productsTableView.getColumns().add(productNameColumn);
 
-        TableColumn<ProductDTO, String> productUnitMeasurementColumn = new TableColumn<>("UM");
-        productUnitMeasurementColumn.setCellValueFactory(new PropertyValueFactory<>("unitMeasurement"));
+        TableColumn<Product, String> productUnitMeasurementColumn = new TableColumn<>("UM");
+        productUnitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getUnitMeasurement()));
         productsTableView.getColumns().add(productUnitMeasurementColumn);
 
+        TableColumn<Product, Integer> editBtnColumn = new TableColumn<>();
+        editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
+        editBtnColumn.setCellFactory(column -> new TableCell<>() {
+            final Button editButton = new Button();
+            final FontIcon fontIcon = new FontIcon("mdi2s-square-edit-outline");
+
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(null);
+
+                    editButton.setGraphic(new FontIcon("mdi2s-square-edit-outline"));
+
+                    editButton.getStyleClass().add("filled-button");
+
+                    editButton.setOnAction(event -> editProductHandler.accept(getTableRow().getItem()));
+                    setGraphic(editButton);
+                    setStyle("-fx-alignment: CENTER-RIGHT;");
+                }
+            }
+        });
+        productsTableView.getColumns().add(editBtnColumn);
+
         productsTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-        productNameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 70);
-        productUnitMeasurementColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 30);
+//        productNameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 70);
+//        productUnitMeasurementColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 30);
 
         productsTableView.setPlaceholder(new Label("Nu exista produse."));
         VBox.setVgrow(productsTableView, Priority.ALWAYS);
@@ -241,13 +284,13 @@ public class ManagerView extends Parent implements Builder<Region> {
         return sectionHeaderContainer;
     }
 
-    private TableView<OrderItemReportDTO> createOrdersTable() {
-        TableView<OrderItemReportDTO> ordersTableView = new TableView<>();
+    private TableView<Order> createOrdersTable() {
+        TableView<Order> ordersTableView = new TableView<>();
         ordersTableView.setPlaceholder(new Label("Nu exista comenzi."));
         VBox.setVgrow(ordersTableView, Priority.ALWAYS);
 
-        TableColumn<OrderItemReportDTO, Integer> orderIDColumn = new TableColumn<>("Comanda");
-        orderIDColumn.setCellValueFactory(new PropertyValueFactory<>("ORDER_ID"));
+        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Comanda");
+        orderIDColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
         orderIDColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -266,8 +309,8 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTableView.getColumns().add(orderIDColumn);
 
 
-        TableColumn<OrderItemReportDTO, Timestamp> dateTimeColumn = new TableColumn<>("Plasata la");
-        dateTimeColumn.setCellValueFactory(new PropertyValueFactory<>("orderDateAndTimeInserted"));
+        TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Plasata la");
+        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getInsertedDateTime()));
         ordersTableView.getColumns().add(dateTimeColumn);
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         dateTimeColumn.setCellFactory(column -> new TableCell<>() {
@@ -282,8 +325,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
         });
 
-        TableColumn<OrderItemReportDTO, String> productNameColumn = new TableColumn<>("Denumire");
-        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        TableColumn<Order, String> productNameColumn = new TableColumn<>("Produs");
+        productNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProductName()));
         productNameColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -303,8 +346,8 @@ public class ManagerView extends Parent implements Builder<Region> {
         });
         ordersTableView.getColumns().add(productNameColumn);
 
-        TableColumn<OrderItemReportDTO, Double> quantityColumn = new TableColumn<>("Comandat");
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        TableColumn<Order, Double> quantityColumn = new TableColumn<>("Comandat");
+        quantityColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getQuantity()));
         quantityColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
@@ -319,8 +362,8 @@ public class ManagerView extends Parent implements Builder<Region> {
         });
         ordersTableView.getColumns().add(quantityColumn);
 
-        TableColumn<OrderItemReportDTO, Double> completedColumn = new TableColumn<>("Realizat");
-        completedColumn.setCellValueFactory(new PropertyValueFactory<>("completed"));
+        TableColumn<Order, Double> completedColumn = new TableColumn<>("Realizat");
+        completedColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getCompleted()));
         ordersTableView.getColumns().add(completedColumn);
         completedColumn.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -335,8 +378,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
         });
 
-        TableColumn<OrderItemReportDTO, Double> remainderColumn = new TableColumn<>("Rest");
-        remainderColumn.setCellValueFactory(new PropertyValueFactory<>("remainder"));
+        TableColumn<Order, Double> remainderColumn = new TableColumn<>("Rest");
+        remainderColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getRemainder()));
         ordersTableView.getColumns().add(remainderColumn);
         remainderColumn.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -351,7 +394,29 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
         });
 
-        TableColumn<OrderItemReportDTO, String> productUnitMeasurementColumn = new TableColumn<>("UM");
+        TableColumn<Order, Integer> editBtnColumn = new TableColumn<>();
+        editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
+        editBtnColumn.setCellFactory(column -> new TableCell<>() {
+            final Button editButton = new Button();
+            final FontIcon fontIcon = new FontIcon("mdi2a-arrow-right-drop-circle");
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(null);
+                    editButton.getStyleClass().add("filled-button");
+                    editButton.setOnAction(event -> editOrderHandler.accept(getTableRow().getItem()));
+                    setGraphic(editButton);
+                    setStyle("-fx-alignment: CENTER-RIGHT;");
+                }
+            }
+        });
+        ordersTableView.getColumns().add(editBtnColumn);
+
+        TableColumn<Order, String> productUnitMeasurementColumn = new TableColumn<>("UM");
         productUnitMeasurementColumn.setCellValueFactory(new PropertyValueFactory<>("unitMeasurement"));
         ordersTableView.getColumns().add(productUnitMeasurementColumn);
 
@@ -371,4 +436,74 @@ public class ManagerView extends Parent implements Builder<Region> {
     }
     //endregion
 
+
+    //region Groups Tab
+    private Tab createGroupsTab() {
+        Label sectionTitle = new Label("Grupe");
+        sectionTitle.getStyleClass().add("tab-section-title");
+        sectionTitle.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(sectionTitle, Priority.ALWAYS);
+
+        Button addButton = new Button("Adauga");
+        addButton.getStyleClass().add("ghost-button");
+        addButton.setOnAction(event -> addGroupHandler.run());
+
+        HBox headerSection = new HBox(sectionTitle, addButton);
+        headerSection.getStyleClass().add("tab-section-header");
+
+        VBox content = new VBox(headerSection, createGroupsTable());
+
+        Tab tab = new Tab("Grupe");
+        tab.setClosable(false);
+        tab.setContent(content);
+        return tab;
+    }
+
+    private TableView<Group> createGroupsTable() {
+        TableView<Group> tableView = new TableView<>();
+        tableView.setPlaceholder(new Label("Nu exista grupe."));
+
+        TableColumn<Group, Integer> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
+        tableView.getColumns().add(idColumn);
+
+        TableColumn<Group, String> nameColumn = new TableColumn<>("Denumire");
+        nameColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getName()));
+        tableView.getColumns().add(nameColumn);
+
+        TableColumn<Group, Integer> editBtnColumn = new TableColumn<>();
+        editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
+        editBtnColumn.setCellFactory(column -> new TableCell<>() {
+            final Button editButton = new Button();
+            final FontIcon fontIcon = new FontIcon("mdi2s-square-edit-outline");
+
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(null);
+
+                    editButton.setGraphic(fontIcon);
+                    editButton.getStyleClass().add("filled-button");
+                    editButton.setOnAction(event -> editGroupHandler.accept(getTableRow().getItem()));
+                    setGraphic(editButton);
+                    setStyle("-fx-alignment: CENTER-RIGHT;");
+                }
+            }
+        });
+        tableView.getColumns().add(editBtnColumn);
+
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableView.setItems(model.getGroups());
+        VBox.setVgrow(tableView, Priority.ALWAYS);
+        return tableView;
+    }
+
+    public void setEditGroupHandler(Consumer<Group> editGroupHandler) {
+        this.editGroupHandler = editGroupHandler;
+    }
+    //endregion
 }

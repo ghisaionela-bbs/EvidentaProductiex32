@@ -16,6 +16,7 @@ module ro.brutariabaiasprie.evidentaproductie {
     requires jdk.compiler;
     requires org.dhatim.fastexcel;
     requires java.desktop;
+    requires commons.math3;
 
     opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie;

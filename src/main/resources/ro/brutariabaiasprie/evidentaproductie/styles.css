@@ -104,6 +104,12 @@
     -fx-icon-color: COLOR_WHITE;
     -fx-alignment: RIGHT;
 }
+.floating-button {
+    -fx-background-color: transparent;
+}
+.floating-button .ikonli-font-icon {
+     -fx-icon-color: COLOR_BRAND_BROWN;
+ }
 .padded-button {
     -fx-padding: 1em;
 }
@@ -180,6 +186,7 @@
 .modal-window {
     -fx-padding: 20;
     -fx-spacing: 0.2em;
+    -fx-spacing: 1em;
 }
 
 .modal-window .grid-form {

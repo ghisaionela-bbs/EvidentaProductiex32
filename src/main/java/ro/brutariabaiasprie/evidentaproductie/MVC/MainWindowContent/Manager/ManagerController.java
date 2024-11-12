@@ -5,6 +5,15 @@ import javafx.collections.MapChangeListener;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import ro.brutariabaiasprie.evidentaproductie.DTO.Group;
+import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
+import ro.brutariabaiasprie.evidentaproductie.DTO.Product;
+import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupModel;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
@@ -19,21 +28,46 @@ public class ManagerController implements SceneController {
         this.PARENT_STAGE = parentStage;
         this.view = new ManagerView(this.model, parentStage, this::refreshProducts, this::refreshOrders);
         Platform.runLater(() -> {
+            view.setEditProductHandler(this::editProduct);
+            view.setAddGroupHandler(this::addGroup);
+            view.setEditGroupHandler(this::editGroup);
+            view.setEditOrderHandler(this::editOrder);
             model.loadProducts();
             model.loadOrders();
+            model.loadGroups();
         });
-        DBConnectionService.getModifiedTables().addListener(new MapChangeListener<String, Timestamp>() {
-            @Override
-            public void onChanged(Change<? extends String, ? extends Timestamp> change) {
-                if(change.wasAdded()) {
-                    if (change.getKey().equals("PRODUSE")) {
+        DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, Timestamp>) change -> {
+            if (change.wasAdded()) {
+                String key = change.getKey();
+                switch (key) {
+                    case "PRODUSE":
                         model.loadProducts();
-                    } else if (change.getKey().equals("COMENZI")) {
+                        break;
+                    case "COMENZI":
                         model.loadOrders();
-                    }
+                        break;
+                    case "GRUPE":
+                        model.loadGroups();
+                        break;
                 }
             }
         });
+    }
+
+    private void editProduct(Product product) {
+        ProductController productController = new ProductController(PARENT_STAGE, WINDOW_TYPE.ADD);
+    }
+
+    private void editOrder(Order order) {
+        OrderController orderController = new OrderController(PARENT_STAGE, WINDOW_TYPE.EDIT, order);
+    }
+
+    private void editGroup(Group group) {
+        GroupController groupController = new GroupController(PARENT_STAGE, WINDOW_TYPE.EDIT, group);
+    }
+
+    private void addGroup() {
+        GroupController groupController = new GroupController(PARENT_STAGE, WINDOW_TYPE.ADD);
     }
 
     private void refreshOrders() {

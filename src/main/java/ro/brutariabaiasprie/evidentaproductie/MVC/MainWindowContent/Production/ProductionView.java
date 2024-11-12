@@ -48,7 +48,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     private final Stage stage;
     private final User user;
 
-    private TabPane root;
+    private HBox root;
     private TextField quantityTextField;
     private GridPane numpad;
     private VBox leftSection;
@@ -122,10 +122,10 @@ public class ProductionView extends Parent implements Builder<Region> {
         records.setAlignment(Pos.CENTER);
         HBox.setHgrow(records, Priority.ALWAYS);
 
-        TabPane root = new TabPane(createOrdersTab(), createRecordsTab());
-//        root = new HBox();
-//        root.getChildren().addAll(leftSection, records);
-//        root.setSpacing(8);
+//        TabPane root = new TabPane(createOrdersTab(), createRecordsTab());
+        root = new HBox();
+        root.getChildren().addAll(leftSection, records);
+        root.setSpacing(8);
         return root;
     }
 
@@ -412,45 +412,6 @@ public class ProductionView extends Parent implements Builder<Region> {
         };
     }
 
-//    private ListView<ProductRecordDTO> createProductRecordListView() {
-//        ListView<ProductRecordDTO> listView = new ListView<>();
-//
-//        listView.setCellFactory(new Callback<ListView<ProductRecordDTO>, ListCell<ProductRecordDTO>>() {
-//            @Override
-//            public ListCell<ProductRecordDTO> call(ListView<ProductRecordDTO> param) {
-//                return new ListCell<ProductRecordDTO>() {
-//
-//                    @Override
-//                    protected void updateItem(ProductRecordDTO item, boolean empty) {
-//                        super.updateItem(item, empty);
-//                        if (item == null || empty) {
-//                            setText(null);
-//                            setGraphic(null);
-//                        } else {
-//                            Button btnEdit = new Button("✎");
-//                            btnEdit.setOnAction(handleBtnEditRecordOnAction(item));
-//
-//                            Label lblProductName = new Label(item.getName());
-//                            lblProductName.getStyleClass().add("den-prod-record-list-cell");
-//                            Label lblProductDetails = new Label(" Cantitate : " + String.format("%.2f", item.getQuantity()) + " " + item.getUnitMeasurement());
-//                            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-//                            Label lblDateTime = new Label(" Data si ora: " + dateTimeFormatter.format(item.getDateAndTimeInserted()));
-//                            HBox productCell = new HBox();
-//                            productCell.getChildren().addAll(lblProductName, lblProductDetails, lblDateTime, btnEdit);
-//
-//                            productCell.setSpacing(10);
-//                            productCell.setPadding(new Insets(10));
-//                            setText(null);
-//                            setGraphic(productCell);
-//                        }
-//                    }
-//                };
-//            }
-//        });
-//        listView.setItems(model.getProductRecords());
-//        return listView;
-//    }
-
     private TableView<ProductRecordDTO> createProductRecordTableView() {
         TableView<ProductRecordDTO> tableView = new TableView<>();
 
@@ -531,8 +492,8 @@ public class ProductionView extends Parent implements Builder<Region> {
                         editButton.setGraphic(new FontIcon("mdi2s-square-edit-outline"));
 
                         editButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
-                        editButton.getStyleClass().add("edit-button");
                         editButton.getStyleClass().add("filled-button");
+//                        editButton.getStyleClass().add("filled-button");
 
                         editButton.setOnAction(event -> {
                             editProductRecordHandler.accept(getTableRow().getItem());
