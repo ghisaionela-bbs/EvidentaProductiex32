@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class ConfigApp {
     public static Map<String, Object> configuration = new Hashtable<>();
     private static File fileConfig;
-    private static String fileConfigPath = System.getProperty("user.dir") + "\\configApp.txt";
+    private static final String fileConfigPath = System.getProperty("user.dir") + "\\configApp.txt";
 
     public static void check_config() {
         try {

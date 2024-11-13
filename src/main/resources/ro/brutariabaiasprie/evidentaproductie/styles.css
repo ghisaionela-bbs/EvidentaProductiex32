@@ -184,14 +184,22 @@
 
 /*MODAL WINDOW*/
 .modal-window {
-    -fx-padding: 20;
+    -fx-padding: 0.5em;
     -fx-spacing: 0.2em;
     -fx-spacing: 1em;
 }
+.modal-window .center,
+.modal-window .bottom{
+    -fx-padding: 0.5em;
+}
 
 .modal-window .grid-form {
-   -fx-vgap: 4;
-   -fx-hgap: 4;
+   -fx-vgap: 0.2em;
+   -fx-hgap: 0.2em;
+}
+
+.modal-window .choice-box {
+   -fx-spacing: 0.2em;
 }
 /* PLACE ORDER VIEW */
 .place-order-view .order-details {

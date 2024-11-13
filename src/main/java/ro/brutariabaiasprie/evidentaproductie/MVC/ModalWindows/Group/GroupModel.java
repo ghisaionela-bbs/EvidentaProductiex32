@@ -1,6 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group;
 
-import ro.brutariabaiasprie.evidentaproductie.DTO.Group;
+import ro.brutariabaiasprie.evidentaproductie.DTO.GroupDTO;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Exceptions.GroupNotFound;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
@@ -37,7 +38,7 @@ public class GroupModel {
             Connection connection = DBConnectionService.getConnection();
             String sql = "DELETE FROM GRUPE WHERE ID = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1,group.getId());
+            statement.setInt(1, group.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

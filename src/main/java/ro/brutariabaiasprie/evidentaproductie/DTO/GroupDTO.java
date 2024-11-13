@@ -4,7 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class Group {
+public class GroupDTO {
     private final IntegerProperty id = new SimpleIntegerProperty();
     private final SimpleStringProperty name = new SimpleStringProperty();
 

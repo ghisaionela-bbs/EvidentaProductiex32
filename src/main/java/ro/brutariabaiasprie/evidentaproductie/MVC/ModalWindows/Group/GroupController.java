@@ -1,14 +1,12 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group;
 
-import javafx.collections.MapChangeListener;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.DTO.Group;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 

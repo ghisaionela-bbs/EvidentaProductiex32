@@ -2,10 +2,13 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import ro.brutariabaiasprie.evidentaproductie.DTO.*;
+import ro.brutariabaiasprie.evidentaproductie.DTO.GroupDTO;
+import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.*;
@@ -45,8 +48,8 @@ public class ManagerModel {
         try {
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getID_GROUP() != null) {
-                whereCond = "WHERE p.ID_GRUPA = ?";
+            if(user.getID_GROUP() != 0 && user.getID_ROLE() != 1) {
+                whereCond = "WHERE p.ID_GRUPA = ? ";
             }
 
             Connection connection = DBConnectionService.getConnection();
@@ -58,21 +61,29 @@ public class ManagerModel {
                     "g.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE g ON p.ID_GRUPA = g.ID " +
-                    whereCond;
+                    whereCond +
+                    "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_GROUP() != null) {
+            if(user.getID_GROUP() != 0 && user.getID_ROLE() != 1) {
                 statement.setInt(1, user.getID_GROUP());
             }
             ResultSet resultSet = statement.executeQuery();
 
             products.clear();
             while(resultSet.next()) {
-                Product product = new Product();
-                product.setId(resultSet.getInt("ID"));
-                product.setName(resultSet.getString("denumire"));
-                product.setUnitMeasurement(resultSet.getString("um"));
-                product.setGroupId(resultSet.getInt("ID_GRUPA"));
-                product.setGroupName(resultSet.getString("denumire_grupa"));
+                Group group = null;
+                int groupId = resultSet.getInt("ID_GRUPA");
+                if(!resultSet.wasNull()) {
+                    group = new Group(groupId,
+                            resultSet.getString("denumire_grupa"));
+                }
+                Product product = new Product(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire"),
+                        resultSet.getString("um"),
+                        group
+                );
+                product.setGroup(group);
                 products.add(product);
             }
         } catch (Exception e) {
@@ -143,9 +154,10 @@ public class ManagerModel {
 
             groups.clear();
             while (resultSet.next()) {
-                Group group = new Group();
-                group.setId(resultSet.getInt("ID"));
-                group.setName(resultSet.getString("denumire"));
+                Group group = new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire")
+                );
                 groups.add(group);
             }
 

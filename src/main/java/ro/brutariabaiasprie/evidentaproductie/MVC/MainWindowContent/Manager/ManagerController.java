@@ -5,13 +5,11 @@ import javafx.collections.MapChangeListener;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.DTO.Group;
 import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
-import ro.brutariabaiasprie.evidentaproductie.DTO.Product;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupModel;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
@@ -55,7 +53,7 @@ public class ManagerController implements SceneController {
     }
 
     private void editProduct(Product product) {
-        ProductController productController = new ProductController(PARENT_STAGE, WINDOW_TYPE.ADD);
+        ProductController productController = new ProductController(PARENT_STAGE, WINDOW_TYPE.EDIT, product);
     }
 
     private void editOrder(Order order) {

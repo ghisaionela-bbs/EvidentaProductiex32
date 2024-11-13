@@ -3,6 +3,7 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -12,13 +13,17 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Builder;
+import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
-import ro.brutariabaiasprie.evidentaproductie.DTO.*;
+
+import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
 import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewOrder.AddNewOrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewProduct.AddNewProductController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -131,10 +136,11 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         addProductButton = new Button();
         addProductButton.setOnAction(event -> {
-            AddNewProductController controller = new AddNewProductController(PARENT_STAGE);
-            if(controller.getSUCCESS()) {
-                refreshProductsHandler.run();
-            }
+            ProductController productController = new ProductController(PARENT_STAGE);
+//            AddNewProductController controller = new AddNewProductController(PARENT_STAGE);
+//            if(controller.getSUCCESS()) {
+//                refreshProductsHandler.run();
+//            }
         });
 
         importProductsButton = new Button();
@@ -188,6 +194,15 @@ public class ManagerView extends Parent implements Builder<Region> {
         productUnitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getUnitMeasurement()));
         productsTableView.getColumns().add(productUnitMeasurementColumn);
 
+        TableColumn<Product, String> groupColumn = new TableColumn<>("Grupa");
+        groupColumn.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getGroup() == null) {
+                return null;
+            }
+            return new SimpleObjectProperty<>(cellData.getValue().getGroup().getName());
+        });
+        productsTableView.getColumns().add(groupColumn);
+
         TableColumn<Product, Integer> editBtnColumn = new TableColumn<>();
         editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
         editBtnColumn.setCellFactory(column -> new TableCell<>() {
@@ -216,8 +231,6 @@ public class ManagerView extends Parent implements Builder<Region> {
         productsTableView.getColumns().add(editBtnColumn);
 
         productsTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-//        productNameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 70);
-//        productUnitMeasurementColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 30);
 
         productsTableView.setPlaceholder(new Label("Nu exista produse."));
         VBox.setVgrow(productsTableView, Priority.ALWAYS);
