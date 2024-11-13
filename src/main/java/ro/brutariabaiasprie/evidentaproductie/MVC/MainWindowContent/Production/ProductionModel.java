@@ -74,7 +74,7 @@ public class ProductionModel {
             String whereCond = "";
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             if(user.getID_ROLE() != 0 && user.getID_ROLE() != 1) {
-                whereCond = "WHERE ip.ID_UTILIZATOR_I = ? ";
+                whereCond = "WHERE r.ID_UTILIZATOR_I = ? ";
             }
 
             String sql = "SELECT r.ID, p.ID AS PRODUCT_ID, p.denumire, p.um, r.cantitate, r.datasiora_i, r.ID_UTILIZATOR_I, r.ID_COMANDA " +

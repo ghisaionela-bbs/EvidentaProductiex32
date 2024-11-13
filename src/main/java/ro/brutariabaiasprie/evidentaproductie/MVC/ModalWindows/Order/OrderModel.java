@@ -2,11 +2,11 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.*;

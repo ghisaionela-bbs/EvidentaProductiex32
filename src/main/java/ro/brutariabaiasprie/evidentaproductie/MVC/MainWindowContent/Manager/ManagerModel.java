@@ -2,8 +2,7 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import ro.brutariabaiasprie.evidentaproductie.DTO.GroupDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;

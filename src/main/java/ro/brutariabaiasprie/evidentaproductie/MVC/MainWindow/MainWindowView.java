@@ -62,9 +62,6 @@ public class MainWindowView extends Parent implements Builder<Region> {
         }
 
         navigationMenu.getChildren().add(accountButton);
-        if(model.getCONNECTED_USER().getID_ROLE() == 0) {
-            navigationMenu.getChildren().add(dashBoardButton);
-        }
         navigationMenu.getChildren().add(managerButton);
         navigationMenu.getChildren().add(productionButton);
         root.setLeft(navigationMenu);

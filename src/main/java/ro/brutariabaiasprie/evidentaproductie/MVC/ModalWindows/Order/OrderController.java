@@ -1,12 +1,10 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order;
 
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupModel;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupView;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 
 public class OrderController extends ModalWindow {

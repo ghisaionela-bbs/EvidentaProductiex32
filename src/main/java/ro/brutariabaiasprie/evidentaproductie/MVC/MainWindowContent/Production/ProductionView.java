@@ -207,7 +207,7 @@ public class ProductionView extends Parent implements Builder<Region> {
 
     private TextField createQuantityField() {
         TextField quantityTextField = new TextField();
-        quantityTextField.promptTextProperty().set("----------.--");
+        quantityTextField.promptTextProperty().set("0.00");
 
         quantityTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override

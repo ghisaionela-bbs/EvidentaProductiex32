@@ -3,7 +3,6 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -13,16 +12,17 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Builder;
-import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
 import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
+import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewOrder.AddNewOrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
 
 import java.sql.Timestamp;
@@ -32,33 +32,21 @@ import java.util.function.Consumer;
 public class ManagerView extends Parent implements Builder<Region> {
     private final Stage PARENT_STAGE;
     private final ManagerModel model;
-    private final Runnable refreshProductsHandler;
     private final Runnable refreshOrdersHandler;
-    private Runnable addGroupHandler;
-    private Consumer<Group> editGroupHandler;
-    private Consumer<Product> editProductHandler;
-    private Consumer<Order> editOrderHandler;
 
     //products tab
     private Button addProductButton;
     private Button importProductsButton;
+
     //orders tab
     private Button addOrderButton;
     private Button excelExportButton;
+    private Consumer<Order> editOrderHandler;
 
-    public ManagerView(ManagerModel model, Stage parentStage, Runnable refreshProductsHandler, Runnable refreshOrdersHandler) {
+    public ManagerView(ManagerModel model, Stage parentStage, Runnable refreshOrdersHandler) {
         this.model = model;
         this.PARENT_STAGE = parentStage;
-        this.refreshProductsHandler = refreshProductsHandler;
         this.refreshOrdersHandler = refreshOrdersHandler;
-    }
-
-    public void setAddGroupHandler(Runnable addGroupHandler) {
-        this.addGroupHandler = addGroupHandler;
-    }
-
-    public void setEditProductHandler(Consumer<Product> editProductHandler) {
-        this.editProductHandler = editProductHandler;
     }
 
     public void setEditOrderHandler(Consumer<Order> editOrderHandler) {
@@ -101,13 +89,10 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTab.setClosable(false);
         tabPane.getTabs().add(ordersTab);
 
-        if(model.getCONNECTED_USER().getID_ROLE() == 0 || model.getCONNECTED_USER().getID_ROLE() == 1) {
-            Tab productsTab = createProductsTab();
-            productsTab.setClosable(false);
-            tabPane.getTabs().add(productsTab);
+        if(model.getCONNECTED_USER().getID_ROLE() == 1) {
+            tabPane.getTabs().add(createProductsTab());
+            tabPane.getTabs().add(createGroupsTab());
         }
-
-        tabPane.getTabs().add(createGroupsTab());
 
         VBox.setVgrow(tabPane, Priority.ALWAYS);
         return tabPane;
@@ -120,7 +105,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         contentContainer.getChildren().addAll(createProductsSectionHeader(), createProductsTable());
         productsTab.setContent(contentContainer);
-
+        productsTab.setClosable(false);
         return productsTab;
     }
 
@@ -135,21 +120,10 @@ public class ManagerView extends Parent implements Builder<Region> {
         HBox.setHgrow(productsSectionTitle, Priority.ALWAYS);
 
         addProductButton = new Button();
-        addProductButton.setOnAction(event -> {
-            ProductController productController = new ProductController(PARENT_STAGE);
-//            AddNewProductController controller = new AddNewProductController(PARENT_STAGE);
-//            if(controller.getSUCCESS()) {
-//                refreshProductsHandler.run();
-//            }
-        });
+        addProductButton.setOnAction(event -> new ProductController(PARENT_STAGE));
 
         importProductsButton = new Button();
-        importProductsButton.setOnAction(event -> {
-            ExcelImportController excelImportController = new ExcelImportController(PARENT_STAGE);
-            if(excelImportController.getSUCCESS()) {
-                refreshProductsHandler.run();
-            }
-        });
+        importProductsButton.setOnAction(event -> new ExcelImportController(PARENT_STAGE));
         importProductsButton.setTooltip(new Tooltip("Importa produse dintr-un fisier excel."));
         if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
             addProductButton.setText("➕");
@@ -222,7 +196,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
                     editButton.getStyleClass().add("filled-button");
 
-                    editButton.setOnAction(event -> editProductHandler.accept(getTableRow().getItem()));
+                    editButton.setOnAction(event -> new ProductController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                     setGraphic(editButton);
                     setStyle("-fx-alignment: CENTER-RIGHT;");
                 }
@@ -459,7 +433,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         Button addButton = new Button("Adauga");
         addButton.getStyleClass().add("ghost-button");
-        addButton.setOnAction(event -> addGroupHandler.run());
+        addButton.setOnAction(event -> new GroupController(PARENT_STAGE, WINDOW_TYPE.ADD));
 
         HBox headerSection = new HBox(sectionTitle, addButton);
         headerSection.getStyleClass().add("tab-section-header");
@@ -475,10 +449,6 @@ public class ManagerView extends Parent implements Builder<Region> {
     private TableView<Group> createGroupsTable() {
         TableView<Group> tableView = new TableView<>();
         tableView.setPlaceholder(new Label("Nu exista grupe."));
-
-        TableColumn<Group, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
-        tableView.getColumns().add(idColumn);
 
         TableColumn<Group, String> nameColumn = new TableColumn<>("Denumire");
         nameColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getName()));
@@ -501,7 +471,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
                     editButton.setGraphic(fontIcon);
                     editButton.getStyleClass().add("filled-button");
-                    editButton.setOnAction(event -> editGroupHandler.accept(getTableRow().getItem()));
+                    editButton.setOnAction(event -> new GroupController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                     setGraphic(editButton);
                     setStyle("-fx-alignment: CENTER-RIGHT;");
                 }
@@ -513,10 +483,6 @@ public class ManagerView extends Parent implements Builder<Region> {
         tableView.setItems(model.getGroups());
         VBox.setVgrow(tableView, Priority.ALWAYS);
         return tableView;
-    }
-
-    public void setEditGroupHandler(Consumer<Group> editGroupHandler) {
-        this.editGroupHandler = editGroupHandler;
     }
     //endregion
 }

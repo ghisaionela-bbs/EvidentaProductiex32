@@ -5,10 +5,7 @@ import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Exceptions.GroupNotFound;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class GroupModel {
     private Group group;
@@ -36,10 +33,24 @@ public class GroupModel {
     public void deleteGroup() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "DELETE FROM GRUPE WHERE ID = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, group.getId());
-            statement.executeUpdate();
+
+            String sqlDel = "DELETE FROM GRUPE WHERE ID = ?";
+            PreparedStatement statementDel = connection.prepareStatement(sqlDel);
+            statementDel.setInt(1, group.getId());
+
+            String sqlUpdate1 = "UPDATE UTILIZATORI SET ID_GRUPA = ? WHERE ID_GRUPA = ?";
+            PreparedStatement statementUpdate1 = connection.prepareStatement(sqlUpdate1);
+            statementUpdate1.setNull(1, Types.INTEGER);
+            statementUpdate1.setInt(2, group.getId());
+
+            String sqlUpdate2 = "UPDATE PRODUSE SET ID_GRUPA = ? WHERE ID_GRUPA = ?";
+            PreparedStatement statementUpdate2 = connection.prepareStatement(sqlUpdate2);
+            statementUpdate2.setNull(1, Types.INTEGER);
+            statementUpdate2.setInt(2, group.getId());
+
+            statementDel.executeUpdate();
+            statementUpdate1.executeUpdate();
+            statementUpdate2.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -53,23 +64,6 @@ public class GroupModel {
             statement.setString(1, group.getName());
             statement.setInt(2, getGroup().getId());
             statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void loadGroup() {
-        try {
-            Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT * FROM GRUPE WHERE ID = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, group.getId());
-            ResultSet resultSet = statement.executeQuery();
-            if(!resultSet.next()) {
-                throw new GroupNotFound(String.format("Grupul cu ID-ul '%d' nu a fost gasit.", group.getId()));
-            }
-            group.setName(resultSet.getString("denumire"));
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

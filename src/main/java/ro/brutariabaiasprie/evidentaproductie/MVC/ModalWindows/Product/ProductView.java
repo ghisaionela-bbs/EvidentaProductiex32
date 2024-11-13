@@ -93,7 +93,7 @@ public class ProductView extends Parent implements Builder<Region> {
                     protected void updateItem(Group item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
-                            setText(null);
+                            setText("Selectati grupa");
                         } else {
                             setText(item.getName());
                         }

@@ -8,7 +8,6 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Account.AccountController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.DBConn.DBConnController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Dashboard.DashboardController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager.ManagerController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production.ProductionController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
@@ -47,9 +46,6 @@ public class MainWindowController implements SceneController {
                 break;
             case USERCONN:
                 controller = new UserConnController(PARENT_STAGE, this::switchScene);
-                break;
-            case DASHBOARD:
-                controller = new DashboardController(PARENT_STAGE);
                 break;
             case MANAGER:
                 controller = new ManagerController(PARENT_STAGE);

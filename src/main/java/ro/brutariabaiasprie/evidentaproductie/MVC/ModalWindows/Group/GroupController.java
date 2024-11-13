@@ -8,6 +8,7 @@ import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 
 import java.util.Objects;
@@ -58,6 +59,9 @@ public class GroupController extends ModalWindow {
     @Override
     protected void onWindowAction(ACTION_TYPE actionType) {
         if(actionType == ACTION_TYPE.CONFIRMATION) {
+            if(!this.isInputValid(type)) {
+                return;
+            }
             if(type == WINDOW_TYPE.ADD) {
                 model.addGroup(view.getName());
             } else if (type == WINDOW_TYPE.EDIT) {
@@ -68,9 +72,25 @@ public class GroupController extends ModalWindow {
         stage.close();
     }
 
+    /***
+     * Validates the data of the controls from the ProductView
+     * @return returns true if it gets past checks
+     */
+    private boolean isInputValid(WINDOW_TYPE type) {
+        if(view.getName().isEmpty()) {
+            new WarningController(stage, "Completati denumirea grupei!");
+            return false;
+        }
+        return true;
+    }
+
     private void deleteGroup() {
+        String message = "Sunteti sigur ca doriti sa stergeti grupa %s?\n\n" +
+                "GRUPA ACEASTA VA FI STEARSA DE LA TOTI UTILIZATORII SI \n" +
+                "PRODUSELE CARE AVEAU ASOCIATA ACEASTA GRUPA\n\n" +
+                "!!! ACEASTA ACTIUNE ESTE IREVERSIBILA !!!";
         if(new ConfirmationController(stage, "Confirmati stergerea",
-                String.format("Sunteti sigur ca doriti sa stergeti grupa %s?", model.getGroup().getName())).isSUCCESS()) {
+                String.format(message, model.getGroup().getName())).isSUCCESS()) {
             model.deleteGroup();
             stage.close();
         }

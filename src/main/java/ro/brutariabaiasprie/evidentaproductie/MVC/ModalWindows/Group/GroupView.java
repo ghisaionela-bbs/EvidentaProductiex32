@@ -1,14 +1,15 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
+import javafx.util.Callback;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
 import java.util.function.Consumer;
@@ -18,8 +19,8 @@ public class GroupView extends Parent implements Builder<Region> {
     private final Consumer<ACTION_TYPE> actionHandler;
     private final WINDOW_TYPE type;
 
-    private TextField nameTextField;
     private Runnable deleteGroupHandler;
+    private TextArea groupNameTextArea;
 
     public GroupView(GroupModel model, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler) {
         this.model = model;
@@ -30,14 +31,7 @@ public class GroupView extends Parent implements Builder<Region> {
     @Override
     public Region build() {
         VBox root = new VBox();
-        root.getChildren().addAll(createInputSection());
-        if(type == WINDOW_TYPE.EDIT) {
-            Button deleteButton = new Button("Stergere grupa");
-            deleteButton.setOnAction(event -> deleteGroupHandler.run());
-            deleteButton.getStyleClass().add("filled-button");
-            deleteButton.setStyle("-fx-background-color: RED; -fx-text-fill: COLOR_WHITE");
-            root.getChildren().add(deleteButton);
-        }
+        root.getChildren().addAll(createContentSection());
         root.getChildren().add(createWindowButtons());
         root.setAlignment(Pos.CENTER);
         root.getStyleClass().add("modal-window");
@@ -48,27 +42,59 @@ public class GroupView extends Parent implements Builder<Region> {
         this.deleteGroupHandler = deleteGroupHandler;
     }
 
-    private GridPane createInputSection() {
+    /***
+     * Creates the product information section with possibility of editing depending on the WINDOW_TYPE type.
+     * @return GridPane with the product information
+     */
+    private GridPane createContentSection() {
+        //  Title
+        Label groupIdLabel  = new Label();
+        // Name
+        Label groupNameLabel = new Label("Denumire:");
+        groupNameTextArea = new TextArea();
+        groupNameTextArea.setPrefSize(400, 200);
+        groupNameTextArea.setWrapText(true);
+
+        // Setting up the container
         GridPane gridPane = new GridPane();
+        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
+            RowConstraints row = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            gridPane.getRowConstraints().add(row);
+        }
+        for (int j = 0 ; j < gridPane.getColumnCount(); j++) {
+            ColumnConstraints col = new ColumnConstraints();
+            col.setHgrow(Priority.ALWAYS);
+            gridPane.getColumnConstraints().add(col);
+        }
+        gridPane.getStyleClass().add("grid-form");
 
-        Label nameLabel = new Label("Denumire:");
-        nameTextField = new TextField();
-
-        gridPane.add(nameLabel, 0, 0);
-        gridPane.add(nameTextField, 1, 0);
-        VBox.setVgrow(gridPane, Priority.ALWAYS);
-
+        // Setting up the values and properties of controls
         switch (type) {
             case ADD:
+                groupIdLabel.setText("Adaugare grupa nou");
                 break;
             case VIEW:
-                nameTextField.setEditable(false);
+                groupNameTextArea.setDisable(true);
             case EDIT:
-                nameTextField.setText(model.getGroup().getName());
+                groupIdLabel.setText("Grupa " + model.getGroup().getId());
+                groupNameTextArea.setText(model.getGroup().getName());
                 break;
         }
 
-        gridPane.getStyleClass().add("grid-form");
+        // Adding the controls
+        gridPane.add(groupIdLabel, 0, 0);
+        if(type == WINDOW_TYPE.EDIT) {
+            Button deleteButton = new Button("Stergere");
+            deleteButton.setOnAction(event -> deleteGroupHandler.run());
+            deleteButton.getStyleClass().add("filled-button");
+            deleteButton.setStyle("-fx-background-color: red;");
+            GridPane.setHalignment(deleteButton, HPos.RIGHT);
+            gridPane.add(deleteButton, 1, 0);
+        }
+        gridPane.add(groupNameLabel, 0, 1, 2, 1);
+        gridPane.add(groupNameTextArea, 0, 2, 2, 1);
+
         return gridPane;
     }
 
@@ -85,6 +111,6 @@ public class GroupView extends Parent implements Builder<Region> {
     }
 
     public String getName() {
-        return nameTextField.getText();
+        return groupNameTextArea.getText();
     }
 }

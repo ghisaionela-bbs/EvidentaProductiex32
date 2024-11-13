@@ -87,6 +87,7 @@ public class ProductModel {
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             groups.clear();
+            groups.add(null);
             while (resultSet.next()) {
                 Group group = new Group(
                         resultSet.getInt("ID"),

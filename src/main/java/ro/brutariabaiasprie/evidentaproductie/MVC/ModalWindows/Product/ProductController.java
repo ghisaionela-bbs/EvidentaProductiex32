@@ -100,41 +100,54 @@ public class ProductController extends ModalWindow {
     @Override
     protected void onWindowAction(ACTION_TYPE actionType) {
         if(actionType == ACTION_TYPE.CONFIRMATION) {
+            // Validate the data from the view
+            if(!this.isInputValid(type)) {
+                return;
+            }
+            // Set the data in the model
+            model.getProduct().setName(view.getName());
+            model.getProduct().setUnitMeasurement(view.getUnitMeasurement());
+            model.getProduct().setGroup(view.getGroup());
+
             // If the type of view is ADD, when the CONFIRMATION button is pressed,
             // the product will be added in the database
             if(type == WINDOW_TYPE.ADD) {
-                String name = view.getName();
-                if(name.isEmpty()) {
-                    new WarningController(stage, "Completati denumirea produsului!");
-                    return;
-                }
-                String unitMeasurement = view.getUnitMeasurement();
-                if(unitMeasurement.isEmpty()) {
-                    new WarningController(stage, "Selectati unitatea de masura a produsului!");
-                    return;
-                }
-                Group group = view.getGroup();
-                if(group == null) {
-                    if(!new ConfirmationController(stage, "Confirmare",
-                            "Sunteti sigur ca doriti sa introduce produsul fara o grupa?").isSUCCESS()) {
-                        return;
-                    }
-                }
-                model.getProduct().setName(name);
-                model.getProduct().setUnitMeasurement(unitMeasurement);
-                model.getProduct().setGroup(group);
                 model.addProduct();
             }
             // If the type of view is EDIT, when the CONFIRMATION button is pressed,
             // the product will be updated in the database
             else if (type == WINDOW_TYPE.EDIT) {
-                model.getProduct().setName(view.getName());
-                model.getProduct().setUnitMeasurement(view.getUnitMeasurement());
-                model.getProduct().setGroup(view.getGroup());
                 model.updateProduct();
             }
         }
         stage.close();
+    }
+
+    /***
+     * Validates the data of the controls from the ProductView
+     * @return returns true if it gets past checks
+     */
+    private boolean isInputValid(WINDOW_TYPE type) {
+        if(view.getName().isEmpty()) {
+            new WarningController(stage, "Completati denumirea produsului!");
+            return false;
+        }
+        if(view.getUnitMeasurement().isEmpty()) {
+            new WarningController(stage, "Selectati unitatea de masura a produsului!");
+            return false;
+        }
+        if(view.getGroup() == null) {
+            String message = "";
+            if(type == WINDOW_TYPE.ADD) {
+                message = "Sunteti sigur ca doriti sa introduce produsul fara o grupa?";
+            } else if (type == WINDOW_TYPE.EDIT) {
+                message = "Sunteti sigur ca doriti sa actualizati produsul fara o grupa?";
+            }
+            if(!new ConfirmationController(stage, "Confirmare", message).isSUCCESS()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /***
