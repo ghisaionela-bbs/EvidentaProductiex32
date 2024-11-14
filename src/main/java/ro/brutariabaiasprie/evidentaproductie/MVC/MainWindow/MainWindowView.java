@@ -115,10 +115,8 @@ public class MainWindowView extends Parent implements Builder<Region> {
 
     public void openDefaultTab() {
         switch (model.getCONNECTED_USER().getID_ROLE()){
-            case 0:
-                dashBoardButton.fire();
-                break;
             case 1:
+            case 2:
                 managerButton.fire();
                 break;
             default:

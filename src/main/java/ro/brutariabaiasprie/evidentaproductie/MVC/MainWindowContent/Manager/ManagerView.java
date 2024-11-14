@@ -80,7 +80,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTab.setClosable(false);
         tabPane.getTabs().add(ordersTab);
 
-        if(model.getCONNECTED_USER().getID_ROLE() == 1) {
+        if(model.getCONNECTED_USER().getID_ROLE() == 1 || model.getCONNECTED_USER().getID_ROLE() == 2) {
             tabPane.getTabs().add(createProductsTab());
             tabPane.getTabs().add(createGroupsTab());
         }
@@ -229,7 +229,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         sectionHeaderContainer.getChildren().addAll(ordersSectionTitle);
 
-        if(model.getCONNECTED_USER().getID_ROLE() == 0 || model.getCONNECTED_USER().getID_ROLE() == 1) {
+        if(model.getCONNECTED_USER().getID_ROLE() == 1 || model.getCONNECTED_USER().getID_ROLE() == 2) {
             addOrderButton = new Button();
             addOrderButton.setOnAction(event -> {
                 new OrderController(PARENT_STAGE, WINDOW_TYPE.ADD);
