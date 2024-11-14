@@ -8,10 +8,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 
@@ -182,25 +180,22 @@ public class ProductionView extends Parent implements Builder<Region> {
         btnProductChoice.getStyleClass().add("production-product-selection-button");
         btnProductChoice.prefWidthProperty().bind(stage.widthProperty().divide(3));
         btnProductChoice.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btnProductChoice.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                leftSection.setDisable(true);
-                productSelectionActionHandler.accept(() -> {
-                    if(leftSection.getChildren().contains(productsListView)) {
-                        leftSection.setDisable(false);
-                        leftSection.getChildren().addAll(quantityInputContainer, numpad);
-                        leftSection.getChildren().remove(productsListView);
-                        arrowIcon.setText("▼");
-                    } else {
-                        leftSection.setDisable(false);
-                        leftSection.getChildren().removeAll(quantityInputContainer, numpad);
-                        leftSection.getChildren().add(productsListView);
-                        arrowIcon.setText("▲");
-                    }
+        btnProductChoice.setOnAction(event -> {
+            leftSection.setDisable(true);
+            productSelectionActionHandler.accept(() -> {
+                if (leftSection.getChildren().contains(productsListView)) {
+                    leftSection.setDisable(false);
+                    leftSection.getChildren().addAll(quantityInputContainer, numpad);
+                    leftSection.getChildren().remove(productsListView);
+                    arrowIcon.setText("▼");
+                } else {
+                    leftSection.setDisable(false);
+                    leftSection.getChildren().removeAll(quantityInputContainer, numpad);
+                    leftSection.getChildren().add(productsListView);
+                    arrowIcon.setText("▲");
+                }
 
-                });
-            }
+            });
         });
         return btnProductChoice;
     }
@@ -370,7 +365,7 @@ public class ProductionView extends Parent implements Builder<Region> {
                 String value = node.getText();
                 //Handle warning screen for no product selected
                 if(model.getSelectedProduct() == null) {
-                    WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
+                    new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
                     return;
                 }
                 if("0123456789.".contains(value)) {
@@ -385,13 +380,13 @@ public class ProductionView extends Parent implements Builder<Region> {
                 } else if ("Adauga +".equals(value)) {
                     //Handle warning for no quantity entered
                     if(quantityTextField.getText().isEmpty() || quantityTextField.getText() == null) {
-                        WarningController warningController = new WarningController(stage, "Introduceti cantitatea pentru produsul:\n" +
+                        new WarningController(stage, "Introduceti cantitatea pentru produsul:\n" +
                                 model.getSelectedProduct().getName());
                         return;
                     }
                     double quantity = Double.parseDouble(quantityTextField.getText());
                     if(quantity <= 0) {
-                        WarningController warningController = new WarningController(stage, "Cantitatea trebuie sa fie mai mare de 0!");
+                        new WarningController(stage, "Cantitatea trebuie sa fie mai mare de 0!");
                         return;
                     }
                     //Ask for confirmation
@@ -579,22 +574,5 @@ public class ProductionView extends Parent implements Builder<Region> {
             setSelectedProductHandler.accept(product, orderAssociationController.getOrder());
         }
 
-    }
-
-    private Tab createOrdersTab() {
-        Tab ordersTab = new Tab("Comenzi");
-        ordersTab.setClosable(false);
-        return ordersTab;
-    }
-
-    private Tab createRecordsTab() {
-        Tab recordsTab = new Tab("Realizari");
-        recordsTab.setClosable(false);
-        return recordsTab;
-    }
-
-    private Node createOrdersListview() {
-        ListView<Order> listView = new ListView<>();
-        return listView;
     }
 }

@@ -42,7 +42,11 @@ public class ExcelExportController extends ModalWindow {
             Task<Void> taskDBSelect = new Task<>() {
                 @Override
                 protected Void call() {
-                    model.export(view.getFromDateValue(), view.getToDateValue());
+                    try {
+                        model.export(view.getFromDateValue(), view.getToDateValue());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     return null;
                 }
             };

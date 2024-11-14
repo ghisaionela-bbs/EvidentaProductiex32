@@ -38,24 +38,20 @@ public class ExcelExportModel {
             }
 
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-            String userCond = "";
-            if(user.getID_ROLE() != 1 || user.getID_ROLE() != 0) {
-                userCond = " AND ip.ID_UTILIZATOR_I =" + user.getID() + " ";
-            }
 
             //Select records from database
-            String sql = "SELECT p.ID, p.denumire, ip.cantitate, ip.datasiora_i FROM " +
-                    "INREGISTRARI_PRODUSE AS ip join PRODUSE AS p ON ip.ID_PRODUS = p.ID" + userCond;
+            String sql = "SELECT p.ID, p.denumire, r.cantitate, r.datasiora_i FROM " +
+                    "REALIZARI AS r join PRODUSE AS p ON r.ID_PRODUS = p.ID";
 
             if(dateFrom != null && dateTo != null) {
-                sql += " AND ip.datasiora_i >= ? AND ip.datasiora_i <= ? ";
+                sql += " AND r.datasiora_i >= ? AND r.datasiora_i <= ? ";
             } else if(dateFrom != null){
-                sql += " AND ip.datasiora_i >= ? ";
+                sql += " AND r.datasiora_i >= ? ";
             } else if(dateTo != null) {
-                sql += " AND ip.datasiora_i <= ? ";
+                sql += " AND r.datasiora_i <= ? ";
             }
 
-            sql += "ORDER BY ip.datasiora_i DESC";
+            sql += "ORDER BY r.datasiora_i DESC";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             if(dateFrom != null && dateTo != null) {
@@ -94,13 +90,13 @@ public class ExcelExportModel {
             String title = "Raport generat in " + dateTimeFormatter.format(timestamp);
             if(dateFrom != null && dateTo != null) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                title += " pentru inregistrari introduse in intervalul: " + dateFrom.format(formatter) + " - " + dateTo.format(formatter);
+                title += " pentru realizari introduse in intervalul: " + dateFrom.format(formatter) + " - " + dateTo.format(formatter);
             } else if(dateFrom != null){
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                title += " pentru inregistrari introduse din: " + dateFrom.format(formatter);
+                title += " pentru realizari introduse din: " + dateFrom.format(formatter);
             } else if(dateTo != null) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                title += " pentru inregistrari introduse pana in: " + dateTo.format(formatter);
+                title += " pentru realizari introduse pana in: " + dateTo.format(formatter);
             }
 
             infoRow.createCell(0).setCellValue(title);
