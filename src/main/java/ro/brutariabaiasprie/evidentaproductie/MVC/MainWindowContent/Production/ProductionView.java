@@ -1,6 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -18,16 +19,17 @@ import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
-import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.OrderAssociationController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Record.RecordController;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -40,9 +42,8 @@ import java.util.regex.Pattern;
 public class ProductionView extends Parent implements Builder<Region> {
     private final Consumer<Runnable> productSelectionActionHandler;
     private final BiConsumer<Runnable, Double> productRecordAddActionHandler;
-    private final Consumer<ProductDTO> searchOrderForProductHandler;
-    private final BiConsumer<ProductDTO, OrderDTO> setSelectedProductHandler;
-    private final Consumer<ProductRecordDTO> editProductRecordHandler;
+    private final Consumer<Product> searchOrderForProductHandler;
+    private final BiConsumer<Product, Order> setSelectedProductHandler;
 
     private final ProductionModel model;
     private final Stage stage;
@@ -52,7 +53,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     private TextField quantityTextField;
     private GridPane numpad;
     private VBox leftSection;
-    private ListView<ProductDTO> productsListView;
+    private ListView<Product> productsListView;
     private Label arrowIcon;
     private Label orderLabel;
     private HBox quantityInputContainer;
@@ -64,15 +65,14 @@ public class ProductionView extends Parent implements Builder<Region> {
     public ProductionView(ProductionModel model, Stage stage,
                           Consumer<Runnable> productSelectionActionHandler,
                           BiConsumer<Runnable, Double>  productRecordAddActionHandler,
-                          Consumer<ProductDTO> searchOrderForProductHandler,
-                          BiConsumer<ProductDTO, OrderDTO> setSelectedProductHandler, Consumer<ProductRecordDTO> editProductRecordHandler) {
+                          Consumer<Product> searchOrderForProductHandler,
+                          BiConsumer<Product, Order> setSelectedProductHandler) {
         this.productSelectionActionHandler = productSelectionActionHandler;
         this.productRecordAddActionHandler = productRecordAddActionHandler;
         this.model = model;
         this.stage = stage;
         this.searchOrderForProductHandler = searchOrderForProductHandler;
         this.setSelectedProductHandler = setSelectedProductHandler;
-        this.editProductRecordHandler = editProductRecordHandler;
         this.user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
     }
 
@@ -114,7 +114,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         productsListView.maxWidthProperty().bind(stage.widthProperty().divide(3));
 
         Label titleLabel = new Label("Inregistrari introduse");
-        TableView<ProductRecordDTO> tableView = createProductRecordTableView();
+        TableView<Record> tableView = createRecordTableView();
         tableView.setMaxSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
         VBox.setVgrow(tableView, Priority.ALWAYS);
 
@@ -158,8 +158,8 @@ public class ProductionView extends Parent implements Builder<Region> {
                         return "!!! Nici o comanda asociata !!!";
                     }
                     orderLabel.getStyleClass().remove("warning");
-                    OrderDTO order = model.getAssociatedOrder();
-                    return "Asociat la comanda: " + order.getID() + " din " + dateTimeFormatter.format(order.getDateAndTimeInserted());
+                    Order order = model.getAssociatedOrder();
+                    return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
 
                 },
                 model.associatedOrderProperty()
@@ -412,13 +412,30 @@ public class ProductionView extends Parent implements Builder<Region> {
         };
     }
 
-    private TableView<ProductRecordDTO> createProductRecordTableView() {
-        TableView<ProductRecordDTO> tableView = new TableView<>();
+    private TableView<Record> createRecordTableView() {
+        TableView<Record> tableView = new TableView<>();
 
-        tableView.setPlaceholder(new Label("Nu exista inregistrari."));
+        tableView.setPlaceholder(new Label("Nu exista realizari."));
 
-        TableColumn<ProductRecordDTO, String> nameColumn = new TableColumn<>("Produs");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<Record, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
+        dateAndTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        dateAndTimeColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Timestamp item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(format.format(item));
+                    setStyle("-fx-alignment: CENTER;");
+                }
+            }
+        });
+        tableView.getColumns().add(dateAndTimeColumn);
+
+        TableColumn<Record, String> nameColumn = new TableColumn<>("Produs");
+        nameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getName()));
         nameColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -438,8 +455,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         });
         tableView.getColumns().add(nameColumn);
 
-        TableColumn<ProductRecordDTO, Double> quantityColumn = new TableColumn<>("Cantitate");
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        TableColumn<Record, Double> quantityColumn = new TableColumn<>("Cantitate");
+        quantityColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getQuantity()));
         quantityColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
@@ -448,36 +465,20 @@ public class ProductionView extends Parent implements Builder<Region> {
                     setText(null);
                 } else {
                     setText(String.format("%.2f", item));
+                    setStyle("-fx-alignment: CENTER-RIGHT;");
                 }
             }
         });
         tableView.getColumns().add(quantityColumn);
 
-        TableColumn<ProductRecordDTO, String> unitMeasurementColumn = new TableColumn<>("UM");
-        unitMeasurementColumn.setCellValueFactory(new PropertyValueFactory<>("unitMeasurement"));
+        TableColumn<Record, String> unitMeasurementColumn = new TableColumn<>("UM");
+        unitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getUnitMeasurement()));
+        unitMeasurementColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
         tableView.getColumns().add(unitMeasurementColumn);
 
-        TableColumn<ProductRecordDTO, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
-        dateAndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateAndTimeInserted"));
-        quantityColumn.setPrefWidth(100);
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        dateAndTimeColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Timestamp item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                } else {
-                    setText(format.format(item));
-                }
-            }
-        });
-        tableView.getColumns().add(dateAndTimeColumn);
-
-        int percentEditBtn = 0;
         if(user.getID_ROLE() == 0 || user.getID_ROLE() == 1) {
-            TableColumn<ProductRecordDTO, Integer> editBtnColumn = new TableColumn<>();
-            editBtnColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+            TableColumn<Record, Integer> editBtnColumn = new TableColumn<>();
+            editBtnColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
             editBtnColumn.setCellFactory(column -> new TableCell<>() {
                 @Override
                 protected void updateItem(Integer item, boolean empty) {
@@ -493,48 +494,36 @@ public class ProductionView extends Parent implements Builder<Region> {
 
                         editButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
                         editButton.getStyleClass().add("filled-button");
-//                        editButton.getStyleClass().add("filled-button");
+                        setStyle("-fx-alignment: CENTER-RIGHT;");
 
-                        editButton.setOnAction(event -> {
-                            editProductRecordHandler.accept(getTableRow().getItem());
-                        });
+                        editButton.setOnAction(event -> new RecordController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                         setGraphic(editButton);
                     }
                 }
             });
             tableView.getColumns().add(editBtnColumn);
-            percentEditBtn = 10;
-            editBtnColumn.setMaxWidth(1f * Integer.MAX_VALUE * percentEditBtn);
         }
 
-        int percentName = 40 - percentEditBtn;
-        int percentQuantity = 25;
-        int percentUnitMeasurement = 10;
-        int percentDateAndTime = 25;
 
         tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-        nameColumn.setMaxWidth(1f * Integer.MAX_VALUE * percentName); // 40% width
-        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * percentQuantity ); // 30% width
-        unitMeasurementColumn.setMaxWidth(1f * Integer.MAX_VALUE * percentUnitMeasurement); // 10% width
-        dateAndTimeColumn.setMaxWidth( 1f * Integer.MAX_VALUE * percentDateAndTime ); // 50% width
 
-        tableView.getStyleClass().add("tbl-product-record-view");
-        tableView.setItems(model.getProductRecords());
+        tableView.getStyleClass().add("main-table-view");
+        tableView.setItems(model.getRecords());
 
         return tableView;
     }
 
-    private ListView<ProductDTO> createProductListView() {
-        ListView<ProductDTO> listView = new ListView<>();
-        listView.setCellFactory(new Callback<ListView<ProductDTO>, ListCell<ProductDTO>>() {
+    private ListView<Product> createProductListView() {
+        ListView<Product> listView = new ListView<>();
+        listView.setCellFactory(new Callback<ListView<Product>, ListCell<Product>>() {
             @Override
-            public ListCell<ProductDTO> call(ListView<ProductDTO> param) {
-                return new ListCell<ProductDTO>() {
+            public ListCell<Product> call(ListView<Product> param) {
+                return new ListCell<Product>() {
                     {
                         setPrefWidth(0);
                     }
                     @Override
-                    protected void updateItem(ProductDTO item, boolean empty) {
+                    protected void updateItem(Product item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
                             setText(null);
@@ -559,8 +548,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         listView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 //Use ListView's getSelected Item
-                ProductDTO productDTO = listView.getSelectionModel().getSelectedItem();
-                handleListViewItemSelected(productDTO);
+                Product product = listView.getSelectionModel().getSelectedItem();
+                handleListViewItemSelected(product);
                 arrowIcon.setText("▼");
             }
         });
@@ -568,8 +557,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         listView.setOnTouchPressed(event -> {
             if (event.getTouchCount() == 2) {
                 //Use ListView's getSelected Item
-                ProductDTO productDTO = listView.getSelectionModel().getSelectedItem();
-                handleListViewItemSelected(productDTO);
+                Product product = listView.getSelectionModel().getSelectedItem();
+                handleListViewItemSelected(product);
                 arrowIcon.setText("▼");
             }
         });
@@ -578,11 +567,11 @@ public class ProductionView extends Parent implements Builder<Region> {
         return listView;
     }
 
-    private void handleListViewItemSelected(ProductDTO product) {
+    private void handleListViewItemSelected(Product product) {
         searchOrderForProductHandler.accept(product);
     }
 
-    public void handleOrderSearchForProduct(ProductDTO product, boolean isFound) {
+    public void handleOrderSearchForProduct(Product product, boolean isFound) {
         OrderAssociationController orderAssociationController = new OrderAssociationController(stage, product);
         if(orderAssociationController.isSUCCESS()) {
             leftSection.getChildren().addAll(quantityInputContainer, numpad);

@@ -30,10 +30,11 @@ public class GroupView extends Parent implements Builder<Region> {
 
     @Override
     public Region build() {
-        VBox root = new VBox();
-        root.getChildren().addAll(createContentSection());
-        root.getChildren().add(createWindowButtons());
-        root.setAlignment(Pos.CENTER);
+        BorderPane root = new BorderPane();
+        root.setCenter(createContentSection());
+        root.setBottom(createSceneButtons());
+        root.getCenter().getStyleClass().add("center");
+        root.getBottom().getStyleClass().add("bottom");
         root.getStyleClass().add("modal-window");
         return root;
     }
@@ -54,8 +55,6 @@ public class GroupView extends Parent implements Builder<Region> {
         groupNameTextArea = new TextArea();
         groupNameTextArea.setPrefSize(400, 200);
         groupNameTextArea.setWrapText(true);
-
-
 
         // Setting up the values and properties of controls
         switch (type) {
@@ -100,7 +99,7 @@ public class GroupView extends Parent implements Builder<Region> {
         return gridPane;
     }
 
-    private HBox createWindowButtons() {
+    private HBox createSceneButtons() {
         SceneButton confirmButton = new SceneButton("OK", ACTION_TYPE.CONFIRMATION);
         confirmButton.setOnAction(event -> actionHandler.accept(confirmButton.getActionType()));
         SceneButton cancelButton = new SceneButton("Anuleaza", ACTION_TYPE.CANCELLATION);

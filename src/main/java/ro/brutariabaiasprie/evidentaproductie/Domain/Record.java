@@ -10,6 +10,7 @@ public class Record {
     private int userIdInserted;
     private Timestamp dateTimeModified;
     private int userIdModified;
+    private int orderId;
 
     public int getId() {
         return id;
@@ -65,5 +66,13 @@ public class Record {
 
     public void setUserIdModified(int userIdModified) {
         this.userIdModified = userIdModified;
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 }

@@ -1,13 +1,11 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -26,10 +24,9 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductCo
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.function.Consumer;
 
 public class ManagerView extends Parent implements Builder<Region> {
-    private final Stage PARENT_STAGE;
+    private final Stage stage;
     private final ManagerModel model;
     //products tab
     private Button addProductButton;
@@ -39,9 +36,9 @@ public class ManagerView extends Parent implements Builder<Region> {
     private Button addOrderButton;
     private Button excelExportButton;
 
-    public ManagerView(ManagerModel model, Stage parentStage) {
+    public ManagerView(ManagerModel model, Stage stage) {
         this.model = model;
-        this.PARENT_STAGE = parentStage;
+        this.stage = stage;
     }
 
     @Override
@@ -56,7 +53,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
     private void createStageResizeListeners() {
         ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
-            if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
+            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
                 addProductButton.setText("➕");
                 importProductsButton.setText("\uD83D\uDCE5");
                 addOrderButton.setText("➕");
@@ -69,8 +66,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
         };
 
-        PARENT_STAGE.widthProperty().addListener(stageSizeListener);
-        PARENT_STAGE.heightProperty().addListener(stageSizeListener);
+        stage.widthProperty().addListener(stageSizeListener);
+        stage.heightProperty().addListener(stageSizeListener);
     }
 
     private Node createTabs() {
@@ -111,12 +108,12 @@ public class ManagerView extends Parent implements Builder<Region> {
         HBox.setHgrow(productsSectionTitle, Priority.ALWAYS);
 
         addProductButton = new Button();
-        addProductButton.setOnAction(event -> new ProductController(PARENT_STAGE));
+        addProductButton.setOnAction(event -> new ProductController(stage));
 
         importProductsButton = new Button();
-        importProductsButton.setOnAction(event -> new ExcelImportController(PARENT_STAGE));
+        importProductsButton.setOnAction(event -> new ExcelImportController(stage));
         importProductsButton.setTooltip(new Tooltip("Importa produse dintr-un fisier excel."));
-        if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
+        if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
             addProductButton.setText("➕");
             importProductsButton.setText("\uD83D\uDCE5");
         } else {
@@ -183,11 +180,11 @@ public class ManagerView extends Parent implements Builder<Region> {
                 } else {
                     setText(null);
 
-                    editButton.setGraphic(new FontIcon("mdi2s-square-edit-outline"));
+                    editButton.setGraphic(fontIcon);
 
                     editButton.getStyleClass().add("filled-button");
 
-                    editButton.setOnAction(event -> new ProductController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                    editButton.setOnAction(event -> new ProductController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                     setGraphic(editButton);
                     setStyle("-fx-alignment: CENTER-RIGHT;");
                 }
@@ -232,16 +229,16 @@ public class ManagerView extends Parent implements Builder<Region> {
         if(model.getCONNECTED_USER().getID_ROLE() == 1 || model.getCONNECTED_USER().getID_ROLE() == 2) {
             addOrderButton = new Button();
             addOrderButton.setOnAction(event -> {
-                new OrderController(PARENT_STAGE, WINDOW_TYPE.ADD);
+                new OrderController(stage, WINDOW_TYPE.ADD);
 //                AddNewOrderController orderController = new AddNewOrderController(PARENT_STAGE);
             });
             excelExportButton = new Button();
             excelExportButton.setOnAction(event -> {
-                ExcelExportController excelExportController = new ExcelExportController(PARENT_STAGE);
+                ExcelExportController excelExportController = new ExcelExportController(stage);
             });
 
             excelExportButton.setTooltip(new Tooltip("Exporta inregistrarile realizate intr-un excel."));
-            if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
+            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
                 addOrderButton.setText("➕");
                 excelExportButton.setText("");
             } else {
@@ -331,6 +328,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                     setGraphic(null);
                 } else {
                     setText(String.format("%.2f", item));
+                    setStyle("-fx-alignment: CENTER-RIGHT;");
                 }
             }
         });
@@ -348,6 +346,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                     setGraphic(null);
                 } else {
                     setText(String.format("%.2f", item));
+                    setStyle("-fx-alignment: CENTER-RIGHT;");
                 }
             }
         });
@@ -364,6 +363,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                     setGraphic(null);
                 } else {
                     setText(String.format("%.2f", item));
+                    setStyle("-fx-alignment: CENTER-RIGHT;");
                 }
             }
         });
@@ -390,7 +390,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                         setText(null);
                         editButton.getStyleClass().add("filled-button");
                         editButton.setGraphic(fontIcon);
-                        editButton.setOnAction(event -> new OrderController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                        editButton.setOnAction(event -> new OrderController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                         setGraphic(editButton);
                         setStyle("-fx-alignment: CENTER-RIGHT;");
                     }
@@ -410,7 +410,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                         setText(null);
                         editButton.getStyleClass().add("filled-button");
                         editButton.setGraphic(fontIcon);
-                        editButton.setOnAction(event -> new OrderController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                        editButton.setOnAction(event -> new OrderController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                         setGraphic(editButton);
                         setStyle("-fx-alignment: CENTER-RIGHT;");
                     }
@@ -422,13 +422,6 @@ public class ManagerView extends Parent implements Builder<Region> {
 
 
         ordersTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-//        orderIDColumn.setMaxWidth(1f * Integer.MAX_VALUE * 8);
-//        dateTimeColumn.setMaxWidth(1f * Integer.MAX_VALUE * 13);
-//        productNameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 34);
-//        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
-//        productUnitMeasurementColumn.setMaxWidth(1f * Integer.MAX_VALUE * 6);
-//        completedColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
-//        remainderColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
 
         ordersTableView.setItems(model.getOrders());
         ordersTableView.getStyleClass().add("main-table-view");
@@ -447,7 +440,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         Button addButton = new Button("Adauga o grupa");
         addButton.getStyleClass().add("ghost-button");
-        addButton.setOnAction(event -> new GroupController(PARENT_STAGE, WINDOW_TYPE.ADD));
+        addButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.ADD));
 
         HBox headerSection = new HBox(sectionTitle, addButton);
         headerSection.getStyleClass().add("tab-section-header");
@@ -485,7 +478,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
                     editButton.setGraphic(fontIcon);
                     editButton.getStyleClass().add("filled-button");
-                    editButton.setOnAction(event -> new GroupController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                    editButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                     setGraphic(editButton);
                     setStyle("-fx-alignment: CENTER-RIGHT;");
                 }

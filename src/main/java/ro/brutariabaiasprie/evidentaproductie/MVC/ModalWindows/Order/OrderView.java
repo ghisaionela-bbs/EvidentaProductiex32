@@ -18,6 +18,7 @@ import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 
+import java.text.SimpleDateFormat;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,6 +90,9 @@ public class OrderView extends Parent implements Builder<Region> {
         Label quantityLabel = new Label("Cantitate");
         quantityTextField = createQuantityField();
 
+        Label dateLabel = new Label();
+        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
         isClosedCheckBox = new CheckBox("Inchisa");
 
         GridPane numpad = createNumpad();
@@ -107,6 +111,7 @@ public class OrderView extends Parent implements Builder<Region> {
                 orderIdLabel.setText("Comanda " + model.getOrder().getId());
                 productComboBox.getSelectionModel().select(model.getOrder().getProduct());
                 quantityTextField.setText(String.format("%.2f", model.getOrder().getQuantity()));
+                dateLabel.setText("Introdusa la: " + dateTimeFormatter.format(model.getOrder().getDateTimeInserted()));
                 isClosedCheckBox.setSelected(model.getOrder().isClosed());
                 break;
         }

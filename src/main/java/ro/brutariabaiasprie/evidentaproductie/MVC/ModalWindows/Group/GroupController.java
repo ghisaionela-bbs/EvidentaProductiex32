@@ -73,7 +73,7 @@ public class GroupController extends ModalWindow {
     }
 
     /***
-     * Validates the data of the controls from the ProductView
+     * Validates the data of the controls from the GroupView
      * @return returns true if it gets past checks
      */
     private boolean isInputValid(WINDOW_TYPE type) {

@@ -1,19 +1,16 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
+import javafx.scene.text.Text;
 import javafx.util.Builder;
-
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderResultsDTO;
-import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Data.*;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -23,7 +20,7 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
     private final OrderAssociationModel model;
     private final Consumer<ACTION_TYPE> actionHandler;
 
-    private TableView<OrderResultsDTO> orderTableView;
+    private TableView<Order> ordersTableView;
 
     public OrderAssociationView(OrderAssociationModel model, Consumer<ACTION_TYPE> actionHandler) {
         this.model = model;
@@ -61,29 +58,68 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
 
         Label infoLabel = new Label("Alegeti comanda pentru care introduceti produsul: " + model.getProduct().getName());
 
-        orderTableView = new TableView<>();
-        TableColumn<OrderResultsDTO, Integer> orderIDColumn = new TableColumn<>("Comanda");
-        orderIDColumn.setCellValueFactory(new PropertyValueFactory<>("ORDER_ID"));
-        orderTableView.getColumns().add(orderIDColumn);
+        ordersTableView = new TableView<>();
+        ordersTableView.setPlaceholder(new Label("Nu exista comenzi."));
+        VBox.setVgrow(ordersTableView, Priority.ALWAYS);
 
-        TableColumn<OrderResultsDTO, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
-        dateAndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("orderDateAndTime"));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        dateAndTimeColumn.setCellFactory(column -> new TableCell<>() {
+        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Comanda");
+        orderIDColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
+        orderIDColumn.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected void updateItem(Timestamp item, boolean empty) {
+            protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
+                if (item == null || empty) {
                     setText(null);
                 } else {
-                    setText(dateFormat.format(item));
+                    if(item == 0) {
+                        setText(null);
+                    } else {
+                        setText(item.toString());
+                    }
                 }
             }
         });
-        orderTableView.getColumns().add(dateAndTimeColumn);
+        ordersTableView.getColumns().add(orderIDColumn);
 
-        TableColumn<OrderResultsDTO, Double> quantityColumn = new TableColumn<>("Cantitate");
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Plasata la");
+        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
+        ordersTableView.getColumns().add(dateTimeColumn);
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        dateTimeColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Timestamp item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(format.format(item));
+                }
+            }
+        });
+
+        TableColumn<Order, String> productNameColumn = new TableColumn<>("Produs");
+        productNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getName()));
+        productNameColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Text txtName = new Text(item);
+                    txtName.getStyleClass().add("text");
+                    txtName.wrappingWidthProperty().bind(widthProperty());
+                    setGraphic(txtName);
+                    setWrapText(true);
+                    setText(item);
+                }
+            }
+        });
+        ordersTableView.getColumns().add(productNameColumn);
+
+        TableColumn<Order, Double> quantityColumn = new TableColumn<>("Comandat");
+        quantityColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getQuantity()));
         quantityColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
@@ -93,31 +129,63 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
                     setGraphic(null);
                 } else {
                     setText(String.format("%.2f", item));
+                    setStyle("-fx-alignment: TOP-RIGHT;");
                 }
             }
         });
-        orderTableView.getColumns().add(quantityColumn);
+        ordersTableView.getColumns().add(quantityColumn);
 
-        TableColumn<OrderResultsDTO, String> unitMeasurementColumn = new TableColumn<>("UM");
-        unitMeasurementColumn.setCellValueFactory(new PropertyValueFactory<>("unitMeasurement"));
-        orderTableView.getColumns().add(unitMeasurementColumn);
+        TableColumn<Order, Double> completedColumn = new TableColumn<>("Realizat");
+        completedColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getCompleted()));
+        ordersTableView.getColumns().add(completedColumn);
+        completedColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(String.format("%.2f", item));
+                    setStyle("-fx-alignment: TOP-RIGHT;");
+                }
+            }
+        });
 
-        orderTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-        orderIDColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
-        dateAndTimeColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 30 );
-        quantityColumn.setMaxWidth(1f * Integer.MAX_VALUE * 30);
-        unitMeasurementColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 10 );
+        TableColumn<Order, Double> remainderColumn = new TableColumn<>("Rest");
+        remainderColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getRemainder()));
+        ordersTableView.getColumns().add(remainderColumn);
+        remainderColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(String.format("%.2f", item));
+                    setStyle("-fx-alignment: TOP-RIGHT;");
+                }
+            }
+        });
 
-        orderTableView.setItems(model.getOrderSearchResults());
-        orderTableView.getSelectionModel().select(0);
+        TableColumn<Order, String> productUnitMeasurementColumn = new TableColumn<>("UM");
+        productUnitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getUnitMeasurement()));
+        ordersTableView.getColumns().add(productUnitMeasurementColumn);
 
-        container.getChildren().addAll(infoLabel, orderTableView);
+        ordersTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+
+        ordersTableView.setItems(model.getOrders());
+        ordersTableView.getStyleClass().add("main-table-view");
+        ordersTableView.getSelectionModel().select(0);
+
+        container.getChildren().addAll(infoLabel, ordersTableView);
 
         return container;
     }
 
-    public OrderResultsDTO getSelectedOrder() {
-        return orderTableView.getSelectionModel().getSelectedItem();
+    public Order getSelectedOrder() {
+        return ordersTableView.getSelectionModel().getSelectedItem();
     }
 
 }

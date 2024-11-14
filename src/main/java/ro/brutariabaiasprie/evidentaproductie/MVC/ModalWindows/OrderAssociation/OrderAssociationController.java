@@ -9,9 +9,9 @@ import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderResultsDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewOrder.AddNewOrderView;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
@@ -24,9 +24,9 @@ public class OrderAssociationController extends ModalWindow{
     private Stage stage;
     private boolean SUCCESS = false;
     private final Stage PARENT_STAGE;
-    private final ProductDTO product;
+    private final Product product;
 
-    public OrderAssociationController(Stage owner, ProductDTO product) {
+    public OrderAssociationController(Stage owner, Product product) {
         //loading screen
         this.PARENT_STAGE = owner;
         this.product = product;
@@ -53,17 +53,14 @@ public class OrderAssociationController extends ModalWindow{
     protected void onWindowAction(ACTION_TYPE actionType) {
         switch (actionType) {
             case CONFIRMATION:
-                OrderResultsDTO orderResult = view.getSelectedOrder();
-                if (orderResult == null) {
-                    WarningController warning = new WarningController(stage, "Nu ati ales nici o comanda!");
+                Order order = view.getSelectedOrder();
+                if (order == null) {
+                    new WarningController(stage, "Nu ati ales nici o comanda!");
                     return;
                 }
-                OrderDTO order = model.getSelectedOrder(orderResult.getORDER_ID());
-                if(order!= null){
-                    model.setOrder(order);
-                    SUCCESS = true;
-                    stage.close();
-                }
+                model.setOrder(order);
+                SUCCESS = true;
+                stage.close();
                 break;
             case CONTINUATION:
                 if(model.getOrder() == null) {
@@ -85,15 +82,19 @@ public class OrderAssociationController extends ModalWindow{
         return SUCCESS;
     }
 
-    public OrderDTO getOrder() {
+    public Order getOrder() {
         return model.getOrder();
     }
 
-    private void searchOrders(ProductDTO product) {
-        Task<Void> taskDBSelect = new Task<Void>() {
+    private void searchOrders(Product product) {
+        Task<Void> taskDBSelect = new Task<>() {
             @Override
-            protected Void call() throws Exception {
-                model.loadSearchResults();
+            protected Void call() {
+                try {
+                    model.loadSearchResults();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return null;
             }
         };

@@ -4,115 +4,121 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderResultsDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.Exceptions.OrderNotFound;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.*;
 
 public class OrderAssociationModel {
-    private final ObservableList<OrderResultsDTO> orderSearchResults;
-    private final ObjectProperty<ProductDTO> product;
-    private OrderDTO order;
+    private final ObservableList<Order> orders = FXCollections.observableArrayList();
+    private final ObjectProperty<Product> product;
+    private Order order;
 
-    public OrderAssociationModel(ProductDTO product) {
-        this.orderSearchResults = FXCollections.observableArrayList();
+    public OrderAssociationModel(Product product) {
         this.product = new SimpleObjectProperty<>(product);
     }
 
-    public ObservableList<OrderResultsDTO> getOrderSearchResults() {
-        return orderSearchResults;
+    public ObservableList<Order> getOrders() {
+        return orders;
     }
 
-    public ProductDTO getProduct() {
+    public Product getProduct() {
         return product.get();
     }
 
-    public ObjectProperty<ProductDTO> productProperty() {
+    public ObjectProperty<Product> productProperty() {
         return product;
     }
 
-    public void setProduct(ProductDTO product) {
+    public void setProduct(Product product) {
         this.product.set(product);
     }
 
-    public OrderDTO getOrder() {
+    public Order getOrder() {
         return order;
     }
 
-    public void setOrder(OrderDTO order) {
+    public void setOrder(Order order) {
         this.order = order;
     }
-
-    public OrderDTO getSelectedOrder(int orderID) {
-        try {
-            Connection connection = DBConnectionService.getConnection();
-
-            String sql = "SELECT * FROM [dbo].[COMENZI] WHERE ID = ?";
-
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, orderID);
-            ResultSet resultSet = statement.executeQuery();
-
-            if(!resultSet.next()){
-                throw new OrderNotFound("The order " + product.get().getID() + " was not found.");
-            }
-
-            Timestamp dateTime = resultSet.getTimestamp("datasiora_i");
-            int USER_ID = resultSet.getInt("ID_UTILIZATOR_I");
-
-            return order = new OrderDTO(orderID, dateTime, USER_ID);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     public void loadSearchResults() {
         try {
             Connection connection = DBConnectionService.getConnection();
 
             String sql = "SELECT " +
-                    "c.ID AS ORDER_ID, " +
-                    "ic.ID AS ORDER_ITEM_ID, " +
-                    "p.ID AS PRODUCT_ID, " +
-                    "c.datasiora_i, " +
+                    "c.ID, " +
+                    "c.ID_PRODUS, " +
                     "p.denumire, " +
-                    "ic.cantitate, " +
-                    "p.um " +
-                    "FROM [dbo].[COMENZI] AS c " +
-                    "LEFT JOIN [dbo].[ITEME_COMENZI] AS ic ON c.ID = ic.ID_COMANDA " +
-                    "LEFT JOIN [dbo].[PRODUSE] AS p ON p.ID = ic.ID_PRODUS " +
-                    "WHERE ic.ID_PRODUS = ?";
+                    "p.um, " +
+                    "g.ID AS ID_GRUPA, " +
+                    "g.denumire  AS denumire_grupa, " +
+                    "c.cantitate, " +
+                    "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
+                    "c.cantitate - SUM(COALESCE(r.cantitate, 0.00)) AS rest, " +
+                    "c.datasiora_i, " +
+                    "c.ID_UTILIZATOR_I, " +
+                    "c.datasiora_m, " +
+                    "c.ID_UTILIZATOR_M, " +
+                    "c.inchisa  " +
+                    "FROM COMENZI c LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
+                    "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
+                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "WHERE p.ID = ? " +
+                    "GROUP BY c.ID, " +
+                    "c.ID_PRODUS, " +
+                    "p.denumire, " +
+                    "p.um, " +
+                    "g.ID, " +
+                    "g.denumire, " +
+                    "c.cantitate, " +
+                    "c.datasiora_i, " +
+                    "c.ID_UTILIZATOR_I, " +
+                    "c.datasiora_m, " +
+                    "c.ID_UTILIZATOR_M, " +
+                    "c.inchisa " +
+                    "ORDER BY c.datasiora_i ASC ";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, product.get().getID());
+            statement.setInt(1, product.get().getId());
             ResultSet resultSet = statement.executeQuery();
 
-            orderSearchResults.clear();
-            if(!resultSet.next()){
-                throw new OrderNotFound("No order was found for order:" + product.get().getID());
-            } else {
-                do {
-                    orderSearchResults.add(getOrderResultFromResultset(resultSet));
-                } while (resultSet.next());
+            orders.clear();
+            while(resultSet.next()){
+                orders.add(getOrderFromResultset(resultSet));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private OrderResultsDTO getOrderResultFromResultset(ResultSet resultSet) throws SQLException {
-        int ORDER_ID = resultSet.getInt("ORDER_ID");
-        Timestamp orderDateAndTime = resultSet.getTimestamp("datasiora_i");
-        String productName = resultSet.getString("denumire");
-        double quantity = resultSet.getDouble("cantitate");
-        String unitMeasurement = resultSet.getString("um");
-        return new OrderResultsDTO(ORDER_ID, orderDateAndTime, productName, quantity, unitMeasurement);
+    private Order getOrderFromResultset(ResultSet resultSet) throws SQLException {
+        Group group = null;
+        int groupId = resultSet.getInt("ID_GRUPA");
+        if(!resultSet.wasNull()) {
+            group = new Group(groupId, resultSet.getString("denumire_grupa"));
+        }
+
+        Order order = new Order();
+        order.setId(resultSet.getInt("ID"));
+        order.setProduct(new Product(
+                resultSet.getInt("ID_PRODUS"),
+                resultSet.getString("denumire"),
+                resultSet.getString("um"),
+                group
+        ));
+        order.setQuantity(resultSet.getDouble("cantitate"));
+        order.setCompleted(resultSet.getDouble("realizat"));
+        order.setRemainder(resultSet.getDouble("rest"));
+        order.setDateTimeInserted(resultSet.getTimestamp("datasiora_i"));
+        order.setUserIdInserted(resultSet.getInt("ID_UTILIZATOR_I"));
+        order.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
+        order.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
+        order.setClosed(resultSet.getBoolean("inchisa"));
+        return order;
     }
-
-
 
 }

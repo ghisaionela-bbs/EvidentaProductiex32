@@ -42,14 +42,14 @@ public class EditProductRecordController extends ModalWindow {
     }
 
     private void changeOrderHandler() {
-        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, model.getProduct());
-        if(orderAssociationController.isSUCCESS()) {
-            if(orderAssociationController.getOrder() == null) {
-                model.setOrderID(null);
-            } else {
-                model.setOrderID(orderAssociationController.getOrder().getID());
-            }
-        }
+//        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, model.getProduct());
+//        if(orderAssociationController.isSUCCESS()) {
+//            if(orderAssociationController.getOrder() == null) {
+//                model.setOrderID(null);
+//            } else {
+//                model.setOrderID(orderAssociationController.getOrder().getID());
+//            }
+//        }
     }
 
     private void changeProductHandler() {

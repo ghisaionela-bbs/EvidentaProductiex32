@@ -320,29 +320,20 @@
     -fx-font-size: 1.5em;
 }
 /* CONTENT -> MANAGER VIEW -> TABLE VIEW */
-.main-window .main-table-view {
+.main-table-view {
     -fx-background-color: TRANSPARENT;
 }
-.main-window .main-table-view .column-header {
+.main-table-view .column-header {
     -fx-background-color: TRANSPARENT;
 }
-.table-view .main-table-view .column-header .label{
-    -fx-background-color: transparent;
-    -fx-text-fill: white;
-}
-.main-window .main-table-view .column-header-background {
+.main-table-view .column-header-background {
     -fx-background-color: TRANSPARENT;
     -fx-text-fill: COLOR_BRAND_BROWN;
 }
-.table-view .main-table-view .column-header-background .label{
-    -fx-background-color: transparent;
-    -fx-text-fill: white;
-}
-.main-window .main-table-view .column-header-background .filler {
+.main-table-view .column-header-background .filler {
     -fx-background-color: TRANSPARENT;
 }
-
-.main-window .main-table-view .table-row-cell:filled:focused:selected .text {
+.main-table-view .table-row-cell:filled:focused:selected .text {
     -fx-fill: -fx-selection-bar-text;
 }
 

@@ -7,9 +7,8 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.EditProductRecord.EditProductRecordController;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
@@ -20,13 +19,12 @@ public class ProductionController implements SceneController {
     private final ProductionModel model = new ProductionModel();
 
     public ProductionController(Stage window) {
-        model.loadProductRecords();
+        model.loadRecords();
         this.view = new ProductionView(model, window,
                 this::loadProducts,
                 this::addProductRecordToDB,
                 this::searchOrderForProduct,
-                this::setSelectedProduct,
-                this::editProductRecordHandler);
+                this::setSelectedProduct);
         DBConnectionService.getModifiedTables().addListener(new MapChangeListener<String, Timestamp>() {
             @Override
             public void onChanged(Change<? extends String, ? extends Timestamp> change) {
@@ -34,8 +32,8 @@ public class ProductionController implements SceneController {
                     if(change.getKey().equals("PRODUSE")) {
                         model.loadProducts();
                     }
-                    if(change.getKey().equals("INREGISTRARI_PRODUSE")) {
-                        model.loadProductRecords();
+                    if(change.getKey().equals("REALIZARI")) {
+                        model.loadRecords();
                     }
                 }
             }
@@ -86,29 +84,25 @@ public class ProductionController implements SceneController {
         dbTaskThread.start();
     }
 
-    private void editProductRecordHandler(ProductRecordDTO productRecord) {
-        EditProductRecordController editProductRecordController = new EditProductRecordController(view.getStage(), productRecord);
-    }
-
-    private void searchOrderForProduct(ProductDTO productDTO) {
+    private void searchOrderForProduct(Product product) {
         Task<Void> taskDBSelect = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                model.searchForOrders(productDTO);
+                model.searchForOrders(product);
                 return null;
             }
         };
         taskDBSelect.setOnSucceeded(evt -> {
-            view.handleOrderSearchForProduct(productDTO, true);
+            view.handleOrderSearchForProduct(product, true);
         });
         taskDBSelect.setOnFailed(evt -> {
-            view.handleOrderSearchForProduct(productDTO, false);
+            view.handleOrderSearchForProduct(product, false);
         });
         Thread dbTaskThread = new Thread(taskDBSelect);
         dbTaskThread.start();
     }
 
-    private void setSelectedProduct(ProductDTO productDTO, OrderDTO order) {
+    private void setSelectedProduct(Product productDTO, Order order) {
         Platform.runLater(() -> {
             model.setSelectedProduct(productDTO);
             model.setAssociatedOrder(order);});
