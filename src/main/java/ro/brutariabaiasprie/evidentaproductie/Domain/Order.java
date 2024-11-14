@@ -1,16 +1,18 @@
 package ro.brutariabaiasprie.evidentaproductie.Domain;
 
-import ro.brutariabaiasprie.evidentaproductie.Data.User;
-
 import java.sql.Timestamp;
 
 public class Order {
     private int id;
     private Product product;
+    private double quantity;
+    private double completed;
+    private double remainder;
     private Timestamp dateTimeInserted;
-    private User userInserted;
+    private int userIdInserted;
     private Timestamp dateTimeModified;
-    private User userModified;
+    private int userIdModified;
+    private boolean closed;
 
     public int getId() {
         return id;
@@ -28,6 +30,30 @@ public class Order {
         this.product = product;
     }
 
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
+
+    public double getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(double completed) {
+        this.completed = completed;
+    }
+
+    public double getRemainder() {
+        return remainder;
+    }
+
+    public void setRemainder(double remainder) {
+        this.remainder = remainder;
+    }
+
     public Timestamp getDateTimeInserted() {
         return dateTimeInserted;
     }
@@ -36,12 +62,12 @@ public class Order {
         this.dateTimeInserted = dateTimeInserted;
     }
 
-    public User getUserInserted() {
-        return userInserted;
+    public int getUserIdInserted() {
+        return userIdInserted;
     }
 
-    public void setUserInserted(User userInserted) {
-        this.userInserted = userInserted;
+    public void setUserIdInserted(int userIdInserted) {
+        this.userIdInserted = userIdInserted;
     }
 
     public Timestamp getDateTimeModified() {
@@ -52,11 +78,19 @@ public class Order {
         this.dateTimeModified = dateTimeModified;
     }
 
-    public User getUserModified() {
-        return userModified;
+    public int getUserIdModified() {
+        return userIdModified;
     }
 
-    public void setUserModified(User userModified) {
-        this.userModified = userModified;
+    public void setUserIdModified(int userIdModified) {
+        this.userIdModified = userIdModified;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }

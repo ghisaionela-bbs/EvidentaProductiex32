@@ -55,19 +55,7 @@ public class GroupView extends Parent implements Builder<Region> {
         groupNameTextArea.setPrefSize(400, 200);
         groupNameTextArea.setWrapText(true);
 
-        // Setting up the container
-        GridPane gridPane = new GridPane();
-        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
-            RowConstraints row = new RowConstraints();
-            row.setVgrow(Priority.ALWAYS);
-            gridPane.getRowConstraints().add(row);
-        }
-        for (int j = 0 ; j < gridPane.getColumnCount(); j++) {
-            ColumnConstraints col = new ColumnConstraints();
-            col.setHgrow(Priority.ALWAYS);
-            gridPane.getColumnConstraints().add(col);
-        }
-        gridPane.getStyleClass().add("grid-form");
+
 
         // Setting up the values and properties of controls
         switch (type) {
@@ -82,6 +70,9 @@ public class GroupView extends Parent implements Builder<Region> {
                 break;
         }
 
+        // Setting up the container
+        GridPane gridPane = new GridPane();
+        gridPane.getStyleClass().add("grid-form");
         // Adding the controls
         gridPane.add(groupIdLabel, 0, 0);
         if(type == WINDOW_TYPE.EDIT) {
@@ -94,6 +85,17 @@ public class GroupView extends Parent implements Builder<Region> {
         }
         gridPane.add(groupNameLabel, 0, 1, 2, 1);
         gridPane.add(groupNameTextArea, 0, 2, 2, 1);
+        // adding constraints
+        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
+            RowConstraints row = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            gridPane.getRowConstraints().add(row);
+        }
+        for (int j = 0 ; j < gridPane.getColumnCount(); j++) {
+            ColumnConstraints col = new ColumnConstraints();
+            col.setHgrow(Priority.ALWAYS);
+            gridPane.getColumnConstraints().add(col);
+        }
 
         return gridPane;
     }

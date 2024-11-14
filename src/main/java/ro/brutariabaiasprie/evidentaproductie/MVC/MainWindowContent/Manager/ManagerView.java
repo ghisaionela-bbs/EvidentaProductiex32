@@ -14,15 +14,14 @@ import javafx.stage.Stage;
 import javafx.util.Builder;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import ro.brutariabaiasprie.evidentaproductie.DTO.Order;
-import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
-import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Data.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.AddNewOrder.AddNewOrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
 
 import java.sql.Timestamp;
@@ -32,8 +31,6 @@ import java.util.function.Consumer;
 public class ManagerView extends Parent implements Builder<Region> {
     private final Stage PARENT_STAGE;
     private final ManagerModel model;
-    private final Runnable refreshOrdersHandler;
-
     //products tab
     private Button addProductButton;
     private Button importProductsButton;
@@ -41,16 +38,10 @@ public class ManagerView extends Parent implements Builder<Region> {
     //orders tab
     private Button addOrderButton;
     private Button excelExportButton;
-    private Consumer<Order> editOrderHandler;
 
-    public ManagerView(ManagerModel model, Stage parentStage, Runnable refreshOrdersHandler) {
+    public ManagerView(ManagerModel model, Stage parentStage) {
         this.model = model;
         this.PARENT_STAGE = parentStage;
-        this.refreshOrdersHandler = refreshOrdersHandler;
-    }
-
-    public void setEditOrderHandler(Consumer<Order> editOrderHandler) {
-        this.editOrderHandler = editOrderHandler;
     }
 
     @Override
@@ -241,12 +232,8 @@ public class ManagerView extends Parent implements Builder<Region> {
         if(model.getCONNECTED_USER().getID_ROLE() == 0 || model.getCONNECTED_USER().getID_ROLE() == 1) {
             addOrderButton = new Button();
             addOrderButton.setOnAction(event -> {
-                AddNewOrderController orderController = new AddNewOrderController(PARENT_STAGE);
-                Platform.runLater(() -> {
-                    if(orderController.isSUCCESS()) {
-                        refreshOrdersHandler.run();
-                    }
-                });
+                new OrderController(PARENT_STAGE, WINDOW_TYPE.ADD);
+//                AddNewOrderController orderController = new AddNewOrderController(PARENT_STAGE);
             });
             excelExportButton = new Button();
             excelExportButton.setOnAction(event -> {
@@ -297,7 +284,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
 
         TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Plasata la");
-        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getInsertedDateTime()));
+        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
         ordersTableView.getColumns().add(dateTimeColumn);
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         dateTimeColumn.setCellFactory(column -> new TableCell<>() {
@@ -313,7 +300,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         });
 
         TableColumn<Order, String> productNameColumn = new TableColumn<>("Produs");
-        productNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProductName()));
+        productNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getName()));
         productNameColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -381,40 +368,67 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
         });
 
-        TableColumn<Order, Integer> editBtnColumn = new TableColumn<>();
-        editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
-        editBtnColumn.setCellFactory(column -> new TableCell<>() {
-            final Button editButton = new Button();
-            final FontIcon fontIcon = new FontIcon("mdi2a-arrow-right-drop-circle");
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(null);
-                    editButton.getStyleClass().add("filled-button");
-                    editButton.setOnAction(event -> editOrderHandler.accept(getTableRow().getItem()));
-                    setGraphic(editButton);
-                    setStyle("-fx-alignment: CENTER-RIGHT;");
-                }
-            }
-        });
-        ordersTableView.getColumns().add(editBtnColumn);
-
         TableColumn<Order, String> productUnitMeasurementColumn = new TableColumn<>("UM");
-        productUnitMeasurementColumn.setCellValueFactory(new PropertyValueFactory<>("unitMeasurement"));
+        productUnitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getUnitMeasurement()));
         ordersTableView.getColumns().add(productUnitMeasurementColumn);
 
+        User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+
+        TableColumn<Order, Integer> editBtnColumn = new TableColumn<>();
+        editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
+        if(user.getID_ROLE() == 1) {
+            editBtnColumn.setCellFactory(column -> new TableCell<>() {
+                final Button editButton = new Button();
+                final FontIcon fontIcon = new FontIcon("mdi2s-square-edit-outline");
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        setText(null);
+                        editButton.getStyleClass().add("filled-button");
+                        editButton.setGraphic(fontIcon);
+                        editButton.setOnAction(event -> new OrderController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                        setGraphic(editButton);
+                        setStyle("-fx-alignment: CENTER-RIGHT;");
+                    }
+                }
+            });
+        } else {
+            editBtnColumn.setCellFactory(column -> new TableCell<>() {
+                final Button editButton = new Button();
+                final FontIcon fontIcon = new FontIcon("mdi2a-arrow-right-drop-circle");
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        setText(null);
+                        editButton.getStyleClass().add("filled-button");
+                        editButton.setGraphic(fontIcon);
+                        editButton.setOnAction(event -> new OrderController(PARENT_STAGE, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                        setGraphic(editButton);
+                        setStyle("-fx-alignment: CENTER-RIGHT;");
+                    }
+                }
+            });
+        }
+
+        ordersTableView.getColumns().add(editBtnColumn);
+
+
         ordersTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-        orderIDColumn.setMaxWidth(1f * Integer.MAX_VALUE * 8);
-        dateTimeColumn.setMaxWidth(1f * Integer.MAX_VALUE * 13);
-        productNameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 34);
-        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
-        productUnitMeasurementColumn.setMaxWidth(1f * Integer.MAX_VALUE * 6);
-        completedColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
-        remainderColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
+//        orderIDColumn.setMaxWidth(1f * Integer.MAX_VALUE * 8);
+//        dateTimeColumn.setMaxWidth(1f * Integer.MAX_VALUE * 13);
+//        productNameColumn.setMaxWidth(1f * Integer.MAX_VALUE * 34);
+//        quantityColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
+//        productUnitMeasurementColumn.setMaxWidth(1f * Integer.MAX_VALUE * 6);
+//        completedColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
+//        remainderColumn.setMaxWidth( 1f * Integer.MAX_VALUE * 13);
 
         ordersTableView.setItems(model.getOrders());
         ordersTableView.getStyleClass().add("main-table-view");
@@ -431,7 +445,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         sectionTitle.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(sectionTitle, Priority.ALWAYS);
 
-        Button addButton = new Button("Adauga");
+        Button addButton = new Button("Adauga o grupa");
         addButton.getStyleClass().add("ghost-button");
         addButton.setOnAction(event -> new GroupController(PARENT_STAGE, WINDOW_TYPE.ADD));
 
@@ -478,6 +492,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
         });
         tableView.getColumns().add(editBtnColumn);
+        tableView.getStyleClass().add("main-table-view");
 
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableView.setItems(model.getGroups());

@@ -20,9 +20,8 @@ public class ManagerController implements SceneController {
 
     public ManagerController(Stage parentStage) {
         this.PARENT_STAGE = parentStage;
-        this.view = new ManagerView(this.model, parentStage, this::refreshOrders);
+        this.view = new ManagerView(this.model, parentStage);
         Platform.runLater(() -> {
-            view.setEditOrderHandler(this::editOrder);
             model.loadProducts();
             model.loadOrders();
             model.loadGroups();
@@ -43,29 +42,6 @@ public class ManagerController implements SceneController {
                 }
             }
         });
-    }
-
-    private void editOrder(Order order) {
-        OrderController orderController = new OrderController(PARENT_STAGE, WINDOW_TYPE.EDIT, order);
-    }
-
-    private void refreshOrders() {
-        Task<Void> taskDBload = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        model.loadOrders();
-                    }
-                });
-                return null;
-            }
-        };
-
-        Thread dbTaskThread = new Thread(taskDBload);
-        dbTaskThread.setDaemon(true);
-        dbTaskThread.start();
     }
 
     @Override

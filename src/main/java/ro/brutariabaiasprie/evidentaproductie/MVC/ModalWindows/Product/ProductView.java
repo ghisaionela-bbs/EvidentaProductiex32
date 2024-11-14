@@ -106,20 +106,6 @@ public class ProductView extends Parent implements Builder<Region> {
         groupComboBox.setItems(model.getGroups());
         groupComboBox.setMaxWidth(Double.MAX_VALUE);
 
-        // Setting up the container
-        GridPane gridPane = new GridPane();
-        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
-            RowConstraints row = new RowConstraints();
-            row.setVgrow(Priority.ALWAYS);
-            gridPane.getRowConstraints().add(row);
-        }
-        for (int j = 0 ; j < gridPane.getColumnCount(); j++) {
-            ColumnConstraints col = new ColumnConstraints();
-            col.setHgrow(Priority.ALWAYS);
-            gridPane.getColumnConstraints().add(col);
-        }
-        gridPane.getStyleClass().add("grid-form");
-
         // Setting up the values and properties of controls
         switch (type) {
             case ADD:
@@ -144,8 +130,11 @@ public class ProductView extends Parent implements Builder<Region> {
                 break;
         }
 
-        // Adding the controls
+        // Setting up the container
+        GridPane gridPane = new GridPane();
+        gridPane.getStyleClass().add("grid-form");
         gridPane.add(productIdLabel, 0, 0);
+        // Adding the controls
         if(type == WINDOW_TYPE.EDIT) {
             Button deleteButton = new Button("Stergere");
             deleteButton.setOnAction(event -> deleteProductHandler.run());
@@ -160,6 +149,17 @@ public class ProductView extends Parent implements Builder<Region> {
         gridPane.add(unitMeasurementChoiceBox, 0, 4, 2, 1);
         gridPane.add(groupLabel, 0, 5);
         gridPane.add(groupComboBox, 0, 6, 2, 1);
+        // adding constraints
+        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
+            RowConstraints row = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            gridPane.getRowConstraints().add(row);
+        }
+        for (int j = 0 ; j < gridPane.getColumnCount(); j++) {
+            ColumnConstraints col = new ColumnConstraints();
+            col.setHgrow(Priority.ALWAYS);
+            gridPane.getColumnConstraints().add(col);
+        }
 
         return gridPane;
     }

@@ -93,48 +93,62 @@ public class ManagerModel {
     public void loadOrders() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT c.ID, \n" +
-                    "\tc.ID_PRODUS, \n" +
-                    "\tp.denumire, \n" +
-                    "\tp.um, \n" +
-                    "\tc.cantitate, \n" +
-                    "\tSUM(COALESCE(r.cantitate, 0.00)) AS realizat,\n" +
-                    "\tc.cantitate - SUM(COALESCE(r.cantitate, 0.00)) AS rest,\n" +
-                    "\tc.datasiora_i, \n" +
-                    "\tc.ID_UTILIZATOR_I, \n" +
-                    "\tc.datasiora_m, \n" +
-                    "\tc.ID_UTILIZATOR_M, \n" +
-                    "\tc.inchisa \n" +
-                    "FROM COMENZI c \n" +
-                    "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS \n" +
-                    "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID\n" +
-                    "GROUP BY c.ID, \n" +
-                    "\tc.ID_PRODUS, \n" +
-                    "\tp.denumire, \n" +
-                    "\tp.um, \n" +
-                    "\tc.cantitate, \n" +
-                    "\tc.datasiora_i, \n" +
-                    "\tc.ID_UTILIZATOR_I, \n" +
-                    "\tc.datasiora_m, \n" +
-                    "\tc.ID_UTILIZATOR_M, \n" +
-                    "\tc.inchisa \n" +
+            String sql = "SELECT c.ID, " +
+                    "c.ID_PRODUS, " +
+                    "p.denumire, " +
+                    "p.um, " +
+                    "g.ID AS ID_GRUPA, " +
+                    "g.denumire AS denumire_grupa, " +
+                    "c.cantitate, " +
+                    "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
+                    "c.cantitate - SUM(COALESCE(r.cantitate, 0.00)) AS rest, " +
+                    "c.datasiora_i, " +
+                    "c.ID_UTILIZATOR_I, " +
+                    "c.datasiora_m, " +
+                    "c.ID_UTILIZATOR_M, " +
+                    "c.inchisa " +
+                    "FROM COMENZI c " +
+                    "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
+                    "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
+                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "GROUP BY c.ID, " +
+                    "c.ID_PRODUS, " +
+                    "p.denumire, " +
+                    "p.um, " +
+                    "g.ID, " +
+                    "g.denumire, " +
+                    "c.cantitate, " +
+                    "c.datasiora_i, " +
+                    "c.ID_UTILIZATOR_I, " +
+                    "c.datasiora_m, " +
+                    "c.ID_UTILIZATOR_M, " +
+                    "c.inchisa " +
                     "ORDER BY c.datasiora_i ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             orders.clear();
             while (resultSet.next()) {
+                Group group = null;
+                int groupId = resultSet.getInt("ID_GRUPA");
+                if(!resultSet.wasNull()) {
+                    group = new Group(groupId, resultSet.getString("denumire_grupa"));
+                }
+
                 Order order = new Order();
                 order.setId(resultSet.getInt("ID"));
-                order.setProductId(resultSet.getInt("ID_PRODUS"));
-                order.setProductName(resultSet.getString("denumire"));
-                order.setUnitMeasurement(resultSet.getString("um"));
+                order.setProduct(new Product(
+                        resultSet.getInt("ID_PRODUS"),
+                        resultSet.getString("denumire"),
+                        resultSet.getString("um"),
+                        group
+                ));
                 order.setQuantity(resultSet.getDouble("cantitate"));
                 order.setCompleted(resultSet.getDouble("realizat"));
                 order.setRemainder(resultSet.getDouble("rest"));
-                order.setInsertedDateTime(resultSet.getTimestamp("datasiora_i"));
-                order.setInsertedIdUser(resultSet.getInt("ID_UTILIZATOR_I"));
-                order.setModifiedDateTime(resultSet.getTimestamp("datasiora_m"));
-                order.setModifiedIdUser(resultSet.getInt("ID_UTILIZATOR_M"));
+                order.setDateTimeInserted(resultSet.getTimestamp("datasiora_i"));
+                order.setUserIdInserted(resultSet.getInt("ID_UTILIZATOR_I"));
+                order.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
+                order.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
                 order.setClosed(resultSet.getBoolean("inchisa"));
                 orders.add(order);
             }
