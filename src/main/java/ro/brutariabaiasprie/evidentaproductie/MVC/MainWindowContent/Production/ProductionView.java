@@ -423,7 +423,6 @@ public class ProductionView extends Parent implements Builder<Region> {
                     setText(null);
                 } else {
                     setText(format.format(item));
-                    setStyle("-fx-alignment: CENTER;");
                 }
             }
         });
@@ -460,18 +459,13 @@ public class ProductionView extends Parent implements Builder<Region> {
                     setText(null);
                 } else {
                     setText(String.format("%.2f", item));
-                    setStyle("-fx-alignment: CENTER-RIGHT;");
+                    setStyle("-fx-alignment: TOP-RIGHT;");
                 }
             }
         });
         tableView.getColumns().add(quantityColumn);
 
-        TableColumn<Record, String> unitMeasurementColumn = new TableColumn<>("UM");
-        unitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getUnitMeasurement()));
-        unitMeasurementColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
-        tableView.getColumns().add(unitMeasurementColumn);
-
-        if(user.getID_ROLE() == 0 || user.getID_ROLE() == 1) {
+        if(user.getID_ROLE() == 1 || user.getID_ROLE() == 2) {
             TableColumn<Record, Integer> editBtnColumn = new TableColumn<>();
             editBtnColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
             editBtnColumn.setCellFactory(column -> new TableCell<>() {
@@ -489,7 +483,7 @@ public class ProductionView extends Parent implements Builder<Region> {
 
                         editButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
                         editButton.getStyleClass().add("filled-button");
-                        setStyle("-fx-alignment: CENTER-RIGHT;");
+                        setStyle("-fx-alignment: TOP-RIGHT;");
 
                         editButton.setOnAction(event -> new RecordController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                         setGraphic(editButton);
@@ -524,16 +518,10 @@ public class ProductionView extends Parent implements Builder<Region> {
                             setText(null);
                             setGraphic(null);
                         } else {
-                            Label lblProductName = new Label(item.getName());
-                            lblProductName.getStyleClass().add("den-prod-record-list-cell");
-                            lblProductName.setWrapText(true);
-                            Label lblProductDetails = new Label(item.getUnitMeasurement());
-                            VBox container = new VBox();
-                            container.getChildren().addAll(lblProductName, lblProductDetails);
-                            container.setSpacing(10);
-                            container.setPadding(new Insets(10));
-                            setText(null);
-                            setGraphic(container);
+                            setText(item.getName());
+                            setWrapText(true);
+                            setPadding(new Insets(20));
+                            setGraphic(null);
                         }
                     }
                 };
@@ -567,7 +555,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     }
 
     public void handleOrderSearchForProduct(Product product, boolean isFound) {
-        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, product);
+        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, product, false);
         if(orderAssociationController.isSUCCESS()) {
             leftSection.getChildren().addAll(quantityInputContainer, numpad);
             leftSection.getChildren().remove(productsListView);

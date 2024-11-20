@@ -1,11 +1,15 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.Domain.UserRole;
 import ro.brutariabaiasprie.evidentaproductie.Exceptions.UserNotFound;
+import ro.brutariabaiasprie.evidentaproductie.Services.AppProperties;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.Connection;
@@ -51,16 +55,21 @@ public class UserConnModel {
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
                 int ID = resultSet.getInt("ID");
-                int ID_ROL = resultSet.getInt("ID_ROL");
+                int ID_ROLE = resultSet.getInt("ID_ROL");
                 int ID_GROUP = resultSet.getInt("ID_GRUPA");
                 User user = new User();
                 user.setID(ID);
-                user.setID_ROLE(ID_ROL);
+                user.setID_ROLE(ID_ROLE);
                 user.setUsername(username);
                 user.setPassword(password);
                 user.setID_GROUP(ID_GROUP);
+
+                ConfigApp.setConfig(CONFIG_KEY.USER.name(), user);
+                ConfigApp.setConfig(CONFIG_KEY.USER_ROLE.name(), new UserRole(ID_ROLE));
+
                 ConfigApp.setConfig(CONFIG_KEY.APPUSER.name(), user);
                 ConfigApp.write_config();
+
             } else {
                 throw new UserNotFound(String.format("The user with password '%s' and username '%s' was not found", username, password));
             }

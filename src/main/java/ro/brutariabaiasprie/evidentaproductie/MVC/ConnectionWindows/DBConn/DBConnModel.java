@@ -106,6 +106,7 @@ public class DBConnModel {
         try {
             DBConnectionService.connectToDatabase(getUrl(), getUsername(), getPassword());
             DBConnectionService.startSync();
+            DBConnectionService.verifyDatabase();
             ConfigApp.setConfig(CONFIG_KEY.DBURL.name(), getUrl());
             ConfigApp.setConfig(CONFIG_KEY.DBUSER.name(), getUsername());
             ConfigApp.setConfig(CONFIG_KEY.DBPASS.name(), getPassword());
@@ -120,6 +121,7 @@ public class DBConnModel {
             FileWriter myWriter = new FileWriter("errorLog.txt");
             myWriter.write(e.toString());
             myWriter.close();
+            throw new RuntimeException(e.toString());
         }
     }
 }

@@ -327,7 +327,7 @@
     -fx-background-color: TRANSPARENT;
 }
 .main-table-view .column-header-background {
-    -fx-background-color: TRANSPARENT;
+    -fx-background-color: COLOR_BRAND_BROWN_10;
     -fx-text-fill: COLOR_BRAND_BROWN;
 }
 .main-table-view .column-header-background .filler {

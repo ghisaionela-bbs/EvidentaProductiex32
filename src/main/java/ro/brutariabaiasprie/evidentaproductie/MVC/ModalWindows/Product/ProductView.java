@@ -23,8 +23,8 @@ import java.util.function.Consumer;
  */
 public class ProductView extends Parent implements Builder<Region> {
     private final ProductModel model;
-    private final Consumer<ACTION_TYPE> actionHandler;
     private final WINDOW_TYPE type;
+    private final Consumer<ACTION_TYPE> actionHandler;
 
     private Runnable deleteProductHandler;
 
@@ -95,7 +95,11 @@ public class ProductView extends Parent implements Builder<Region> {
                         if (item == null || empty) {
                             setText("Selectati grupa");
                         } else {
-                            setText(item.getName());
+                            if(item.getId() == 0) {
+                                setText(null);
+                            } else {
+                                setText(item.getName());
+                            }
                         }
                     }
                 };
@@ -125,7 +129,9 @@ public class ProductView extends Parent implements Builder<Region> {
                     unitMeasurementGroup.selectToggle(bucRadioButton);
                 }
                 if(model.getProduct().getGroup() != null) {
-                    groupComboBox.getSelectionModel().select(model.getProduct().getGroup());
+                    if(model.getProduct().getGroup().getId() != 0) {
+                        groupComboBox.getSelectionModel().select(model.getProduct().getGroup());
+                    }
                 }
                 break;
         }

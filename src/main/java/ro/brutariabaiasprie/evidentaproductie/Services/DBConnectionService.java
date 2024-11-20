@@ -1,11 +1,10 @@
 package ro.brutariabaiasprie.evidentaproductie.Services;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
-import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
-import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
+import ro.brutariabaiasprie.evidentaproductie.Exceptions.VersionCompatibility;
 
 import java.sql.*;
 
@@ -14,7 +13,7 @@ import java.sql.*;
  */
 public class DBConnectionService {
     private static Connection connection;
-    private static ObservableMap<String, Timestamp> modifiedTables;
+    private static ObservableMap<String, ModifiedTableData> modifiedTables;
     /**
      * Returns the connection
      * @return connection or null if connection is not created
@@ -27,7 +26,7 @@ public class DBConnectionService {
      * Returns a list of tables that were modified in the last second
      * @return ObservableList<String> modifiedTables
      */
-    public static ObservableMap<String, Timestamp> getModifiedTables() {
+    public static ObservableMap<String, ModifiedTableData> getModifiedTables() {
         return modifiedTables;
     }
 
@@ -68,7 +67,7 @@ public class DBConnectionService {
                 while (true) {
                     checkForNotifications(connection);
                     cleanupNotifications(connection);
-                    Thread.sleep(500); // Poll every second
+                    Thread.sleep(1000); // Poll every second
                 }
             }
         };
@@ -92,7 +91,7 @@ public class DBConnectionService {
                 int rowId = resultSet.getInt("row_id");
 
                 // Process the change event
-                modifiedTables.put(table_name, changeTime);
+                modifiedTables.put(table_name, new ModifiedTableData(rowId, operationType, changeTime));
 
                 // Update last checked time to the most recent change time
                 if (changeTime.after(lastCheckedTime)) {
@@ -111,4 +110,178 @@ public class DBConnectionService {
         }
     }
 
+    /***
+     * Verifies the database
+     * Checks first if the "APP_INFO" table exists in the database.
+     * If it does not exist then it will create all the tables and the triggers.
+     * Else it verifies if the database is compatible with the app version.
+     * @throws SQLException when there was an error
+     */
+    public static void verifyDatabase() throws SQLException {
+        // Check if app info table exists
+        try (PreparedStatement statement = connection.prepareStatement(
+                "IF (NOT EXISTS " +
+                "(SELECT object_id FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[APP_INFO]') and type = 'U')) " +
+                "SELECT 1 " +
+                "ELSE " +
+                "SELECT 0 ")) {
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            // If it doesn't exist generate tables
+            if(resultSet.getBoolean(1)) {
+                generateTables();
+            }
+            // Verify database version
+            else {
+                verifyTables();
+            }
+        }
+    }
+
+    private static void verifyTables() throws SQLException {
+        // Verify database app compatibility
+        try(PreparedStatement statement = connection.prepareStatement("SELECT valoare FROM [dbo].[APP_INFO] WHERE proprietate = ?")){
+            statement.setString(1, "version");
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            String version = resultSet.getString("valoare");
+            if(!version.equals(AppProperties.properties.getProperty("version"))) {
+                throw new VersionCompatibility("App version is not compatible with database version");
+            }
+        }
+
+    }
+
+    public static void generateTables() throws SQLException {
+        // Setting up the app properties table for compatibility
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[APP_INFO](" +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[proprietate] [nvarchar](50) NOT NULL, " +
+                "[valoare] [nvarchar](100) NOT NULL)")) {
+            statement.execute();
+        }
+        // Setting up the version compatible with the app
+        try(PreparedStatement statement = connection.prepareStatement("INSERT INTO [dbo].[APP_INFO] " +
+                "(proprietate, valoare) VALUES (?, ?)")) {
+            statement.setString(1,"version");
+            statement.setString(2, AppProperties.get("version"));
+            statement.executeUpdate();
+        }
+
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[change_notifications]( " +
+                "[id] [int] IDENTITY(1,1) NOT NULL, " +
+                "[table_name] [nvarchar](50) NOT NULL, " +
+                "[operation_type] [nvarchar](10) NOT NULL, " +
+                "[change_time] [datetime] NOT NULL DEFAULT (getdate()), " +
+                "[row_id] [int] NOT NULL) ")) {
+            statement.execute();
+        }
+        // Setting up the groups table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE](  " +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[denumire] [nvarchar](50) NOT NULL)")) {
+            statement.execute();
+        }
+        // Setting up the groups table triggers
+        createTableTriggers("GRUPE");
+
+        // Setting up the products table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[PRODUSE](" +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[denumire] [nvarchar](255) NOT NULL, " +
+                "[um] [nvarchar](5) NOT NULL, " +
+                "[ID_GRUPA] [int] NULL)")) {
+            statement.execute();
+        }
+        // Setting up the products table triggers
+        createTableTriggers("PRODUSE");
+
+        // Setting up the users table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[UTILIZATORI](" +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[ID_ROL] [int] NOT NULL, " +
+                "[nume_utilizator] [varchar](255) NOT NULL, " +
+                "[parola] [varchar](255) NOT NULL, " +
+                "[ID_GRUPA] [int] NULL)")) {
+            statement.execute();
+        }
+        // Setting up the users table triggers
+        createTableTriggers("UTILIZATORI");
+
+        // Setting up the orders table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[COMENZI](  " +
+                "[ID] [int] IDENTITY(1,1) NOT NULL," +
+                "[ID_PRODUS] [int] NOT NULL," +
+                "[cantitate] [decimal](38, 2) NOT NULL," +
+                "[datasiora_i] [datetime] NOT NULL," +
+                "[ID_UTILIZATOR_I] [int] NOT NULL," +
+                "[datasiora_m] [datetime] NULL," +
+                "[ID_UTILIZATOR_M] [int] NULL," +
+                "[inchisa] [bit] NOT NULL DEFAULT ((0)) )")) {
+            statement.execute();
+        }
+        // Setting up the orders table triggers
+        createTableTriggers("COMENZI");
+
+        // Setting up the records table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[REALIZARI]( " +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[ID_PRODUS] [int] NOT NULL, " +
+                "[cantitate] [decimal](38, 2) NOT NULL, " +
+                "[datasiora_i] [datetime] NOT NULL, " +
+                "[ID_UTILIZATOR_I] [int] NOT NULL, " +
+                "[datasiora_m] [datetime] NULL, " +
+                "[ID_UTILIZATOR_M] [int] NULL, " +
+                "[ID_COMANDA] [int] NULL)")) {
+            statement.execute();
+        }
+        // Setting up the records table triggers
+        createTableTriggers("REALIZARI");
+
+        try (PreparedStatement statement = connection.prepareStatement("INSERT INTO [dbo].[UTILIZATORI] " +
+                "(nume_utilizator, parola, ID_ROL, ID_GRUPA)" +
+                "VALUES (?, ?, ?, ?)" )) {
+            statement.setString(1, "director");
+            statement.setString(2, "director");
+            statement.setInt(3, 1);
+            statement.setNull(4, Types.INTEGER);
+            statement.execute();
+        }
+
+    }
+
+    private static void createTableTriggers(String tableName) throws SQLException {
+        try(PreparedStatement statement = connection.prepareStatement(
+                createTriggerSql("trg_" + tableName + "_after_insert", tableName, "INSERT"))) {
+            statement.execute();
+        }
+        try(PreparedStatement statement = connection.prepareStatement(
+                createTriggerSql("trg_" + tableName + "_after_update", tableName, "UPDATE"))) {
+            statement.execute();
+        }
+        try(PreparedStatement statement = connection.prepareStatement(
+                createTriggerSql("trg_" + tableName + "_after_delete", tableName, "DELETE"))) {
+            statement.execute();
+        }
+    }
+
+    private static String createTriggerSql(String triggerName, String tableName, String operationType) {
+        String triggerSql = "EXEC('CREATE TRIGGER [dbo].[" + triggerName + "] " +
+                "ON [dbo].[" + tableName + "] AFTER " + operationType + " " +
+                "AS " +
+                "BEGIN " +
+                "INSERT INTO change_notifications (table_name, operation_type, row_id) " +
+                "SELECT ''" + tableName + "'', ''" + operationType + "'', id ";
+        switch (operationType) {
+            case "INSERT":
+            case "UPDATE":
+                triggerSql += "FROM inserted ";
+                break;
+            case "DELETE":
+                triggerSql += "FROM deleted ";
+                break;
+        }
+        triggerSql += "END')";
+        return triggerSql;
+    }
 }

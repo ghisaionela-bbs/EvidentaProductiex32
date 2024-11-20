@@ -6,10 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
-import javafx.util.Callback;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
 import java.util.function.Consumer;

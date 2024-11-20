@@ -81,29 +81,44 @@ public class OrderController extends ModalWindow {
                 return;
             }
 
-            model.getOrder().setProduct(view.getProduct());
-            model.getOrder().setQuantity(Double.parseDouble(view.getQuantityInput()));
-            model.getOrder().setClosed(view.isClosed());
 
             if(type == WINDOW_TYPE.ADD) {
-                model.addOrder();
+                this.addOrder();
             } else if (type == WINDOW_TYPE.EDIT) {
-                if(model.hasRecords()) {
-                    String message = "Sunteti sigur ca doriti sa modificati produsul?\n\n" +
-                            "EXISTA REALIZARI ASOCIATE ACESTEI COMENZI CU PRODUSUL INITIAL\n" +
-                            "SCHIMBAREA PRODUSUL VA STERGE COMANDA CURENTA DE LA REALIZARILE RESPECTIVE\n\n" +
-                            "!!! ACEASTA ACTIUNE ESTE IREVERSIBILA !!!";
-                    if(!new ConfirmationController(stage, "Confirmati modificarea produsului",
-                            String.format(message, model.getOrder().getId())).isSUCCESS()) {
-                        return;
-                    }
-                    model.updateOrder(true);
-                } else {
-                    model.updateOrder(false);
-                }
+               this.updateOrder();
             }
         }
         stage.close();
+    }
+
+    private void addOrder() {
+        model.getOrder().setProduct(view.getProduct());
+        model.getOrder().setQuantity(Double.parseDouble(view.getQuantityInput()));
+        model.getOrder().setClosed(view.isClosed());
+        model.addOrder();
+    }
+
+    private void updateOrder() {
+        model.getOrder().setProduct(view.getProduct());
+        model.getOrder().setQuantity(Double.parseDouble(view.getQuantityInput()));
+        model.getOrder().setClosed(view.isClosed());
+
+        if(model.hasRecords()) {
+            if(model.getOrder().getProduct() != view.getProduct()) {
+                String message = "Sunteti sigur ca doriti sa modificati produsul din comanda?\n\n" +
+                        "EXISTA REALIZARI ASOCIATE ACESTEI COMENZI CU PRODUSUL INITIAL.\n" +
+                        "SCHIMBAREA PRODUSULUI VA STERGE COMANDA CURENTA DE LA REALIZARILE RESPECTIVE.\n\n" +
+                        "!!! ACEASTA ACTIUNE ESTE IREVERSIBILA !!!";
+                if(!new ConfirmationController(stage, "Confirmati modificarea produsului",
+                        String.format(message, model.getOrder().getId())).isSUCCESS()) {
+                    return;
+                }
+            }
+            model.updateOrder(true);
+        } else {
+            model.updateOrder(false);
+        }
+
     }
 
     private boolean isInputValid(WINDOW_TYPE type) {

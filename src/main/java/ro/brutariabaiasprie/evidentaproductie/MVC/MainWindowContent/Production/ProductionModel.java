@@ -4,11 +4,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-//import ro.brutariabaiasprie.evidentaproductie.DTO.*;
-import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderResultsDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
-import ro.brutariabaiasprie.evidentaproductie.DTO.ProductRecordDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
@@ -251,4 +247,109 @@ public class ProductionModel {
         return new OrderResultsDTO(ORDER_ID, orderDateAndTime, productName, quantity, unitMeasurement);
     }
 
+    public void loadSelectedProduct() {
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT TOP 1 " +
+                    "p.denumire, " +
+                    "p.um, " +
+                    "p.ID_GRUPA, " +
+                    "g.denumire AS denumire_grupa " +
+                    "FROM PRODUSE p " +
+                    "LEFT JOIN GRUPE g ON p.ID_GRUPA = g.ID " +
+                    "WHERE p.ID = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, selectedProduct.get().getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            resultSet.next();
+            Group group = null;
+            int groupId = resultSet.getInt("ID_GRUPA");
+            if(!resultSet.wasNull()) {
+                group = new Group(groupId,
+                        resultSet.getString("denumire_grupa"));
+            }
+            Product product = new Product(
+                    selectedProduct.get().getId(),
+                    resultSet.getString("denumire"),
+                    resultSet.getString("um"),
+                    group
+            );
+            product.setGroup(group);
+            this.selectedProduct.set(product);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadAssociatedOrder() {
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT c.ID, " +
+                    "c.ID_PRODUS, " +
+                    "p.denumire, " +
+                    "p.um, " +
+                    "g.ID AS ID_GRUPA, " +
+                    "g.denumire AS denumire_grupa, " +
+                    "c.cantitate, " +
+                    "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
+                    "c.cantitate - SUM(COALESCE(r.cantitate, 0.00)) AS rest, " +
+                    "c.datasiora_i, " +
+                    "c.ID_UTILIZATOR_I, " +
+                    "c.datasiora_m, " +
+                    "c.ID_UTILIZATOR_M, " +
+                    "c.inchisa " +
+                    "FROM COMENZI c " +
+                    "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
+                    "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
+                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "WHERE c.ID = ? " +
+                    "GROUP BY c.ID, " +
+                    "c.ID_PRODUS, " +
+                    "p.denumire, " +
+                    "p.um, " +
+                    "g.ID, " +
+                    "g.denumire, " +
+                    "c.cantitate, " +
+                    "c.datasiora_i, " +
+                    "c.ID_UTILIZATOR_I, " +
+                    "c.datasiora_m, " +
+                    "c.ID_UTILIZATOR_M, " +
+                    "c.inchisa ";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, this.associatedOrder.get().getId());
+
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+
+            Group group = null;
+            int groupId = resultSet.getInt("ID_GRUPA");
+            if(!resultSet.wasNull()) {
+                group = new Group(groupId, resultSet.getString("denumire_grupa"));
+            }
+
+            Order order = new Order();
+            order.setId(resultSet.getInt("ID"));
+            order.setProduct(new Product(
+                    resultSet.getInt("ID_PRODUS"),
+                    resultSet.getString("denumire"),
+                    resultSet.getString("um"),
+                    group
+            ));
+            order.setQuantity(resultSet.getDouble("cantitate"));
+            order.setCompleted(resultSet.getDouble("realizat"));
+            order.setRemainder(resultSet.getDouble("rest"));
+            order.setDateTimeInserted(resultSet.getTimestamp("datasiora_i"));
+            order.setUserIdInserted(resultSet.getInt("ID_UTILIZATOR_I"));
+            order.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
+            order.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
+            order.setClosed(resultSet.getBoolean("inchisa"));
+
+            this.setAssociatedOrder(order);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

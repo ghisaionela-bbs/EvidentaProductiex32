@@ -1,6 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation;
 
 import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -10,11 +11,13 @@ import ro.brutariabaiasprie.evidentaproductie.DTO.OrderDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderResultsDTO;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
+import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.util.Objects;
 
@@ -26,14 +29,14 @@ public class OrderAssociationController extends ModalWindow{
     private final Stage PARENT_STAGE;
     private final Product product;
 
-    public OrderAssociationController(Stage owner, Product product) {
+    public OrderAssociationController(Stage owner, Product product, boolean showClosedOrders) {
         //loading screen
         this.PARENT_STAGE = owner;
         this.product = product;
         this.stage = new Stage();
 
         this.model = new OrderAssociationModel(product);
-        this.searchOrders(product);
+        this.searchOrders(product, showClosedOrders);
 
         Scene loadingScene = new Scene(new LoadingView("Va rugam asteptati.\nSe cauta comenzi pentru produsul: " + product.getName()).build());
         loadingScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
@@ -45,6 +48,16 @@ public class OrderAssociationController extends ModalWindow{
         Image icon32x32 = new Image("app-icon-32x32.png");
         Image icon64x64 = new Image("app-icon-64x64.png");
         this.stage.getIcons().addAll(icon16x16, icon32x32, icon64x64);
+
+        DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, ModifiedTableData>) change -> {
+            if(change.wasAdded()) {
+                Platform.runLater(() -> {
+                    if(change.getKey().equals("COMENZI")) {
+                        model.loadSearchResults(showClosedOrders);
+                    }
+            });
+        }});
+
         this.stage.showAndWait();
 
     }
@@ -86,12 +99,12 @@ public class OrderAssociationController extends ModalWindow{
         return model.getOrder();
     }
 
-    private void searchOrders(Product product) {
+    private void searchOrders(Product product, boolean showClosedOrders) {
         Task<Void> taskDBSelect = new Task<>() {
             @Override
             protected Void call() {
                 try {
-                    model.loadSearchResults();
+                    model.loadSearchResults(showClosedOrders);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -5,10 +5,12 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class DBConnController implements SceneController {
     private final DBConnView view;

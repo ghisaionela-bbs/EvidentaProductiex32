@@ -38,7 +38,11 @@ public class UserConnController implements SceneController {
         Task<Void> taskDBLookUp = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                model.findUser(username, password);
+                try {
+                    model.findUser(username, password);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return null;
             }
         };

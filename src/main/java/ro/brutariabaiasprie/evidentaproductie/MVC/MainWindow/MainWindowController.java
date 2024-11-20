@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Account.AccountController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.DBConn.DBConnController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager.ManagerController;
@@ -48,7 +49,7 @@ public class MainWindowController implements SceneController {
                 controller = new UserConnController(PARENT_STAGE, this::switchScene);
                 break;
             case MANAGER:
-                controller = new ManagerController(PARENT_STAGE);
+                controller = new ManagerController(PARENT_STAGE, this::productionShortcutHandler);
                 break;
             case PRODUCTION:
                 controller = productionController;
@@ -68,6 +69,12 @@ public class MainWindowController implements SceneController {
                 }
         }
         view.setCenter(Objects.requireNonNull(controller).getView());
+    }
+
+    private void productionShortcutHandler(Order order) {
+        productionController.setOrder(order);
+        view.onProductionShortcut();
+        view.setCenter(Objects.requireNonNull(productionController).getView());
     }
 
     private Runnable disconnect() throws Exception {

@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.util.Builder;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
@@ -61,6 +62,30 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
         ordersTableView = new TableView<>();
         ordersTableView.setPlaceholder(new Label("Nu exista comenzi."));
         VBox.setVgrow(ordersTableView, Priority.ALWAYS);
+
+        TableColumn<Order, Boolean> isClosedColumn = new TableColumn<>();
+        isClosedColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().isClosed()));
+        isClosedColumn.setCellFactory(column -> new TableCell<>() {
+            final FontIcon fontIcon = new FontIcon("mdi2l-lock");
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(null);
+                    if(item) {
+                        setGraphic(fontIcon);
+                        setStyle("-fx-alignment: CENTER;");
+                    } else {
+                        setGraphic(null);
+                    }
+
+                }
+            }
+        });
+        ordersTableView.getColumns().add(isClosedColumn);
 
         TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Comanda");
         orderIDColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));

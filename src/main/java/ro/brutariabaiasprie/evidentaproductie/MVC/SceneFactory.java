@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.DBConn.DBConnController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.MainWindowController;
@@ -36,10 +37,8 @@ public class SceneFactory {
         scene = new Scene(new DBConnController(primaryStage, this::switchScene).getView());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
 
-        Image icon16x16 = new Image("app-icon-16x16.png");
-        Image icon32x32 = new Image("app-icon-32x32.png");
-        Image icon64x64 = new Image("app-icon-64x64.png");
-        primaryStage.getIcons().addAll(icon16x16, icon32x32, icon64x64);
+
+        primaryStage.getIcons().addAll(Images.icon16x16, Images.icon32x32, Images.icon64x64);
         primaryStage.setTitle("Evidenta Productie");
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -69,9 +68,9 @@ public class SceneFactory {
             case USERCONN:
                 controller = new UserConnController(primaryStage, this::switchScene);
                 break;
-            case MANAGER:
-                controller = new ManagerController(primaryStage);
-                break;
+//            case MANAGER:
+//                controller = new ManagerController(primaryStage);
+//                break;
             case MAIN_WINDOW:
                 controller = new MainWindowController(primaryStage, this::disconnect);
                 break;

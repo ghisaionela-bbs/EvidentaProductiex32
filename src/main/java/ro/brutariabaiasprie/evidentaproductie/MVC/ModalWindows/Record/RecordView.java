@@ -13,10 +13,8 @@ import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.OrderAssociationController;
 
 import java.text.SimpleDateFormat;
 import java.util.function.Consumer;

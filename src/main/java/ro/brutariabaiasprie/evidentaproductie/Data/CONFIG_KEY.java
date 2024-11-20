@@ -7,6 +7,6 @@ public enum CONFIG_KEY {
     APPUSER,
     ERRLOG_PATH,
     EXCEL_EXPORT_PATH,
-    APPDIR
-
+    APPDIR,
+    USER_ROLE, USER
 }

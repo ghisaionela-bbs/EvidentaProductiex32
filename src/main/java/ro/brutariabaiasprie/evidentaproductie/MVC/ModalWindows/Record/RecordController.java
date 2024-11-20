@@ -63,7 +63,7 @@ public class RecordController extends ModalWindow {
     }
 
     private void editOrder(Product selectedProduct) {
-        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, selectedProduct);
+        OrderAssociationController orderAssociationController = new OrderAssociationController(stage, selectedProduct, true);
         if(orderAssociationController.isSUCCESS()) {
             Order order = orderAssociationController.getOrder();
             if(order == null) {

@@ -7,7 +7,6 @@ import javafx.collections.ObservableList;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
-import ro.brutariabaiasprie.evidentaproductie.Exceptions.OrderNotFound;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.*;
@@ -45,9 +44,14 @@ public class OrderAssociationModel {
         this.order = order;
     }
 
-    public void loadSearchResults() {
+    public void loadSearchResults(boolean showClosedOrders) {
         try {
             Connection connection = DBConnectionService.getConnection();
+
+            String whereCond = "";
+            if(!showClosedOrders) {
+                whereCond = " AND c.inchisa = 0 ";
+            }
 
             String sql = "SELECT " +
                     "c.ID, " +
@@ -68,6 +72,7 @@ public class OrderAssociationModel {
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
                     "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
                     "WHERE p.ID = ? " +
+                    whereCond +
                     "GROUP BY c.ID, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +

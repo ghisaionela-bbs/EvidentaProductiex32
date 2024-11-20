@@ -2,12 +2,10 @@ package ro.brutariabaiasprie.evidentaproductie.Data;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ro.brutariabaiasprie.evidentaproductie.Domain.UserRole;
 
 import javax.swing.filechooser.FileSystemView;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Scanner;
@@ -42,11 +40,16 @@ public class ConfigApp {
                 int index = line.indexOf("=");
                 String key = line.substring(0, index);
                 String value = line.substring(index + 1);
-                if(key.equals("APPUSER")){
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    configuration.put(key, objectMapper.readValue(value, User.class));
-                } else {
-                    configuration.put(line.substring(0, index), line.substring(index + 1));
+                switch (key) {
+                    case "APPUSER":
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        configuration.put(key, objectMapper.readValue(value, User.class));
+                        break;
+                    case "USER": case "USER_ROLE":
+                        break;
+                    default:
+                        configuration.put(line.substring(0, index), line.substring(index + 1));
+                        break;
                 }
             }
             myReader.close();
@@ -77,13 +80,13 @@ public class ConfigApp {
     }
 
     private static void init_default_config() {
-        String appDirrPath = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie";
-        configuration.put("DBURL", "jdbc:sqlserver://192.168.3.145;databaseName=DB_EVIDENTA_PRODUCTIE;encrypt=false;");
-        configuration.put("DBUSER", "sa");
-        configuration.put("DBPASS", "sqlserverstatia51");
-        configuration.put("ERRLOG_PATH", appDirrPath + "\\ErrorLog.txt");
-        configuration.put("EXCEL_EXPORT_PATH", appDirrPath + "\\Rapoarte excel");
-        configuration.put("APPDIRR", appDirrPath);
+        String appDirPath = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie";
+        setConfig(CONFIG_KEY.DBURL.name(), "jdbc:sqlserver://192.168.3.145;databaseName=DB_EVIDENTA_PRODUCTIE;encrypt=false;");
+        setConfig(CONFIG_KEY.DBUSER.name(), "sa");
+        setConfig(CONFIG_KEY.DBPASS.name(), "sqlserverstatia51");
+        setConfig(CONFIG_KEY.ERRLOG_PATH.name(), appDirPath + "\\ErrorLog.txt");
+        setConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name(), appDirPath + "\\Rapoarte excel");
+        setConfig(CONFIG_KEY.APPDIR.name(), appDirPath);
     }
 
     public static Object getConfig(String key) {
@@ -97,4 +100,13 @@ public class ConfigApp {
     public static void deleteConfig(String key) {
         configuration.remove(key);
     }
+
+    public static User getUser() {
+        return (User) configuration.get(CONFIG_KEY.APPUSER.name());
+    }
+
+    public static UserRole getRole() {
+        return (UserRole) configuration.get(CONFIG_KEY.USER_ROLE.name());
+    }
+
 }
