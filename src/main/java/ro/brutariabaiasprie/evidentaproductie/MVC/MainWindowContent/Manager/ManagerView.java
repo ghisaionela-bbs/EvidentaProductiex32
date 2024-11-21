@@ -22,6 +22,7 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.Excel
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ProductGroup.ProductGroupController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Record.RecordController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.User.UserController;
 
@@ -595,7 +596,11 @@ public class ManagerView extends Parent implements Builder<Region> {
         addButton.getStyleClass().add("ghost-button");
         addButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.ADD));
 
-        HBox headerSection = new HBox(sectionTitle, addButton);
+        Button addProductGroupButton = new Button("Adauga o grupa de produs");
+        addProductGroupButton.getStyleClass().add("ghost-button");
+        addProductGroupButton.setOnAction(event -> new ProductGroupController(stage));
+
+        HBox headerSection = new HBox(sectionTitle, addButton, addProductGroupButton);
         headerSection.getStyleClass().add("tab-section-header");
 
         VBox content = new VBox(headerSection, createGroupsTable());

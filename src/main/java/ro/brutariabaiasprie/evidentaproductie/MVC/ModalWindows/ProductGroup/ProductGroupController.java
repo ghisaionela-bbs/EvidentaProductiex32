@@ -67,6 +67,9 @@ public class ProductGroupController extends ModalWindow {
 
     @Override
     protected void onWindowAction(ACTION_TYPE actionType) {
+        if(actionType == ACTION_TYPE.CONFIRMATION) {
 
+        }
+        stage.close();
     }
 }

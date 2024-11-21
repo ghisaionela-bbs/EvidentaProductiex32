@@ -223,7 +223,6 @@
    -fx-icon-size: 1em;
 }
 
-
 .modal-window.entry-view .password-component {
     -fx-background-color: #FFF4F0;
 }
@@ -247,10 +246,31 @@
     -fx-background-radius: 0.2em;
     -fx-border-color: #f9efeb;
     -fx-border-radius: 0.2em;
-
 }
 
-.modal-window.entry-view .text-field:hover {
+.modal-window.entry-view .text-area {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.modal-window.entry-view .text-area .content{
+    -fx-background-color: #FFF4F0;
+    -fx-background-radius: 0.2em;
+    -fx-border-color: #f9efeb;
+    -fx-border-radius: 0.2em;
+}
+.modal-window.entry-view .text-area:hover .content{
+    -fx-background-color: #fee5dc;
+    -fx-border-color: transparent;
+}
+.modal-window.entry-view .text-area:focused {
+    -fx-text-fill: #59BDFF;
+}
+.modal-window.entry-view .text-area:focused .content{
+    -fx-background-color: #fffbfa;
+    -fx-border-color: #59BDFF;
+}
+
+.modal-window.entry-view .text-field:hover .content{
     -fx-background-color: #fee5dc;
     -fx-border-color: transparent;
 }

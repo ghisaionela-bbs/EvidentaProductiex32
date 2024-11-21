@@ -57,10 +57,23 @@ public class ProductGroupView extends Parent implements Builder<Region> {
         // Username section
         Label nameLabel = new Label("Denumire:");
         nameTextArea = new TextArea();
-        nameTextArea.setPrefSize(250, 200);
+        nameTextArea.setPrefSize(250, 150);
         VBox usernameSection = new VBox(nameLabel, nameTextArea);
         usernameSection.getStyleClass().add("section");
         usernameSection.getStyleClass().add("vbox-layout");
+
+        // Setting up the values and properties of controls
+        switch (type) {
+            case ADD:
+                groupIdLabel.setText("Adaugare grupa\nde produse noua");
+                break;
+            case VIEW:
+                nameTextArea.setDisable(true);
+            case EDIT:
+                nameLabel.setText("Grup de produse " + model.getGroup().getId());
+                nameTextArea.setText(model.getGroup().getName());
+                break;
+        }
 
         // Setting up the container
         GridPane gridPane = new GridPane();
@@ -77,7 +90,6 @@ public class ProductGroupView extends Parent implements Builder<Region> {
         gridPane.add(groupIdLabel, 0, 0, 2, 1);
         gridPane.add(usernameSection, 0, 1, 3, 1);
         gridPane.getStyleClass().add("grid-layout");
-
 
         for (int j = 0 ; j < gridPane.getColumnCount(); j++) {
             ColumnConstraints col = new ColumnConstraints();

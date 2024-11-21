@@ -141,9 +141,9 @@ public class ProductionModel {
                     "p.denumire, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
-                    "g.denumire AS denumire_grupa " +
+                    "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
-                    "LEFT JOIN GRUPE g ON p.ID_GRUPA = g.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     whereCond +
                     "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
