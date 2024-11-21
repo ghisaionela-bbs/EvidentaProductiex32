@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
@@ -64,8 +65,10 @@ public class UserConnModel {
                 user.setPassword(password);
                 user.setID_GROUP(ID_GROUP);
 
+                ACCESS_LEVEL accessLevel = ACCESS_LEVEL.values()[ID_ROLE];
+
                 ConfigApp.setConfig(CONFIG_KEY.USER.name(), user);
-                ConfigApp.setConfig(CONFIG_KEY.USER_ROLE.name(), new UserRole(ID_ROLE));
+                ConfigApp.setConfig(CONFIG_KEY.USER_ROLE.name(), new UserRole(ACCESS_LEVEL.values()[ID_ROLE]));
 
                 ConfigApp.setConfig(CONFIG_KEY.APPUSER.name(), user);
                 ConfigApp.write_config();

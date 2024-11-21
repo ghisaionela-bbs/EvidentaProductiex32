@@ -10,6 +10,11 @@ public class SceneButton extends Button {
         super();
         this.actionType = actionType;
         getStyleClass().add("filled-button");
+        setMinWidth(100);
+        switch (actionType) {
+            case CANCELLATION -> setStyle("-fx-background-color: red;");
+            case CONFIRMATION -> setStyle("-fx-background-color: #60A917;");
+        }
     }
 
     public SceneButton(String s, ACTION_TYPE actionType) {
@@ -17,6 +22,11 @@ public class SceneButton extends Button {
         this.textProperty().set(s);
         this.actionType = actionType;
         getStyleClass().add("filled-button");
+        setMinWidth(100);
+        switch (actionType) {
+            case CANCELLATION -> setStyle("-fx-background-color: red;");
+            case CONFIRMATION -> setStyle("-fx-background-color: #60A917;");
+        }
     }
 
     public ACTION_TYPE getActionType() {

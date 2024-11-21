@@ -218,10 +218,8 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTab.setClosable(false);
 
         VBox contentContainer = new VBox();
-
-        Label recordsLabel = new Label("Realizari fara comanda");
-        recordsLabel.getStyleClass().add("tab-section-title");
-        contentContainer.getChildren().addAll(createOrdersSectionHeader(), createOrdersTable(), recordsLabel, createRecordsWithNoOrderTable());
+        
+        contentContainer.getChildren().addAll(createOrdersSectionHeader(), createOrdersTable());
         ordersTab.setContent(contentContainer);
 
         return ordersTab;

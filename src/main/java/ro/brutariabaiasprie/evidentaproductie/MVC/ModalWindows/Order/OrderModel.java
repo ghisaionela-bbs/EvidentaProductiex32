@@ -34,13 +34,13 @@ public class OrderModel {
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
             if(user.getID_GROUP() != 0) {
-                whereCond += "WHERE g.ID = ? ";
+                whereCond += "WHERE gp.ID = ? ";
             }
 
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT p.ID, p.denumire, p.UM, p.ID_GRUPA, g.denumire AS denumire_grupa " +
+            String sql = "SELECT p.ID, p.denumire, p.UM, p.ID_GRUPA, gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
-                    "LEFT JOIN GRUPE g ON p.ID_GRUPA = g.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     whereCond +
                     "ORDER BY p.UM, p.denumire";
 

@@ -184,6 +184,7 @@
 
 /*MODAL WINDOW*/
 .modal-window {
+    -fx-background-color: COLOR_WHITE;
     -fx-padding: 0.5em;
     -fx-spacing: 0.2em;
     -fx-spacing: 1em;
@@ -201,6 +202,87 @@
 .modal-window .choice-box {
    -fx-spacing: 0.2em;
 }
+/* MODAL WINDOW -> Managing entries in the database*/
+.modal-window.entry-view {
+    -fx-font-size: 1.5em;
+    -fx-text-fill: #1e110b;
+}
+.modal-window.entry-view .grid-layout {
+   -fx-vgap: 0.75em;
+   -fx-hgap: 0.75em;
+}
+.modal-window.entry-view .toggle {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+.modal-window.entry-view .toggle:hover
+{
+    -fx-background-color: #fee5dc;
+}
+.modal-window.entry-view .toggle .ikonli-font-icon {
+   -fx-icon-size: 1em;
+}
+
+
+.modal-window.entry-view .password-component {
+    -fx-background-color: #FFF4F0;
+}
+.modal-window.entry-view .section.hbox-layout {
+    -fx-spacing: 0.25em;
+}
+.modal-window.entry-view .section.vbox-layout {
+    -fx-spacing: 0.25em;
+}
+.modal-window.entry-view .section.grid-layout {
+   -fx-hgap: 0.25em;
+}
+
+.modal-window.entry-view .title {
+    -fx-text-fill: #59BDFF;
+    -fx-font-size: 2em;
+}
+
+.modal-window.entry-view .text-field {
+    -fx-background-color: #FFF4F0;
+    -fx-background-radius: 0.2em;
+    -fx-border-color: #f9efeb;
+    -fx-border-radius: 0.2em;
+
+}
+
+.modal-window.entry-view .text-field:hover {
+    -fx-background-color: #fee5dc;
+    -fx-border-color: transparent;
+}
+
+.modal-window.entry-view .text-field:focused {
+    -fx-background-color: #fffbfa;
+    -fx-border-style: hidden hidden solid hidden;
+    -fx-border-color: #59BDFF;
+    -fx-text-fill: #59BDFF;
+}
+.modal-window.entry-view .combo-box {
+    -fx-background-color: #FFF4F0;
+    -fx-background-radius: 0.2em;
+    -fx-border-color: #f5e2db;
+    -fx-border-radius: 0.2em;
+    -fx-cursor: hand;
+}
+.modal-window.entry-view .combo-box:hover {
+    -fx-border-color: transparent;
+    -fx-background-color: #fee5dc;
+}
+.modal-window.entry-view .combo-box:focused {
+    -fx-border-color:  #59BDFF;
+}
+
+.modal-window.entry-view .combo-box .arrow-button{
+    -fx-background-color: #f9efeb;
+}
+.modal-window.entry-view .combo-box:hover .arrow-button {
+    -fx-background-color: #F1D3C6;
+}
+
 /* PLACE ORDER VIEW */
 .place-order-view .order-details {
     -fx-padding: 0.1em;

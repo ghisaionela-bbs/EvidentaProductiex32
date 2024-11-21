@@ -63,22 +63,6 @@ public class UserController extends ModalWindow {
         this.stage.showAndWait();
     }
 
-    private void runDatabaseTask(Runnable runnable) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    runnable.run();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
-    }
-
     private void deleteUser() {
         if(new ConfirmationController(stage, "Confirmati stergerea",
                 String.format("Sunteti sigur ca doriti sa stergeti utilizatorul %s?", model.getUser().getUsername())).isSUCCESS()) {
@@ -89,6 +73,9 @@ public class UserController extends ModalWindow {
 
     @Override
     protected void onWindowAction(ACTION_TYPE actionType) {
+        if(actionType == ACTION_TYPE.CONFIRMATION) {
 
+        }
+        stage.close();
     }
 }

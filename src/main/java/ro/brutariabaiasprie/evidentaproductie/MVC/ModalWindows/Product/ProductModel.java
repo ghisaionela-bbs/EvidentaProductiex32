@@ -83,7 +83,7 @@ public class ProductModel {
     public void loadGroups() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT * FROM GRUPE";
+            String sql = "SELECT * FROM GRUPE_PRODUSE";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             groups.clear();

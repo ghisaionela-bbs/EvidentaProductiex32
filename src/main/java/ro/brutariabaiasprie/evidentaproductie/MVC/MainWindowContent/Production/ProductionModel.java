@@ -49,7 +49,7 @@ public class ProductionModel {
                     "r.ID_UTILIZATOR_M " +
                     "FROM REALIZARI r " +
                     "LEFT JOIN PRODUSE p ON p.ID = r.ID_PRODUS " +
-                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_UTILIZATORI g ON g.ID = p.ID_GRUPA " +
                     whereCond +
                     "ORDER BY r.datasiora_i DESC ";
 
@@ -254,9 +254,9 @@ public class ProductionModel {
                     "p.denumire, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
-                    "g.denumire AS denumire_grupa " +
+                    "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
-                    "LEFT JOIN GRUPE g ON p.ID_GRUPA = g.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     "WHERE p.ID = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, selectedProduct.get().getId());

@@ -64,9 +64,9 @@ public class ManagerModel {
                     "p.denumire, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
-                    "g.denumire AS denumire_grupa " +
+                    "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
-                    "LEFT JOIN GRUPE g ON p.ID_GRUPA = g.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
 //                    whereCond +
                     "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -113,7 +113,7 @@ public class ManagerModel {
                     "p.denumire, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
-                    "g.denumire AS denumire_grupa, " +
+                    "gp.denumire AS denumire_grupa, " +
                     "r.cantitate, " +
                     "r.datasiora_i, " +
                     "r.ID_UTILIZATOR_I, " +
@@ -121,7 +121,7 @@ public class ManagerModel {
                     "r.ID_UTILIZATOR_M " +
                     "FROM REALIZARI r " +
                     "LEFT JOIN PRODUSE p ON p.ID = r.ID_PRODUS " +
-                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
                     "WHERE (r.ID_COMANDA IS NULL OR r.ID_COMANDA = 0) " +
                     whereCond +
                     "ORDER BY r.datasiora_i DESC ";
@@ -166,7 +166,7 @@ public class ManagerModel {
             // if the user is not an adminstrator filter by the group of the user
             String whereCond = "";
             if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
-                whereCond += "WHERE g.ID = ? ";
+                whereCond += "WHERE gp.ID = ? ";
             }
 
             Connection connection = DBConnectionService.getConnection();
@@ -174,8 +174,8 @@ public class ManagerModel {
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.um, " +
-                    "g.ID AS ID_GRUPA, " +
-                    "g.denumire AS denumire_grupa, " +
+                    "gp.ID AS ID_GRUPA, " +
+                    "gp.denumire AS denumire_grupa, " +
                     "c.cantitate, " +
                     "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
                     "c.cantitate - SUM(COALESCE(r.cantitate, 0.00)) AS rest, " +
@@ -187,14 +187,14 @@ public class ManagerModel {
                     "FROM COMENZI c " +
                     "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
-                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
                     whereCond +
                     "GROUP BY c.ID, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.um, " +
-                    "g.ID, " +
-                    "g.denumire, " +
+                    "gp.ID, " +
+                    "gp.denumire, " +
                     "c.cantitate, " +
                     "c.datasiora_i, " +
                     "c.ID_UTILIZATOR_I, " +
@@ -244,7 +244,7 @@ public class ManagerModel {
     public void loadGroups() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT * FROM GRUPE";
+            String sql = "SELECT * FROM GRUPE_PRODUSE";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
 

@@ -141,24 +141,4 @@ public class OrderController extends ModalWindow {
         }
         return true;
     }
-
-    /***
-     * Runs a task on a different thread for database operations
-     * @param runnable the runnable that will be run by the task
-     */
-    private void runDatabaseTask(Runnable runnable) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    runnable.run();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
-    }
 }

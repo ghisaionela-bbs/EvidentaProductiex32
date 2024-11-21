@@ -1,7 +1,10 @@
 package ro.brutariabaiasprie.evidentaproductie.Domain;
 
+import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
+
 public class UserRole {
     private final String name;
+    private ACCESS_LEVEL accessLevel = ACCESS_LEVEL.UNAUTHORIZED;
     private boolean viewProductionTab = false;
     private boolean editRecords = false;
     private boolean viewAdminTab = false;
@@ -13,11 +16,27 @@ public class UserRole {
     private boolean editGroups = false;
     private boolean viewUsers = false;
     private boolean editUsers = false;
+    private String description = "";
 
 
-    public UserRole(int ID_ROLE) {
+    public UserRole(ACCESS_LEVEL ID_ROLE) {
+        accessLevel = ID_ROLE;
         switch (ID_ROLE) {
-            case 1:
+            case ADMINISTRATOR:
+                name = "Administrator";
+                viewProductionTab = true;
+                editRecords = true;
+                viewAdminTab = true;
+                viewOrders = true;
+                editOrders = true;
+                viewProducts = true;
+                editProducts = true;
+                viewGroups = true;
+                editGroups = true;
+                viewUsers = true;
+                editUsers = true;
+                break;
+            case DIRECTOR:
                 name = "Director";
                 viewProductionTab = true;
                 editRecords = true;
@@ -31,7 +50,7 @@ public class UserRole {
                 viewUsers = true;
                 editUsers = true;
                 break;
-            case 2:
+            case MANAGER:
                 name = "Tehnic";
                 viewProductionTab = true;
                 editRecords = true;
@@ -41,7 +60,7 @@ public class UserRole {
                 viewGroups = true;
                 editGroups = true;
                 break;
-            case 3:
+            case OPERATOR:
                 name = "Operator";
                 viewProductionTab = true;
                 viewAdminTab = true;
@@ -55,6 +74,10 @@ public class UserRole {
 
     public String getName() {
         return name;
+    }
+
+    public ACCESS_LEVEL getAccessLevel() {
+        return accessLevel;
     }
 
     public boolean canViewProductionTab() {
@@ -99,5 +122,9 @@ public class UserRole {
 
     public boolean canEditProducts() {
         return editProducts;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

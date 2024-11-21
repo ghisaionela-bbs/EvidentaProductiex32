@@ -101,6 +101,11 @@ public class DBConnectionService {
         }
     }
 
+    /***
+     * Removes notification entries that were created one hour ago
+     * @param connection the database connection
+     * @throws SQLException when there is a sql exception
+     */
     private static void cleanupNotifications(Connection connection) throws SQLException {
         String cleanupQuery = "DELETE FROM change_notifications WHERE change_time < ?";
         try (PreparedStatement statement = connection.prepareStatement(cleanupQuery)) {
@@ -115,7 +120,7 @@ public class DBConnectionService {
      * Checks first if the "APP_INFO" table exists in the database.
      * If it does not exist then it will create all the tables and the triggers.
      * Else it verifies if the database is compatible with the app version.
-     * @throws SQLException when there was an error
+     * @throws SQLException when there is a sql exception
      */
     public static void verifyDatabase() throws SQLException {
         // Check if app info table exists
@@ -138,6 +143,10 @@ public class DBConnectionService {
         }
     }
 
+    /***
+     * Verifies the database tables to be compatible with the app version
+     * @throws SQLException when there is a sql exception
+     */
     private static void verifyTables() throws SQLException {
         // Verify database app compatibility
         try(PreparedStatement statement = connection.prepareStatement("SELECT valoare FROM [dbo].[APP_INFO] WHERE proprietate = ?")){
@@ -149,9 +158,12 @@ public class DBConnectionService {
                 throw new VersionCompatibility("App version is not compatible with database version");
             }
         }
-
     }
 
+    /***
+     * Generates the necessary tables for the current app version
+     * @throws SQLException when there is a sql exception
+     */
     public static void generateTables() throws SQLException {
         // Setting up the app properties table for compatibility
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[APP_INFO](" +
@@ -176,14 +188,33 @@ public class DBConnectionService {
                 "[row_id] [int] NOT NULL) ")) {
             statement.execute();
         }
-        // Setting up the groups table
-        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE](  " +
+        // Setting up the users groups table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE_UTILIZATORI](  " +
                 "[ID] [int] IDENTITY(1,1) NOT NULL, " +
                 "[denumire] [nvarchar](50) NOT NULL)")) {
             statement.execute();
         }
-        // Setting up the groups table triggers
-        createTableTriggers("GRUPE");
+        // Setting up the users groups table triggers
+        createTableTriggers("GRUPE_UTILIZATORI");
+
+        // Setting up the products groups table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE_PRODUSE](  " +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[denumire] [nvarchar](50) NOT NULL)")) {
+            statement.execute();
+        }
+        // Setting up the products groups table triggers
+        createTableTriggers("GRUPE_PRODUSE");
+
+        // Setting up the groups associations table
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[ASOCIERI_GRUPE](  " +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[ID_GRUPA_UTILIZATORI] [int] NOT NULL, " +
+                "[ID_GRUPA_PRODUS] [int] NOT NULL)")) {
+            statement.execute();
+        }
+        // Setting up the groups associations table triggers
+        createTableTriggers("ASOCIERI_GRUPE");
 
         // Setting up the products table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[PRODUSE](" +
@@ -250,6 +281,11 @@ public class DBConnectionService {
 
     }
 
+    /***
+     * Creates "AFTER INSERT", "AFTER UPDATE" and "AFTER DELETE" triggers for the table with the given table name
+     * @param tableName the name of the table that the triggers will be created for
+     * @throws SQLException when there is a sql exception
+     */
     private static void createTableTriggers(String tableName) throws SQLException {
         try(PreparedStatement statement = connection.prepareStatement(
                 createTriggerSql("trg_" + tableName + "_after_insert", tableName, "INSERT"))) {
@@ -265,6 +301,15 @@ public class DBConnectionService {
         }
     }
 
+    /***
+     * Creates a sql query for creating a trigger depending on the given operationType,
+     * with the given name for the given table
+     * @param triggerName the name of the trigger
+     * @param tableName the name of the table the triggers will be created for
+     * @param operationType the type of operation that will trigger the trigger after it was executed
+     *                      can be "DELETE", "UPDATE" or "INSERT"
+     * @return the sql query for creating the trigger
+     */
     private static String createTriggerSql(String triggerName, String tableName, String operationType) {
         String triggerSql = "EXEC('CREATE TRIGGER [dbo].[" + triggerName + "] " +
                 "ON [dbo].[" + tableName + "] AFTER " + operationType + " " +
