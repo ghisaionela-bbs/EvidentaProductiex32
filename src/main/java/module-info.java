@@ -26,6 +26,6 @@ module ro.brutariabaiasprie.evidentaproductie {
     opens ro.brutariabaiasprie.evidentaproductie.Data to javafx.fxml;
     exports ro.brutariabaiasprie.evidentaproductie.MVC;
     opens ro.brutariabaiasprie.evidentaproductie.MVC to javafx.fxml;
-    exports ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Account;
-    opens ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Account to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account;
+    opens ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account to javafx.fxml;
 }

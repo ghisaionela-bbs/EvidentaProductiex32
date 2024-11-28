@@ -12,10 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import org.kordamp.ikonli.javafx.FontIcon;
-import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
-import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
-import ro.brutariabaiasprie.evidentaproductie.Domain.UserRole;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
 import java.util.function.Consumer;
@@ -117,7 +114,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
     }
 
     public void openDefaultTab() {
-        switch (model.getCONNECTED_USER().getID_ROLE()){
+        switch (model.getCONNECTED_USER().getRoleId()){
             case 1:
             case 2:
                 managerButton.fire();

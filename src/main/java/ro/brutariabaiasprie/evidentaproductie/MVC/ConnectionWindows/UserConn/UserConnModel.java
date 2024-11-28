@@ -1,7 +1,5 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
@@ -10,7 +8,6 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Domain.UserRole;
 import ro.brutariabaiasprie.evidentaproductie.Exceptions.UserNotFound;
-import ro.brutariabaiasprie.evidentaproductie.Services.AppProperties;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.Connection;
@@ -58,14 +55,14 @@ public class UserConnModel {
                 int ID = resultSet.getInt("ID");
                 int ID_ROLE = resultSet.getInt("ID_ROL");
                 int ID_GROUP = resultSet.getInt("ID_GRUPA");
+                int subgroupId = resultSet.getInt("ID_SUBGRUPA_PRODUSE");
                 User user = new User();
-                user.setID(ID);
-                user.setID_ROLE(ID_ROLE);
+                user.setId(ID);
+                user.setRoleId(ID_ROLE);
                 user.setUsername(username);
                 user.setPassword(password);
-                user.setID_GROUP(ID_GROUP);
-
-                ACCESS_LEVEL accessLevel = ACCESS_LEVEL.values()[ID_ROLE];
+                user.setGroupId(ID_GROUP);
+                user.setSubgroupId(subgroupId);
 
                 ConfigApp.setConfig(CONFIG_KEY.USER.name(), user);
                 ConfigApp.setConfig(CONFIG_KEY.USER_ROLE.name(), new UserRole(ACCESS_LEVEL.values()[ID_ROLE]));

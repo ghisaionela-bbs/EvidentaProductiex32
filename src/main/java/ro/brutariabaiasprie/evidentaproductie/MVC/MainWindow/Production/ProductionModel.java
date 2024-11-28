@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production;
+package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Production;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -31,7 +31,7 @@ public class ProductionModel {
 
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
                 whereCond = "WHERE r.ID_UTILIZATOR_I = ? ";
             }
 
@@ -54,8 +54,8 @@ public class ProductionModel {
                     "ORDER BY r.datasiora_i DESC ";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
-                statement.setInt(1, user.getID());
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
+                statement.setInt(1, user.getId());
             }
             ResultSet resultSet = statement.executeQuery();
             records.clear();
@@ -131,7 +131,7 @@ public class ProductionModel {
         try {
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
                 whereCond = "WHERE p.ID_GRUPA = ? ";
             }
 
@@ -141,14 +141,15 @@ public class ProductionModel {
                     "p.denumire, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     whereCond +
                     "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
-                statement.setInt(1, user.getID_GROUP());
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
+                statement.setInt(1, user.getGroupId());
             }
             ResultSet resultSet = statement.executeQuery();
 
@@ -164,7 +165,8 @@ public class ProductionModel {
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
                         resultSet.getString("um"),
-                        group
+                        group,
+                        resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 );
                 product.setGroup(group);
                 products.add(product);
@@ -195,7 +197,7 @@ public class ProductionModel {
             statement.setInt(1, selectedProduct.get().getId());
             statement.setDouble(2, quantity);
             statement.setTimestamp(3, timestamp);
-            statement.setInt(4, user.getID());
+            statement.setInt(4, user.getId());
             if(associatedOrder.get() != null) {
                 statement.setInt(5, associatedOrder.get().getId());
             }
@@ -254,6 +256,7 @@ public class ProductionModel {
                     "p.denumire, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
@@ -273,7 +276,8 @@ public class ProductionModel {
                     selectedProduct.get().getId(),
                     resultSet.getString("denumire"),
                     resultSet.getString("um"),
-                    group
+                    group,
+                    resultSet.getInt("ID_SUBGRUPA_PRODUSE")
             );
             product.setGroup(group);
             this.selectedProduct.set(product);
@@ -291,6 +295,7 @@ public class ProductionModel {
                     "p.denumire, " +
                     "p.um, " +
                     "g.ID AS ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "g.denumire AS denumire_grupa, " +
                     "c.cantitate, " +
                     "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
@@ -335,7 +340,8 @@ public class ProductionModel {
                     resultSet.getInt("ID_PRODUS"),
                     resultSet.getString("denumire"),
                     resultSet.getString("um"),
-                    group
+                    group,
+                    resultSet.getInt("ID_SUBGRUPA_PRODUSE")
             ));
             order.setQuantity(resultSet.getDouble("cantitate"));
             order.setCompleted(resultSet.getDouble("realizat"));

@@ -1,5 +1,7 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -36,14 +38,10 @@ public class ProductController extends ModalWindow {
     /***
      * Constructs an instance of ProductController for editing or viewing an existing product
      * @param owner the owner for the new scene that will be created
-     * @param type the type of the view that we want. It can be EDIT or VIEW
+     * @param type the type of the view that we want. It can be ADD, EDIT or VIEW
      * @param product the product that will be edited or viewed
-     * @throws RuntimeException when the type provided is ADD
      */
     public ProductController(Stage owner, WINDOW_TYPE type, Product product) throws RuntimeException {
-        if(type == WINDOW_TYPE.ADD) {
-            throw new RuntimeException("The WINDOW_TYPE cannot be ADD when an existing product is provided");
-        }
         initStage(owner, type, product);
     }
 
@@ -60,9 +58,26 @@ public class ProductController extends ModalWindow {
         this.stage = new Stage();
         this.model = new ProductModel();
         this.model.setProduct(product);
-        this.runDatabaseTask(model::loadGroups);
         this.view = new ProductView(this.model, type, this::onWindowAction);
         this.view.setDeleteProductHandler(this::deleteProduct);
+        this.view.groupComboBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if(oldValue != newValue) {
+                if(newValue == null) {
+                    this.view.subgroupComboBox.getSelectionModel().clearSelection();
+                    this.view.subgroupComboBox.setDisable(true);
+                } else if(newValue.getId() == 0) {
+                    this.view.subgroupComboBox.setDisable(true);
+                } else {
+                    this.view.subgroupComboBox.setDisable(false);
+                }
+                model.loadSubgroups(newValue);
+            }
+        });
+        this.runDatabaseTask(() -> {
+            model.loadGroups();
+            model.loadSubgroups(product.getGroup());
+            view.loadProductData();
+        });
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
 
@@ -108,6 +123,7 @@ public class ProductController extends ModalWindow {
             model.getProduct().setName(view.getName());
             model.getProduct().setUnitMeasurement(view.getUnitMeasurement());
             model.getProduct().setGroup(view.getGroup());
+            model.getProduct().setSubgroupId(view.getSubgroup());
 
             // If the type of view is ADD, when the CONFIRMATION button is pressed,
             // the product will be added in the database

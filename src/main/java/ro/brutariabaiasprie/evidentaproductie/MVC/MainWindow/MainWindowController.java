@@ -7,10 +7,10 @@ import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
-import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Account.AccountController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account.AccountController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.DBConn.DBConnController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager.ManagerController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production.ProductionController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager.ManagerController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Production.ProductionController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn.UserConnController;
@@ -61,7 +61,7 @@ public class MainWindowController implements SceneController {
                 controller = new MainWindowController(PARENT_STAGE, this::disconnect);
                 break;
             case DEFAULT:
-                int user_role = ((User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name())).getID_ROLE();
+                int user_role = ((User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name())).getRoleId();
                 if(user_role == 1) {
                     controller = new ProductionController(PARENT_STAGE);
                 } else {

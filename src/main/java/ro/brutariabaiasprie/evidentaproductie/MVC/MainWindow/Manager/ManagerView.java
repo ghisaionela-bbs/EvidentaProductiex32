@@ -1,7 +1,8 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
+package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -13,9 +14,7 @@ import javafx.util.Builder;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import ro.brutariabaiasprie.evidentaproductie.Data.*;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
+import ro.brutariabaiasprie.evidentaproductie.Domain.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
@@ -59,7 +58,7 @@ public class ManagerView extends Parent implements Builder<Region> {
     }
 
     private void createStageResizeListeners() {
-        if(model.getCONNECTED_USER().getID_ROLE() == 1 || model.getCONNECTED_USER().getID_ROLE() == 2) {
+        if(model.getCONNECTED_USER().getRoleId() == 1 || model.getCONNECTED_USER().getRoleId() == 2) {
             ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
                 if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
                     addProductButton.setText("➕");
@@ -86,7 +85,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             tabPane.getTabs().add(createOrdersTab());
         }
         if(ConfigApp.getRole().canViewGroups()) {
-            tabPane.getTabs().add(createGroupsTab());
+            tabPane.getTabs().add(createGroupsTab2());
         }
         if (ConfigApp.getRole().canViewProducts()) {
             tabPane.getTabs().add(createProductsTab());
@@ -203,6 +202,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             productsTableView.getColumns().add(editBtnColumn);
         }
 
+
         productsTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 
         productsTableView.setPlaceholder(new Label("Nu exista produse."));
@@ -289,7 +289,6 @@ public class ManagerView extends Parent implements Builder<Region> {
                     } else {
                         setGraphic(null);
                     }
-
                 }
             }
         });
@@ -543,7 +542,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
 
-        if(user.getID_ROLE() == 1 || user.getID_ROLE() == 2) {
+        if(user.getRoleId() == 1 || user.getRoleId() == 2) {
             TableColumn<Record, Integer> editBtnColumn = new TableColumn<>();
             editBtnColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
             editBtnColumn.setCellFactory(column -> new TableCell<>() {
@@ -579,9 +578,6 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         return tableView;
     }
-
-
-
     //endregion
 
 
@@ -609,6 +605,163 @@ public class ManagerView extends Parent implements Builder<Region> {
         tab.setClosable(false);
         tab.setContent(content);
         return tab;
+    }
+
+    private Tab createGroupsTab2() {
+        Label sectionTitle = new Label("Grupe si subgrupe");
+        sectionTitle.setMaxWidth(Double.MAX_VALUE);
+        sectionTitle.getStyleClass().add("sub-main-window-title");
+        HBox.setHgrow(sectionTitle, Priority.ALWAYS);
+        HBox headerSection = new HBox(sectionTitle);
+
+        if(ConfigApp.getRole().canEditGroups()) {
+            Button addGroupButton = new Button("Adaugare grupa");
+            addGroupButton.setGraphic(new FontIcon("mdi2p-plus"));
+            addGroupButton.getStyleClass().add("sub-main-window-button");
+            addGroupButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.ADD));
+            headerSection.getChildren().add(addGroupButton);
+        }
+
+        headerSection.getStyleClass().add("sub-main-window-header");
+
+        VBox content = new VBox(headerSection, createGroupsList());
+        content.getStyleClass().add("sub-main-window-content-container");
+
+        Tab tab = new Tab("Grupe si subgrupe");
+        tab.setClosable(false);
+        tab.setContent(content);
+        return tab;
+    }
+
+//    private Node createGroupCard() {
+//
+//    }
+
+    private ListView<Group> createGroupsList() {
+        ListView<Group> listView = new ListView<>();
+        listView.setFocusTraversable(false);
+        listView.getStyleClass().add("group-listview");
+        listView.setCellFactory(param -> new ListCell<>() {
+            final Button addSubGroupButton = new Button("Adaugare subgrupa");
+            final FontIcon plusIcon = new FontIcon("mdi2p-plus");
+            final Button editButton = new Button();
+            final FontIcon editIcon = new FontIcon("mdi2s-square-edit-outline");
+            @Override
+            protected void updateItem(Group item, boolean empty) {
+                super.updateItem(item, empty);
+                Group lastItem = getItem();
+                if(item == null || empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(null);
+                    if(item.getParentGroupId() == 0) {
+                        final Label groupLabel = new Label(item.getName());
+
+
+                        final Label spacer = new Label();
+                        spacer.setMaxWidth(Double.MAX_VALUE);
+                        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                        HBox titleContainer = new HBox();
+
+                        if(ConfigApp.getRole().canEditGroups()) {
+                            editButton.setGraphic(editIcon);
+                            editButton.setStyle("-fx-background-color: TRANSPARENT; -fx-cursor: hand;");
+                            editButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.EDIT, item));
+                            addSubGroupButton.setGraphic(plusIcon);
+                            addSubGroupButton.getStyleClass().add("sub-main-window-button");
+                            addSubGroupButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.ADD, new Group(0, "", item.getId())));
+                            titleContainer = new HBox(groupLabel, editButton, spacer, addSubGroupButton);
+                        } else {
+                            titleContainer = new HBox(groupLabel, spacer);
+                        }
+
+                        titleContainer.setAlignment(Pos.CENTER_LEFT);
+
+                        final Label subgroupLabel = new Label("Subgrupe:");
+                        subgroupLabel.setStyle("-fx-text-fill: GRAY; -fx-padding: 0 0 0 20;");
+                        subgroupLabel.setMaxWidth(Double.MAX_VALUE);
+
+                        HBox.setHgrow(subgroupLabel, Priority.ALWAYS);
+                        final HBox subGroupContainer = new HBox(subgroupLabel);
+
+                        final VBox container = new VBox(titleContainer, subGroupContainer);
+                        container.getStyleClass().add("sub-main-view-list-header");
+                        container.setSpacing(0);
+                        container.setAlignment(Pos.CENTER_LEFT);
+                        setGraphic(container);
+                    } else {
+                        final Label subgroupLabel = new Label(item.getName());
+
+                        final HBox subgroupContainer = new HBox(subgroupLabel);
+                        if(ConfigApp.getRole().canEditGroups()) {
+                            editButton.setGraphic(editIcon);
+                            editButton.setStyle("-fx-background-color: TRANSPARENT; -fx-cursor: hand;");
+                            editButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.EDIT, item));
+                            subgroupContainer.getChildren().add(editButton);
+                        }
+
+                        subgroupContainer.setAlignment(Pos.CENTER_LEFT);
+
+                        subgroupContainer.setPadding(new Insets(0, 10, 0, 60));
+//                        subgroupContainer.setStyle("-fx-background-color: derive(COLOR_WHITE, -1%);");
+                        setGraphic(subgroupContainer);
+                    }
+                    setFocusTraversable(false);
+                }
+            }
+        });
+        listView.setItems(model.getGroups2());
+        VBox.setVgrow(listView, Priority.ALWAYS);
+        return listView;
+    }
+
+
+//    private ListView<Group> createGroupsList() {
+//        ListView<Group> listView = new ListView<>();
+//        listView.setCellFactory(param -> new ListCell<>() {
+//            @Override
+//            protected void updateItem(Group item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if(item == null || empty) {
+//                    setText(null);
+//                    setGraphic(null);
+//                } else {
+//                    setText(null);
+//                    final BorderPane container = new BorderPane();
+//
+//                    final Button deleteGroupButton = new Button("Stergere");
+//                    final Label groupNameLabel = new Label(item.getName());
+//                    groupNameLabel.setMaxWidth(Double.MAX_VALUE);
+//                    HBox.setHgrow(groupNameLabel, Priority.ALWAYS);
+//                    final HBox titleSection = new HBox(groupNameLabel, deleteGroupButton);
+//                    container.setTop(titleSection);
+//
+//                    final Button addGroupButton = new Button();
+//                    final Label addGroupButtonLabel = new Label("Adauga o subgrupa");
+//                    addGroupButtonLabel.setMaxWidth(Double.MAX_VALUE);
+//                    HBox.setHgrow(addGroupButtonLabel, Priority.ALWAYS);
+//                    final HBox addGroupButtonGraphic = new HBox(addGroupButtonLabel, new FontIcon("mdi2p-plus-box"));
+//                    addGroupButton.setGraphic(addGroupButtonGraphic);
+//                    addGroupButton.setMaxWidth(Double.MAX_VALUE);
+//                    addGroupButton.getStyleClass().add("add-group-button");
+//                    final VBox centerSection = new VBox(addGroupButton, createSubGroupListView());
+//                    container.setCenter(centerSection);
+//
+//                    setGraphic(container);
+//                }
+//            }
+//        });
+//        listView.setEditable(false);
+//        listView.setFocusModel(null);
+//        listView.setItems(model.getGroups());
+//        return listView;
+//    }
+
+    private ListView<Group> createSubGroupListView() {
+        ListView<Group> listView = new ListView<>();
+        return  listView;
     }
 
     private TableView<Group> createGroupsTable() {
@@ -664,6 +817,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             Button addButton = new Button("Adauga un utilizator");
             addButton.getStyleClass().add("ghost-button");
             addButton.setOnAction(event -> new UserController(stage));
+            addButton.setGraphic(new FontIcon("mdi2p-plus"));
             headerSection.getChildren().add(addButton);
         }
 
@@ -685,16 +839,22 @@ public class ManagerView extends Parent implements Builder<Region> {
         usernameColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getUsername()));
         tableView.getColumns().add(usernameColumn);
 
-        TableColumn<User, String> passwordColumn = new TableColumn<>("Parola");
-        passwordColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getPassword()));
-        tableView.getColumns().add(passwordColumn);
-
         TableColumn<User, Integer> roleColumn = new TableColumn<>("Rol");
-        roleColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getID_ROLE()));
+        roleColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getRoleId()));
+        roleColumn.setCellFactory(column -> new TableCell<>() {
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if(empty) {
+                    setText(null);
+                } else {
+                    setText(new UserRole(ACCESS_LEVEL.values()[item]).getName());
+                }
+            }
+        });
         tableView.getColumns().add(roleColumn);
 
         TableColumn<User, Integer> editBtnColumn = new TableColumn<>();
-        editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getID()));
+        editBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
         editBtnColumn.setCellFactory(column -> new TableCell<>() {
             final Button editButton = new Button();
             final FontIcon fontIcon = new FontIcon("mdi2s-square-edit-outline");
@@ -710,7 +870,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
                     editButton.setGraphic(fontIcon);
                     editButton.getStyleClass().add("filled-button");
-//                    editButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                    editButton.setOnAction(event -> new UserController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
                     setGraphic(editButton);
                     setStyle("-fx-alignment:  TOP-RIGHT;");
                 }

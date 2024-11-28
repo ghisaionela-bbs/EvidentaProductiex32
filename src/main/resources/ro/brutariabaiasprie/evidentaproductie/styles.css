@@ -238,7 +238,7 @@
 
 .modal-window.entry-view .title {
     -fx-text-fill: #59BDFF;
-    -fx-font-size: 2em;
+    -fx-font-size: 1.75em;
 }
 
 .modal-window.entry-view .text-field {
@@ -250,7 +250,9 @@
 
 .modal-window.entry-view .text-area {
     -fx-background-color: transparent;
+    -fx-background-radius: 0.2em;
     -fx-border-color: transparent;
+    -fx-border-radius: 0.2em;
 }
 .modal-window.entry-view .text-area .content{
     -fx-background-color: #FFF4F0;
@@ -264,23 +266,35 @@
 }
 .modal-window.entry-view .text-area:focused {
     -fx-text-fill: #59BDFF;
+    -fx-border-color: #59BDFF;
 }
 .modal-window.entry-view .text-area:focused .content{
     -fx-background-color: #fffbfa;
-    -fx-border-color: #59BDFF;
 }
 
 .modal-window.entry-view .text-field:hover .content{
     -fx-background-color: #fee5dc;
     -fx-border-color: transparent;
 }
-
 .modal-window.entry-view .text-field:focused {
     -fx-background-color: #fffbfa;
     -fx-border-style: hidden hidden solid hidden;
     -fx-border-color: #59BDFF;
     -fx-text-fill: #59BDFF;
 }
+
+.modal-window.entry-view .radio-button .radio {
+    -fx-background-color: #FFF4F0;
+    -fx-border-color: #fee5dc;
+    -fx-border-radius: 2em;
+}
+.modal-window.entry-view .radio-button:hover {
+    -fx-cursor: hand;
+}
+.modal-window.entry-view .radio-button:hover .radio {
+    -fx-background-color: #fee5dc;
+}
+
 .modal-window.entry-view .combo-box {
     -fx-background-color: #FFF4F0;
     -fx-background-radius: 0.2em;
@@ -302,6 +316,28 @@
 .modal-window.entry-view .combo-box:hover .arrow-button {
     -fx-background-color: #F1D3C6;
 }
+.modal-window.entry-view .combo-box:hover .arrow {
+    -fx-background-color: COLOR_BRAND_BROWN;
+}
+
+/*
+.modal-window.entry-view .radio-button:hover {
+    -fx-cursor: hand;
+}
+.modal-window.entry-view .radio-button .radio {
+    -fx-border-color: COLOR_BRAND_BROWN;
+    -fx-background-color: COLOR_WHITE;
+    -fx-border-radius: 15px;
+}
+.modal-window.entry-view .radio-button:selected .radio {
+    -fx-background-color: COLOR_BRAND_BROWN;
+}
+.modal-window.entry-view .radio-button .dot {
+    -fx-background-color: transparent;
+}
+.modal-window.entry-view .radio-button:selected .dot {
+    -fx-background-color: COLOR_WHITE;
+}*/
 
 /* PLACE ORDER VIEW */
 .place-order-view .order-details {
@@ -358,9 +394,10 @@
 }
 
 /* CONTENT */
+/*
 .main-window .main-window-content {
     -fx-padding: 0.5em;
-}
+}*/
 /* CONTENT -> PRODUCTION VIEW */
 .main-window .main-window-content .production-input-section .production-product-selection-button{
     -fx-background-color: COLOR_WHITE;
@@ -382,6 +419,99 @@
     -fx-font-weight: BOLD;
 }
 /* CONTENT -> MANAGER VIEW -> TAB*/
+.main-window .tab-header-area {
+    -fx-background-color: #D3D3D3;
+    -fx-padding: 0;
+}
+.main-window .tab{
+     -fx-background-color: transparent;
+     -fx-padding: 0.2em 2em 0.2em 2em;
+}
+.main-window .tab .tab-label {
+    -fx-alignment: CENTER;
+}
+.main-window .tab:hover {
+    -fx-cursor: hand;
+}
+.main-window .tab:selected .tab-label {
+    -fx-text-fill: #59BDFF;
+}
+.main-window .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+     -fx-border-width: 0;
+}
+/* CONTENT -> MANAGER VIEW -> TAB CONTENT*/
+.main-window .sub-main-window-content-container {
+    -fx-alignment: TOP-CENTER;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.1, 0.2, 0.2);
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+
+.main-window .sub-main-window-header {
+    -fx-background-color: COLOR_WHITE;
+    -fx-background-radius: 0.2em;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 1, 0.1, 1, 1);
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-alignment: CENTER-LEFT;
+}
+.main-window .sub-main-window-title {
+    -fx-font-size: 1.5em;
+}
+.main-window .sub-main-window-button {
+    -fx-background-color: COLOR_WHITE;
+    -fx-background-radius: 0.2em;
+    -fx-border-color: #0080F0;
+    -fx-border-radius: 0.2em;
+    -fx-text-fill: #0080F0;
+}
+.main-window .sub-main-window-button:hover {
+    -fx-background-color: #0080F0;
+    -fx-text-fill: COLOR_WHITE;
+    -fx-cursor: hand;
+}
+.main-window .sub-main-window-button .ikonli-font-icon {
+    -fx-icon-color: #0080F0;
+    -fx-icon-size: 32px;
+}
+.main-window .sub-main-window-button:hover .ikonli-font-icon {
+    -fx-icon-color: COLOR_WHITE;
+}
+.main-window .sub-main-view-list-header {
+    -fx-background-color: COLOR_WHITE;
+    -fx-background-radius: 0.2em;
+    -fx-border-radius: 0.2em;
+    /*-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.1, 1, 1);*/
+    -fx-padding: 1em;
+}
+
+.group-listview {
+    -fx-background-color: COLOR_WHITE;
+}
+.group-listview .list-cell{
+    -fx-background-color: transparent;
+}
+
+.main-window .add-group-button {
+    -fx-background-color: #BAE8FF;
+    -fx-cursor: hand;
+    -fx-padding: 1em;
+}
+.main-window .add-group-button > * {
+    -fx-alignment: CENTER;
+}
+
+.main-window .add-group-button .label {
+    -fx-text-alignment: CENTER;
+    -fx-alignment: CENTER;
+    -fx-font-size: 1.5em;
+}
+
+.main-window .add-group-button .ikonli-font-icon {
+    -fx-icon-color: #59BDFF;
+    -fx-icon-size: 64px;
+}
+
+/*
 .main-window .tab-header-area {
     -fx-border-width: 0 0 0.3em 0;
     -fx-border-color: COLOR_BRAND_BROWN;
@@ -414,6 +544,8 @@
 .main-window .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
      -fx-border-width: 0;
 }
+*/
+
 /* CONTENT -> MANAGER VIEW -> TAB CONTENT */
 .main-window .tab-section-header{
     -fx-padding: 0.2em 0 0.2em 0;

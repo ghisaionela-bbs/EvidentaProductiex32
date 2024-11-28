@@ -59,7 +59,7 @@ public class RecordModel {
             statement.setTimestamp(3, record.getDateTimeInserted());
             statement.setInt(4, record.getUserIdInserted());
             statement.setTimestamp(5, timestamp);
-            statement.setInt(6, user.getID());
+            statement.setInt(6, user.getId());
             if(record.getOrderId() == 0) {
                 statement.setNull(7, Types.INTEGER);
             } else {
@@ -77,20 +77,20 @@ public class RecordModel {
         try {
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getID_GROUP() != 0) {
+            if(user.getGroupId() != 0) {
                 whereCond += "WHERE g.ID = ? ";
             }
 
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT p.ID, p.denumire, p.UM, p.ID_GRUPA, g.denumire AS denumire_grupa " +
+            String sql = "SELECT p.ID, p.denumire, p.UM, p.ID_GRUPA, p.ID_SUBGRUPA_PRODUSE, g.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
-                    "LEFT JOIN GRUPE g ON p.ID_GRUPA = g.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE g ON p.ID_GRUPA = g.ID " +
                     whereCond +
                     "ORDER BY p.UM, p.denumire";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_GROUP() != 0) {
-                statement.setInt(1, user.getID_ROLE());
+            if(user.getGroupId() != 0) {
+                statement.setInt(1, user.getRoleId());
             }
             ResultSet resultSet = statement.executeQuery();
 
@@ -105,7 +105,8 @@ public class RecordModel {
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
                         resultSet.getString("um"),
-                        group
+                        group,
+                        resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 );
                 products.add(product);
             }
@@ -120,7 +121,7 @@ public class RecordModel {
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             // if the user is not an adminstrator filter by the group of the user
             String whereCond = "";
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
                 whereCond += "g.ID = ? ";
             }
 
@@ -130,6 +131,7 @@ public class RecordModel {
                     "p.denumire, " +
                     "p.um, " +
                     "g.ID AS ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "g.denumire AS denumire_grupa, " +
                     "c.cantitate, " +
                     "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
@@ -159,8 +161,8 @@ public class RecordModel {
                     "c.inchisa " +
                     "ORDER BY c.datasiora_i ASC ";
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
-                statement.setInt(1, user.getID_GROUP());
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
+                statement.setInt(1, user.getGroupId());
             }
 
             ResultSet resultSet = statement.executeQuery();
@@ -179,7 +181,8 @@ public class RecordModel {
                         resultSet.getInt("ID_PRODUS"),
                         resultSet.getString("denumire"),
                         resultSet.getString("um"),
-                        group
+                        group,
+                        resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 ));
                 order.setQuantity(resultSet.getDouble("cantitate"));
                 order.setCompleted(resultSet.getDouble("realizat"));

@@ -1,26 +1,29 @@
 package ro.brutariabaiasprie.evidentaproductie.Data;
 
+import java.util.Objects;
+
 public class  User {
-    private int ID;
-    private int ID_ROLE;
+    private int id;
+    private int roleId;
     private String username;
     private String password;
-    private Integer ID_GROUP;
+    private Integer groupId;
+    private int subgroupId;
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public int getID_ROLE() {
-        return ID_ROLE;
+    public int getRoleId() {
+        return roleId;
     }
 
-    public void setID_ROLE(int ID_ROLE) {
-        this.ID_ROLE = ID_ROLE;
+    public void setRoleId(int roleId) {
+        this.roleId = roleId;
     }
 
     public String getUsername() {
@@ -39,22 +42,44 @@ public class  User {
         this.password = password;
     }
 
-    public Integer getID_GROUP() {
-        return ID_GROUP;
+    public Integer getGroupId() {
+        return groupId;
     }
 
-    public void setID_GROUP(Integer ID_GROUP) {
-        this.ID_GROUP = ID_GROUP;
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
+    }
+
+    public int getSubgroupId() {
+        return subgroupId;
+    }
+
+    public void setSubgroupId(int subgroupId) {
+        this.subgroupId = subgroupId;
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "ID=" + ID +
-                ", ID_ROLE=" + ID_ROLE +
+                "id=" + id +
+                ", roleId=" + roleId +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", ID_GROUP=" + ID_GROUP +
+                ", groupId=" + groupId +
+                ", subgroupId=" + subgroupId +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id && roleId == user.roleId && subgroupId == user.subgroupId && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(groupId, user.groupId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, roleId, username, password, groupId, subgroupId);
     }
 }

@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Account;
+package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account;
 
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;

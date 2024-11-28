@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production;
+package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Production;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
@@ -465,7 +465,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         });
         tableView.getColumns().add(quantityColumn);
 
-        if(user.getID_ROLE() == 1 || user.getID_ROLE() == 2) {
+        if(user.getRoleId() == 1 || user.getRoleId() == 2) {
             TableColumn<Record, Integer> editBtnColumn = new TableColumn<>();
             editBtnColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
             editBtnColumn.setCellFactory(column -> new TableCell<>() {

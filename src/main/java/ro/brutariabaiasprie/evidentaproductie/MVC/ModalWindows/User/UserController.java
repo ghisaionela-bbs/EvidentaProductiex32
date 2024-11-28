@@ -1,6 +1,5 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.User;
 
-import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -8,11 +7,9 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductModel;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductView;
 
 import java.util.Objects;
 
@@ -38,9 +35,25 @@ public class UserController extends ModalWindow {
         this.stage = new Stage();
         this.model = new UserModel();
         this.model.setUser(user);
-        this.runDatabaseTask(model::loadGroups);
-        this.view = new UserView(this.model, type, this::onWindowAction);;
+        this.view = new UserView(this.model, type, this::onWindowAction);
         this.view.setDeleteUserHandler(this::deleteUser);
+        this.view.groupComboBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if(oldValue != newValue) {
+                if(newValue == null) {
+                    this.view.subgroupComboBox.getSelectionModel().clearSelection();
+                    this.view.subgroupComboBox.setDisable(true);
+                } else if(newValue.getId() == 0) {
+                    this.view.subgroupComboBox.setDisable(true);
+                } else {
+                    this.view.subgroupComboBox.setDisable(false);
+                }
+                model.loadSubgroups(newValue);
+            }
+        });
+        this.runDatabaseTask(() -> {
+            model.loadGroups();
+            view.loadUserData();
+        });
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
 
@@ -74,8 +87,39 @@ public class UserController extends ModalWindow {
     @Override
     protected void onWindowAction(ACTION_TYPE actionType) {
         if(actionType == ACTION_TYPE.CONFIRMATION) {
+            if(!isValidInput()) {
+                return;
+            }
 
+            model.getUser().setUsername(view.getUsername().trim());
+            model.getUser().setPassword(view.getPassword().trim());
+            model.getUser().setRoleId(view.getRoleId());
+            model.getUser().setGroupId(view.getGroupId());
+            model.getUser().setSubgroupId(view.getSubgroupId());
+
+            if(type == WINDOW_TYPE.ADD) {
+                model.addUser();
+            } else {
+                model.updateUser();
+            }
         }
         stage.close();
+    }
+
+    private boolean isValidInput() {
+        if(view.getUsername().trim().isEmpty()) {
+            new WarningController(stage, "Numele de utilizator nu poate sa ramana gol!");
+            return false;
+        }
+        if(view.getPassword().trim().isEmpty()) {
+            new WarningController(stage, "Parola nu poate sa ramana goala!");
+            return false;
+        }
+        if(view.getRoleId() == 0) {
+            new WarningController(stage, "Rolul utilizatorului nu poate ramane gol!");
+            return false;
+        }
+        return true;
+
     }
 }

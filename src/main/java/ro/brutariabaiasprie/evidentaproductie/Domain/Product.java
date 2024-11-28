@@ -7,20 +7,22 @@ public class Product {
     private String name;
     private String unitMeasurement;
     private Group group;
+    private int subgroupId;
 
     public Product() {
         this.id = 0;
         this.name = "";
         this.unitMeasurement = "";
         this.group = null;
+        this.subgroupId = 0;
     }
 
-
-    public Product(int id, String name, String unitMeasurement, Group group) {
+    public Product(int id, String name, String unitMeasurement, Group group, int subgroupId) {
         this.id = id;
         this.name = name;
         this.unitMeasurement = unitMeasurement;
         this.group = group;
+        this.subgroupId = subgroupId;
     }
 
     public int getId() {
@@ -55,16 +57,24 @@ public class Product {
         this.group = group;
     }
 
+    public int getSubgroupId() {
+        return subgroupId;
+    }
+
+    public void setSubgroupId(int subgroupId) {
+        this.subgroupId = subgroupId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return id == product.id && Objects.equals(name, product.name) && Objects.equals(unitMeasurement, product.unitMeasurement) && Objects.equals(group, product.group);
+        return id == product.id && subgroupId == product.subgroupId && Objects.equals(name, product.name) && Objects.equals(unitMeasurement, product.unitMeasurement) && Objects.equals(group, product.group);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, unitMeasurement, group);
+        return Objects.hash(id, name, unitMeasurement, group, subgroupId);
     }
 }

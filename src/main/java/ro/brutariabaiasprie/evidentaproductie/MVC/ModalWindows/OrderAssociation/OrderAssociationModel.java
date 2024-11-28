@@ -59,6 +59,7 @@ public class OrderAssociationModel {
                     "p.denumire, " +
                     "p.um, " +
                     "g.ID AS ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "g.denumire  AS denumire_grupa, " +
                     "c.cantitate, " +
                     "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
@@ -70,7 +71,7 @@ public class OrderAssociationModel {
                     "c.inchisa  " +
                     "FROM COMENZI c LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
-                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE g ON g.ID = p.ID_GRUPA " +
                     "WHERE p.ID = ? " +
                     whereCond +
                     "GROUP BY c.ID, " +
@@ -79,6 +80,7 @@ public class OrderAssociationModel {
                     "p.um, " +
                     "g.ID, " +
                     "g.denumire, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "c.cantitate, " +
                     "c.datasiora_i, " +
                     "c.ID_UTILIZATOR_I, " +
@@ -113,7 +115,8 @@ public class OrderAssociationModel {
                 resultSet.getInt("ID_PRODUS"),
                 resultSet.getString("denumire"),
                 resultSet.getString("um"),
-                group
+                group,
+                resultSet.getInt("ID_SUBGRUPA_PRODUSE")
         ));
         order.setQuantity(resultSet.getDouble("cantitate"));
         order.setCompleted(resultSet.getDouble("realizat"));

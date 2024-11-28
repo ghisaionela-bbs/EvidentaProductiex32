@@ -21,9 +21,14 @@ public class GroupModel {
     public void addGroup(String name) {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "INSERT INTO GRUPE (denumire) VALUES (?)";
+            String sql = "INSERT INTO GRUPE_PRODUSE (denumire, ID_GRUPA_PARINTE) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, name);
+            if(group.getParentGroupId() == 0) {
+                statement.setNull(2, Types.INTEGER);
+            } else {
+                statement.setInt(2, group.getParentGroupId());
+            }
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -34,7 +39,7 @@ public class GroupModel {
         try {
             Connection connection = DBConnectionService.getConnection();
 
-            String sqlDel = "DELETE FROM GRUPE WHERE ID = ?";
+            String sqlDel = "DELETE FROM GRUPE_PRODUSE WHERE ID = ?";
             PreparedStatement statementDel = connection.prepareStatement(sqlDel);
             statementDel.setInt(1, group.getId());
 
@@ -59,10 +64,15 @@ public class GroupModel {
     public void updateGroup() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "UPDATE GRUPE SET denumire = ? WHERE ID = ?";
+            String sql = "UPDATE GRUPE_PRODUSE SET denumire = ?, ID_GRUPA_PARINTE = ? WHERE ID = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, group.getName());
-            statement.setInt(2, getGroup().getId());
+            if(group.getParentGroupId() == 0) {
+                statement.setNull(2, Types.INTEGER);
+            } else {
+                statement.setInt(2, group.getParentGroupId());
+            }
+            statement.setInt(3, getGroup().getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

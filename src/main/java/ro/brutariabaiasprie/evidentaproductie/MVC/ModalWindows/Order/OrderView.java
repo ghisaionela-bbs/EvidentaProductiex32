@@ -19,6 +19,7 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +53,7 @@ public class OrderView extends Parent implements Builder<Region> {
         root.getCenter().getStyleClass().add("center");
         root.getBottom().getStyleClass().add("bottom");
         root.getStyleClass().add("modal-window");
+        root.getStyleClass().add("entry-view");
         return root;
     }
 
@@ -62,6 +64,7 @@ public class OrderView extends Parent implements Builder<Region> {
     private GridPane createContentSection() {
         // Title
         Label orderIdLabel  = new Label();
+        orderIdLabel.getStyleClass().add("title");
         // Product
         Label productLabel = new Label("Produs:");
         productComboBox = new ComboBox<>();
@@ -86,12 +89,27 @@ public class OrderView extends Parent implements Builder<Region> {
         productComboBox.setItems(model.getProducts());
         productComboBox.setMaxWidth(Double.MAX_VALUE);
         productComboBox.setPromptText("Selecteaza produsul");
+        VBox productSection = new VBox(productLabel, productComboBox);
+        productSection.getStyleClass().add("section");
+        productSection.getStyleClass().add("vbox-layout");
 
         Label quantityLabel = new Label("Cantitate");
         quantityTextField = createQuantityField();
+        VBox quantitySection = new VBox(quantityLabel, quantityTextField);
+        quantitySection.getStyleClass().add("section");
+        quantitySection.getStyleClass().add("vbox-layout");
 
         Label dateLabel = new Label();
         SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        DatePicker datePicker = new DatePicker(LocalDate.now());
+        VBox dateSection = new VBox(dateLabel, datePicker);
+        productSection.getStyleClass().add("section");
+        productSection.getStyleClass().add("vbox-layout");
+
+
+        Label hourLabel = new Label("Ora:");
+        TimePicker
+
 
         isClosedCheckBox = new CheckBox("Inchisa");
 
@@ -128,13 +146,11 @@ public class OrderView extends Parent implements Builder<Region> {
             deleteButton.setStyle("-fx-background-color: red;");
             GridPane.setHalignment(deleteButton, HPos.RIGHT);
             gridPane.add(deleteButton, 1, 0);
-            gridPane.add(isClosedCheckBox, 0, 6, 2, 1);
+            gridPane.add(isClosedCheckBox, 0, 4, 2, 1);
         }
-        gridPane.add(productLabel, 0, 1, 2, 1);
-        gridPane.add(productComboBox, 0, 2, 2, 1);
-        gridPane.add(quantityLabel, 0, 3, 2, 1);
-        gridPane.add(quantityTextField, 0, 4, 2, 1);
-        gridPane.add(numpad, 0, 5,2, 1);
+        gridPane.add(productSection, 0, 1, 2, 1);
+        gridPane.add(quantitySection, 0, 2, 2, 1);
+        gridPane.add(numpad, 0, 3,2, 1);
         GridPane.setHalignment(isClosedCheckBox, HPos.RIGHT);
         // adding constraints
         for (int i = 0 ; i < gridPane.getRowCount(); i++) {

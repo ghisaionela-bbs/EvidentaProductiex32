@@ -1,18 +1,14 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
+package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
-import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
-import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
-import java.sql.Timestamp;
 import java.util.function.Consumer;
 
 public class ManagerController implements SceneController {
@@ -26,16 +22,21 @@ public class ManagerController implements SceneController {
         Platform.runLater(() -> {
             model.loadProducts();
             model.loadOrders();
-            model.loadGroups();
+            model.loadGroups2();
             model.loadRecords();
+            model.loadUsers();
         });
         DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, ModifiedTableData>) change -> {
             if (change.wasAdded()) {
                 String key = change.getKey();
-                model.loadGroups();
-                model.loadProducts();
-                model.loadOrders();
-                model.loadRecords();
+                Platform.runLater(() -> {
+                    model.loadGroups2();
+                    model.loadProducts();
+                    model.loadOrders();
+                    model.loadRecords();
+                    model.loadUsers();
+                });
+
 //                switch (key) {
 //                    case "PRODUSE":
 //                        model.loadProducts();

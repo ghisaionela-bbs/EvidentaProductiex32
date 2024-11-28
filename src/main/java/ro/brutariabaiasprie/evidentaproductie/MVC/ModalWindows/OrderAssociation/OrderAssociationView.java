@@ -42,13 +42,13 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
         SceneButton confirmButton = new SceneButton("Confirma", ACTION_TYPE.CONFIRMATION);
         confirmButton.setOnAction(event -> actionHandler.accept(confirmButton.getActionType()));
 
-        SceneButton continueNoOrderButton = new SceneButton("Continua fara comanda", ACTION_TYPE.CONTINUATION);
-        continueNoOrderButton.setOnAction(event -> actionHandler.accept(continueNoOrderButton.getActionType()));
+//        SceneButton continueNoOrderButton = new SceneButton("Continua fara comanda", ACTION_TYPE.CONTINUATION);
+//        continueNoOrderButton.setOnAction(event -> actionHandler.accept(continueNoOrderButton.getActionType()));
 
         SceneButton cancelButton = new SceneButton("Anuleaza", ACTION_TYPE.CANCELLATION);
         cancelButton.setOnAction(event -> actionHandler.accept(cancelButton.getActionType()));
 
-        HBox buttonsContainer = new HBox(confirmButton, continueNoOrderButton, cancelButton);
+        HBox buttonsContainer = new HBox(confirmButton, cancelButton);
         buttonsContainer.setSpacing(8);
         buttonsContainer.setAlignment(Pos.CENTER);
         return buttonsContainer;

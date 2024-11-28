@@ -10,7 +10,9 @@ import javafx.scene.layout.*;
 import javafx.util.Builder;
 import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
+import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.UserRole;
@@ -27,9 +29,9 @@ public class UserView extends Parent implements Builder<Region> {
 
     private TextField usernameTextField;
     private PasswordField passwordField;
-    private ComboBox<UserRole> roleComboBox;
-    private ComboBox<Group> groupComboBox;
-    private ComboBox<Group> productGroupComboBox;
+    private ComboBox<UserRole> roleComboBox = new ComboBox<>();
+    final ComboBox<Group> groupComboBox = new ComboBox<>();
+    final ComboBox<Group> subgroupComboBox = new ComboBox<>();
 
     public UserView(UserModel model, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler) {
         this.model = model;
@@ -57,6 +59,10 @@ public class UserView extends Parent implements Builder<Region> {
         //  Title
         Label userIdLabel  = new Label();
         userIdLabel.getStyleClass().add("title");
+        userIdLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(userIdLabel, Priority.ALWAYS);
+        HBox titleContainer = new HBox(userIdLabel);
+        titleContainer.setAlignment(Pos.CENTER_LEFT);
 
         // Username section
         Label usernameLabel = new Label("Nume de utilizator:");
@@ -100,7 +106,6 @@ public class UserView extends Parent implements Builder<Region> {
         // Role section
         Label roleLabel = new Label("Rol utilizator:");
         roleLabel.setMaxWidth(Double.MAX_VALUE);
-        roleComboBox = new ComboBox<>();
         Callback<ListView<UserRole>, ListCell<UserRole>> roleCellFactory = new Callback<>() {
             @Override
             public ListCell<UserRole> call(ListView<UserRole> userRoleListView) {
@@ -109,28 +114,28 @@ public class UserView extends Parent implements Builder<Region> {
                     protected void updateItem(UserRole item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
-                            setText("Selectati rolul utilizatorului");
+                            setText("Fara rol");
                         } else {
-                            setText(item.getName() + "\nnivel de acces: " + item.getAccessLevel());
+                            setText(item.getName());
                         }
                     }
                 };
             }
         };
-        roleComboBox.setCellFactory(roleCellFactory);
-        roleComboBox.setButtonCell(roleCellFactory.call(null));
         roleComboBox.setItems(FXCollections.observableArrayList());
+        roleComboBox.setButtonCell(roleCellFactory.call(null));
+        roleComboBox.setCellFactory(roleCellFactory);
         roleComboBox.setMaxWidth(Double.MAX_VALUE);
+        roleComboBox.setPromptText("Selectati rolul");
         roleComboBox.setItems(model.getRoles());
         VBox roleSection = new VBox(roleLabel, roleComboBox);
         roleSection.getStyleClass().add("section");
         roleSection.getStyleClass().add("vbox-layout");
 
-        // Group section
-        Label groupLabel = new Label("Grupa utilizator:");
-        groupLabel.setMaxWidth(Double.MAX_VALUE);
-        groupComboBox = new ComboBox<>();
-        Callback<ListView<Group>, ListCell<Group>> groupCellFactory = new Callback<>() {
+        // User group section
+        Label userGroupLabel = new Label("Grupa produse:");
+        userGroupLabel.setMaxWidth(Double.MAX_VALUE);
+        Callback<ListView<Group>, ListCell<Group>> userGroupCellFactory = new Callback<>() {
             @Override
             public ListCell<Group> call(ListView<Group> l) {
                 return new ListCell<>() {
@@ -138,7 +143,7 @@ public class UserView extends Parent implements Builder<Region> {
                     protected void updateItem(Group item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
-                            setText("Selectati grupa de utilizatori");
+                            setText("Fara grupa");
                         } else {
                             if(item.getId() == 0) {
                                 setText(null);
@@ -150,26 +155,25 @@ public class UserView extends Parent implements Builder<Region> {
                 };
             }
         };
-        groupComboBox.setCellFactory(groupCellFactory);
-        groupComboBox.setButtonCell(groupCellFactory.call(null));
         groupComboBox.setItems(model.getGroups());
+        groupComboBox.setButtonCell(userGroupCellFactory.call(null));
+        groupComboBox.setCellFactory(userGroupCellFactory);
         groupComboBox.setMaxWidth(Double.MAX_VALUE);
-        VBox groupSection = new VBox(groupLabel, groupComboBox);
+        groupComboBox.setPromptText("Selectati grupa");
+        VBox groupSection = new VBox(userGroupLabel, groupComboBox);
         groupSection.getStyleClass().add("section");
         groupSection.getStyleClass().add("vbox-layout");
         // Product group section
         Label productGroupLabel = new Label("Grupa produse:");
         productGroupLabel.setMaxWidth(Double.MAX_VALUE);
-        productGroupComboBox = new ComboBox<>();
-        productGroupComboBox.setDisable(true);
+        subgroupComboBox.setDisable(true);
         groupComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             if(newValue == null) {
-                productGroupComboBox.setDisable(true);
+                subgroupComboBox.setDisable(true);
             } else {
-                productGroupComboBox.setDisable(false);
+                subgroupComboBox.setDisable(false);
             }
         });
-        model.getGroups().add(new Group(1, "Grupa 1"));
         Callback<ListView<Group>, ListCell<Group>> productGroupCellFactory = new Callback<>() {
             @Override
             public ListCell<Group> call(ListView<Group> l) {
@@ -178,10 +182,10 @@ public class UserView extends Parent implements Builder<Region> {
                     protected void updateItem(Group item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
-                            setText("Selectati grupul de produse");
+                            setText("Fara subgrupa");
                         } else {
                             if(item.getId() == 0) {
-                                setText(null);
+                                setText("Fara subgrupa");
                             } else {
                                 setText(item.getName());
                             }
@@ -190,12 +194,13 @@ public class UserView extends Parent implements Builder<Region> {
                 };
             }
         };
-        productGroupComboBox.setCellFactory(productGroupCellFactory);
-        productGroupComboBox.setButtonCell(productGroupCellFactory.call(null));
-        productGroupComboBox.setItems(model.getGroups());
-        productGroupComboBox.setMaxWidth(Double.MAX_VALUE);
-        productGroupComboBox.setItems(model.getProductGroups());
-        VBox productGroupSection = new VBox(productGroupLabel, productGroupComboBox);
+        subgroupComboBox.setCellFactory(productGroupCellFactory);
+        subgroupComboBox.setButtonCell(productGroupCellFactory.call(null));
+        subgroupComboBox.setItems(model.getGroups());
+        subgroupComboBox.setMaxWidth(Double.MAX_VALUE);
+        subgroupComboBox.setItems(model.getSubgroups());
+        subgroupComboBox.setPromptText("Selectati subgrupa");
+        VBox productGroupSection = new VBox(productGroupLabel, subgroupComboBox);
         productGroupSection.getStyleClass().add("section");
         productGroupSection.getStyleClass().add("vbox-layout");
 
@@ -207,12 +212,22 @@ public class UserView extends Parent implements Builder<Region> {
             case VIEW:
                 usernameTextField.setDisable(true);
                 passwordField.setDisable(true);
-                groupComboBox.setDisable(true);
                 roleComboBox.setDisable(true);
+                groupComboBox.setDisable(true);
+                subgroupComboBox.setDisable(true);
             case EDIT:
-                userIdLabel.setText("Utilizator " + model.getUser().getID());
+                userIdLabel.setText("Utilizator " + model.getUser().getId());
                 usernameTextField.setText(model.getUser().getUsername());
                 passwordField.setText(model.getUser().getPassword());
+                if(model.getUser().getRoleId() != 0) {
+                    roleComboBox.getSelectionModel().select(new UserRole(ACCESS_LEVEL.values()[model.getUser().getRoleId()]));
+                }
+                if(model.getUser().getGroupId() != 0) {
+                    groupComboBox.getSelectionModel().select(model.getGroup(model.getUser().getGroupId()));
+                }
+                if(model.getUser().getSubgroupId() != 0) {
+                    subgroupComboBox.getSelectionModel().select(model.getSubgroup(model.getUser().getSubgroupId()));
+                }
                 break;
         }
 
@@ -225,15 +240,14 @@ public class UserView extends Parent implements Builder<Region> {
             deleteButton.setOnAction(event -> deleteUserHandler.run());
             deleteButton.getStyleClass().add("filled-button");
             deleteButton.setStyle("-fx-background-color: red;");
-            GridPane.setHalignment(deleteButton, HPos.RIGHT);
-            gridPane.add(deleteButton, 4, 0);
+            titleContainer.getChildren().add(deleteButton);
         }
-        gridPane.add(userIdLabel, 0, 0, 2, 1);
+        gridPane.add(titleContainer, 0, 0, 2, 1);
         gridPane.add(usernameSection, 0, 1);
         gridPane.add(passwordSection, 1, 1);
-        gridPane.add(roleSection, 0, 2, 3, 1);
-        gridPane.add(groupSection, 0, 3, 3, 1);
-        gridPane.add(productGroupSection, 0, 4, 3, 1);
+        gridPane.add(roleSection, 0, 2, 2, 1);
+        gridPane.add(groupSection, 0, 3, 2, 1);
+        gridPane.add(productGroupSection, 0, 4, 2, 1);
         gridPane.getStyleClass().add("grid-layout");
 
 //        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
@@ -261,4 +275,61 @@ public class UserView extends Parent implements Builder<Region> {
         buttonsContainer.setAlignment(Pos.CENTER);
         return buttonsContainer;
     }
+
+    public String getUsername() {
+        return usernameTextField.getText();
+    }
+
+    public String getPassword() {
+        return passwordField.getText();
+    }
+
+    public int getRoleId() {
+        if (roleComboBox.getSelectionModel().getSelectedItem() == null) {
+            return 0;
+        }
+        return roleComboBox.getSelectionModel().getSelectedItem().getAccessLevel().getValue();
+    }
+
+    public int getGroupId() {
+        if (groupComboBox.getSelectionModel().getSelectedItem() == null) {
+            return 0;
+        }
+        return groupComboBox.getSelectionModel().getSelectedItem().getId();
+    }
+
+    public int getSubgroupId() {
+        if (subgroupComboBox.getSelectionModel().getSelectedItem() == null) {
+            return 0;
+        }
+        return subgroupComboBox.getSelectionModel().getSelectedItem().getId();
+    }
+
+    public void loadUserData() {
+        // Setting up the values and properties of controls
+        switch (type) {
+            case ADD:
+                break;
+            case VIEW:
+                usernameTextField.setDisable(true);
+                passwordField.setDisable(true);
+                roleComboBox.setDisable(true);
+                groupComboBox.setDisable(true);
+                subgroupComboBox.setDisable(true);
+            case EDIT:
+                usernameTextField.setText(model.getUser().getUsername());
+                passwordField.setText(model.getUser().getPassword());
+                if(model.getUser().getRoleId() != 0) {
+                    roleComboBox.getSelectionModel().select(new UserRole(ACCESS_LEVEL.values()[model.getUser().getRoleId()]));
+                }
+                if(model.getUser().getGroupId() != 0) {
+                    groupComboBox.getSelectionModel().select(model.getGroup(model.getUser().getGroupId()));
+                }
+                if(model.getUser().getSubgroupId() != 0) {
+                    subgroupComboBox.getSelectionModel().select(model.getSubgroup(model.getUser().getSubgroupId()));
+                }
+                break;
+        }
+    }
+
 }

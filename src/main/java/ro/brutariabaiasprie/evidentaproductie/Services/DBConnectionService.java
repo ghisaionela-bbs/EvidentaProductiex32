@@ -200,21 +200,12 @@ public class DBConnectionService {
         // Setting up the products groups table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE_PRODUSE](  " +
                 "[ID] [int] IDENTITY(1,1) NOT NULL, " +
-                "[denumire] [nvarchar](50) NOT NULL)")) {
+                "[denumire] [nvarchar](50) NOT NULL, " +
+                "[ID_GRUPA_PARINTE] [int] NULL)")) {
             statement.execute();
         }
         // Setting up the products groups table triggers
         createTableTriggers("GRUPE_PRODUSE");
-
-        // Setting up the groups associations table
-        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[ASOCIERI_GRUPE](  " +
-                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
-                "[ID_GRUPA_UTILIZATORI] [int] NOT NULL, " +
-                "[ID_GRUPA_PRODUS] [int] NOT NULL)")) {
-            statement.execute();
-        }
-        // Setting up the groups associations table triggers
-        createTableTriggers("ASOCIERI_GRUPE");
 
         // Setting up the products table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[PRODUSE](" +

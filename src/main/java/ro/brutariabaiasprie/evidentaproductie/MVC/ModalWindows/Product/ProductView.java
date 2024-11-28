@@ -7,12 +7,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
-import ro.brutariabaiasprie.evidentaproductie.DTO.GroupDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
 import java.util.function.Consumer;
@@ -30,7 +27,8 @@ public class ProductView extends Parent implements Builder<Region> {
 
     private TextArea productNameTextArea;
     private ToggleGroup unitMeasurementGroup;
-    private ComboBox<Group> groupComboBox;
+    final ComboBox<Group> groupComboBox = new ComboBox<>();
+    final ComboBox<Group> subgroupComboBox = new ComboBox<>();
 
     /***
      * Constructs the ProductView instance
@@ -50,11 +48,13 @@ public class ProductView extends Parent implements Builder<Region> {
     @Override
     public Region build() {
         BorderPane root = new BorderPane();
+        root.setMinWidth(500);
         root.setCenter(createContentSection());
         root.setBottom(createSceneButtons());
         root.getCenter().getStyleClass().add("center");
         root.getBottom().getStyleClass().add("bottom");
         root.getStyleClass().add("modal-window");
+        root.getStyleClass().add("entry-view");
         return root;
 
     }
@@ -66,12 +66,18 @@ public class ProductView extends Parent implements Builder<Region> {
     private GridPane createContentSection() {
         //  Title
         Label productIdLabel  = new Label();
-        // Name
+        productIdLabel.getStyleClass().add("title");
+
+        // Name section
         Label productNameLabel = new Label("Denumire:");
         productNameTextArea = new TextArea();
-        productNameTextArea.setPrefSize(400, 200);
+        productNameTextArea.setPrefSize(250, 100);
         productNameTextArea.setWrapText(true);
-        // Unit of measurement
+        VBox productNameSection = new VBox(productNameLabel, productNameTextArea);
+        productNameSection.getStyleClass().add("section");
+        productNameSection.getStyleClass().add("vbox-layout");
+
+        // Unit of measurement section
         Label unitMeasurementLabel = new Label("Unitatea de masura:");
         unitMeasurementGroup = new ToggleGroup();
         RadioButton kgRadioButton = new RadioButton("KG");
@@ -81,11 +87,14 @@ public class ProductView extends Parent implements Builder<Region> {
         bucRadioButton.setUserData("BUC");
         bucRadioButton.setToggleGroup(unitMeasurementGroup);
         HBox unitMeasurementChoiceBox = new HBox(kgRadioButton, bucRadioButton);
-        unitMeasurementChoiceBox.setSpacing(8);
-        // Group
+        unitMeasurementChoiceBox.setSpacing(16);
+        VBox unitMeasurementSection = new VBox(unitMeasurementLabel, unitMeasurementChoiceBox);
+        unitMeasurementSection.getStyleClass().add("section");
+        unitMeasurementSection.getStyleClass().add("vbox-layout");
+
+        // User group section
         Label groupLabel = new Label("Grupa:");
-        groupComboBox = new ComboBox<>();
-        Callback<ListView<Group>, ListCell<Group>> cellFactory = new Callback<>() {
+        Callback<ListView<Group>, ListCell<Group>> groupCellFactory = new Callback<>() {
             @Override
             public ListCell<Group> call(ListView<Group> l) {
                 return new ListCell<>() {
@@ -93,10 +102,10 @@ public class ProductView extends Parent implements Builder<Region> {
                     protected void updateItem(Group item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
-                            setText("Selectati grupa");
+                            setText(null);
                         } else {
                             if(item.getId() == 0) {
-                                setText(null);
+                                setText("Fara grupa");
                             } else {
                                 setText(item.getName());
                             }
@@ -105,10 +114,51 @@ public class ProductView extends Parent implements Builder<Region> {
                 };
             }
         };
-        groupComboBox.setCellFactory(cellFactory);
-        groupComboBox.setButtonCell(cellFactory.call(null));
+        groupComboBox.setCellFactory(groupCellFactory);
+        groupComboBox.setButtonCell(groupCellFactory.call(null));
         groupComboBox.setItems(model.getGroups());
         groupComboBox.setMaxWidth(Double.MAX_VALUE);
+        groupComboBox.setPromptText("Selectati grupa");
+        VBox groupSection = new VBox(groupLabel, groupComboBox);
+        groupSection.getStyleClass().add("section");
+        groupSection.getStyleClass().add("vbox-layout");
+
+        Label subgroupLabel = new Label("Subgrupa:");
+        Callback<ListView<Group>, ListCell<Group>> subgroupCellFactory = new Callback<>() {
+            @Override
+            public ListCell<Group> call(ListView<Group> l) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(Group item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText("Fara subgrupa");
+                        } else {
+                            if(item.getId() == 0) {
+                                setText("Fara subgrupa");
+                            } else {
+                                setText(item.getName());
+
+                            }
+                        }
+                    }
+                };
+            }
+        };
+        subgroupComboBox.setCellFactory(subgroupCellFactory);
+        subgroupComboBox.setButtonCell(subgroupCellFactory.call(null));
+        subgroupComboBox.setItems(model.getSubgroups());
+        subgroupComboBox.setMaxWidth(Double.MAX_VALUE);
+        subgroupComboBox.setPromptText("Selectati subgrupa");
+        subgroupComboBox.setDisable(true);
+        groupComboBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldGroup, newGroup) -> {
+            if(oldGroup != newGroup) {
+                subgroupComboBox.getSelectionModel().clearSelection();
+            }
+        });
+        VBox subgroupSection = new VBox(subgroupLabel, subgroupComboBox);
+        subgroupSection.getStyleClass().add("section");
+        subgroupSection.getStyleClass().add("vbox-layout");
 
         // Setting up the values and properties of controls
         switch (type) {
@@ -133,6 +183,9 @@ public class ProductView extends Parent implements Builder<Region> {
                         groupComboBox.getSelectionModel().select(model.getProduct().getGroup());
                     }
                 }
+                if(model.getProduct().getSubgroupId() != 0) {
+                    subgroupComboBox.getSelectionModel().select(model.getSubgroup(model.getProduct().getSubgroupId()));
+                }
                 break;
         }
 
@@ -147,20 +200,18 @@ public class ProductView extends Parent implements Builder<Region> {
             deleteButton.getStyleClass().add("filled-button");
             deleteButton.setStyle("-fx-background-color: red;");
             GridPane.setHalignment(deleteButton, HPos.RIGHT);
-            gridPane.add(deleteButton, 1, 0);
+            gridPane.add(deleteButton, 2, 0);
         }
-        gridPane.add(productNameLabel, 0, 1, 2, 1);
-        gridPane.add(productNameTextArea, 0, 2, 2, 1);
-        gridPane.add(unitMeasurementLabel, 0, 3, 2, 1);
-        gridPane.add(unitMeasurementChoiceBox, 0, 4, 2, 1);
-        gridPane.add(groupLabel, 0, 5);
-        gridPane.add(groupComboBox, 0, 6, 2, 1);
+        gridPane.add(productNameSection, 0, 1, 3, 1);
+        gridPane.add(unitMeasurementSection, 0, 2, 3, 1);
+        gridPane.add(groupSection, 0, 3, 3, 1);
+        gridPane.add(subgroupSection, 0, 4, 3, 1);
         // adding constraints
-        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
-            RowConstraints row = new RowConstraints();
-            row.setVgrow(Priority.ALWAYS);
-            gridPane.getRowConstraints().add(row);
-        }
+//        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
+//            RowConstraints row = new RowConstraints();
+//            row.setVgrow(Priority.ALWAYS);
+//            gridPane.getRowConstraints().add(row);
+//        }
         for (int j = 0 ; j < gridPane.getColumnCount(); j++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setHgrow(Priority.ALWAYS);
@@ -205,5 +256,33 @@ public class ProductView extends Parent implements Builder<Region> {
 
     public Group getGroup() {
         return groupComboBox.getValue();
+    }
+
+    public int getSubgroup() {
+        if(subgroupComboBox.getValue() == null) {
+            return 0;
+        }
+        return subgroupComboBox.getValue().getId();
+    }
+
+    public void loadProductData() {
+        // Setting up the values and properties of controls
+        switch (type) {
+            case ADD:
+                break;
+            case VIEW:
+                groupComboBox.setDisable(true);
+                subgroupComboBox.setDisable(true);
+            case EDIT:
+//                if(model.getProduct().getGroup() != null) {
+//                    if(model.getProduct().getGroup().getId() != 0) {
+//                        groupComboBox.getSelectionModel().select(model.getGroup(model.getUser().getGroupId()));
+//                    }
+//                }
+                if(model.getProduct().getSubgroupId() != 0) {
+                    subgroupComboBox.getSelectionModel().select(model.getSubgroup(model.getProduct().getSubgroupId()));
+                }
+                break;
+        }
     }
 }

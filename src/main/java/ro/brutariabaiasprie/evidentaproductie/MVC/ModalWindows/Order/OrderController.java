@@ -81,7 +81,6 @@ public class OrderController extends ModalWindow {
                 return;
             }
 
-
             if(type == WINDOW_TYPE.ADD) {
                 this.addOrder();
             } else if (type == WINDOW_TYPE.EDIT) {

@@ -58,6 +58,7 @@ public class ProductGroupView extends Parent implements Builder<Region> {
         Label nameLabel = new Label("Denumire:");
         nameTextArea = new TextArea();
         nameTextArea.setPrefSize(250, 150);
+        nameTextArea.setWrapText(true);
         VBox usernameSection = new VBox(nameLabel, nameTextArea);
         usernameSection.getStyleClass().add("section");
         usernameSection.getStyleClass().add("vbox-layout");
@@ -65,7 +66,7 @@ public class ProductGroupView extends Parent implements Builder<Region> {
         // Setting up the values and properties of controls
         switch (type) {
             case ADD:
-                groupIdLabel.setText("Adaugare grupa\nde produse noua");
+                groupIdLabel.setText("Adaugare grupa de produse noua");
                 break;
             case VIEW:
                 nameTextArea.setDisable(true);

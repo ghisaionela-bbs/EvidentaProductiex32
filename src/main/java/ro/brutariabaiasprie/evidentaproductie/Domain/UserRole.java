@@ -18,12 +18,11 @@ public class UserRole {
     private boolean editUsers = false;
     private String description = "";
 
-
     public UserRole(ACCESS_LEVEL ID_ROLE) {
         accessLevel = ID_ROLE;
         switch (ID_ROLE) {
             case ADMINISTRATOR:
-                name = "Administrator";
+                name = "Administrator aplicatie";
                 viewProductionTab = true;
                 editRecords = true;
                 viewAdminTab = true;
@@ -35,6 +34,8 @@ public class UserRole {
                 editGroups = true;
                 viewUsers = true;
                 editUsers = true;
+                description = "Are permisiuni nelimitate pentru administrarea operarii aplicatiei si a functionarii acesteia. " +
+                        "Poate interveni cand apar erori in aplicatie, ce tin de functionarea corecta a programului.";
                 break;
             case DIRECTOR:
                 name = "Director";
@@ -49,6 +50,8 @@ public class UserRole {
                 editGroups = true;
                 viewUsers = true;
                 editUsers = true;
+                description = "Are permisiuni nelimitate pentru administrarea operarii aplicatiei. " +
+                        "Poate interveni cand apar erori de operare a programului.";
                 break;
             case MANAGER:
                 name = "Tehnic";
@@ -58,13 +61,16 @@ public class UserRole {
                 viewOrders = true;
                 editOrders = true;
                 viewGroups = true;
-                editGroups = true;
+                description = "Are permisiuni limitate pentru administrarea operarii aplicatiei." +
+                        "Poate interveni cand apar unele erori de operare a programului";
                 break;
             case OPERATOR:
                 name = "Operator";
                 viewProductionTab = true;
                 viewAdminTab = true;
                 viewOrders = true;
+                description = "Are permisiuni limitate pentru operarea aplicatiei. " +
+                        "Poate vizualiza unele comenzi si realizari si poate introduce realizari";
                 break;
             default:
                 name = "Neautorizat";
@@ -126,5 +132,10 @@ public class UserRole {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

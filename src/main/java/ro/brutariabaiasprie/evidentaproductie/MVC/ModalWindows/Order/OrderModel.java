@@ -33,20 +33,26 @@ public class OrderModel {
         try {
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getID_GROUP() != 0) {
+            if(user.getGroupId() != 0) {
                 whereCond += "WHERE gp.ID = ? ";
             }
 
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT p.ID, p.denumire, p.UM, p.ID_GRUPA, gp.denumire AS denumire_grupa " +
+            String sql = "SELECT " +
+                    "p.ID, " +
+                    "p.denumire, " +
+                    "p.UM, " +
+                    "p.ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
+                    "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     whereCond +
                     "ORDER BY p.UM, p.denumire";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_GROUP() != 0) {
-                statement.setInt(1, user.getID_ROLE());
+            if(user.getGroupId() != 0) {
+                statement.setInt(1, user.getRoleId());
             }
             ResultSet resultSet = statement.executeQuery();
 
@@ -61,7 +67,8 @@ public class OrderModel {
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
                         resultSet.getString("um"),
-                        group
+                        group,
+                        resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 );
                 products.add(product);
             }
@@ -87,7 +94,7 @@ public class OrderModel {
             statement.setInt(1, order.getProduct().getId());
             statement.setDouble(2, order.getQuantity());
             statement.setTimestamp(3, timestamp);
-            statement.setInt(4, user.getID());
+            statement.setInt(4, user.getId());
             statement.setNull(5, Types.TIMESTAMP);
             statement.setNull(6, Types.INTEGER);
             statement.setBoolean(7, false);

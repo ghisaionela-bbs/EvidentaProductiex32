@@ -3,7 +3,6 @@ package ro.brutariabaiasprie.evidentaproductie.MVC;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
@@ -12,8 +11,7 @@ import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.DBConn.DBConnController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.MainWindowController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager.ManagerController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production.ProductionController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Production.ProductionController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn.UserConnController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
@@ -75,7 +73,7 @@ public class SceneFactory {
                 controller = new MainWindowController(primaryStage, this::disconnect);
                 break;
             case DEFAULT:
-                int user_role = ((User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name())).getID_ROLE();
+                int user_role = ((User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name())).getRoleId();
                 if(user_role == 1) {
                     controller = new ProductionController(primaryStage);
                 } else {

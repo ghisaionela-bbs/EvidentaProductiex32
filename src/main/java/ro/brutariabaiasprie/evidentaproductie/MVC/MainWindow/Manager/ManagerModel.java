@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Manager;
+package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +20,8 @@ public class ManagerModel {
     private final ObservableList<Order> orders = FXCollections.observableArrayList();
     private final ObservableList<Record> records = FXCollections.observableArrayList();
     private final ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<Group> groups2 = FXCollections.observableArrayList();
+
 
     public ManagerModel() {
         CONNECTED_USER = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
@@ -33,6 +35,9 @@ public class ManagerModel {
         return groups;
     }
 
+    public ObservableList<Group> getGroups2() {
+        return groups2;
+    }
 
     public User getCONNECTED_USER() {
         return CONNECTED_USER;
@@ -64,6 +69,7 @@ public class ManagerModel {
                     "p.denumire, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
@@ -87,7 +93,8 @@ public class ManagerModel {
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
                         resultSet.getString("um"),
-                        group
+                        group,
+                        resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 );
                 product.setGroup(group);
                 products.add(product);
@@ -103,7 +110,7 @@ public class ManagerModel {
 
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
                 whereCond = " AND r.ID_UTILIZATOR_I = ? ";
             }
 
@@ -127,8 +134,8 @@ public class ManagerModel {
                     "ORDER BY r.datasiora_i DESC ";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
-                statement.setInt(1, user.getID());
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
+                statement.setInt(1, user.getId());
             }
             ResultSet resultSet = statement.executeQuery();
             records.clear();
@@ -165,7 +172,7 @@ public class ManagerModel {
             User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             // if the user is not an adminstrator filter by the group of the user
             String whereCond = "";
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
                 whereCond += "WHERE gp.ID = ? ";
             }
 
@@ -175,6 +182,7 @@ public class ManagerModel {
                     "p.denumire, " +
                     "p.um, " +
                     "gp.ID AS ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "gp.denumire AS denumire_grupa, " +
                     "c.cantitate, " +
                     "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
@@ -194,6 +202,7 @@ public class ManagerModel {
                     "p.denumire, " +
                     "p.um, " +
                     "gp.ID, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "gp.denumire, " +
                     "c.cantitate, " +
                     "c.datasiora_i, " +
@@ -203,8 +212,8 @@ public class ManagerModel {
                     "c.inchisa " +
                     "ORDER BY c.datasiora_i ASC ";
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getID_ROLE() != 1 && user.getID_ROLE() != 2) {
-                statement.setInt(1, user.getID_GROUP());
+            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
+                statement.setInt(1, user.getGroupId());
             }
 
             ResultSet resultSet = statement.executeQuery();
@@ -223,7 +232,8 @@ public class ManagerModel {
                         resultSet.getInt("ID_PRODUS"),
                         resultSet.getString("denumire"),
                         resultSet.getString("um"),
-                        group
+                        group,
+                        resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 ));
                 order.setQuantity(resultSet.getDouble("cantitate"));
                 order.setCompleted(resultSet.getDouble("realizat"));
@@ -262,21 +272,72 @@ public class ManagerModel {
         }
     }
 
-    public void loadUsers() {
+    public void loadGroups2() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT * FROM UTILIZATORI";
+            String sql = "SELECT g.ID, g.denumire, g.ID_GRUPA_PARINTE, ( " +
+                    " CASE " +
+                    "    WHEN g.ID_GRUPA_PARINTE IS NULL THEN g.ID " +
+                    "    ELSE g.ID_GRUPA_PARINTE " +
+                    " END " +
+                    ") AS grupa FROM GRUPE_PRODUSE g " +
+                    "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID_GRUPA_PARINTE = g.ID " +
+                    "GROUP BY ( " +
+                    " CASE " +
+                    "    WHEN g.ID_GRUPA_PARINTE IS NULL THEN g.ID " +
+                    "    ELSE g.ID_GRUPA_PARINTE " +
+                    " END " +
+                    "), g.ID, g.denumire, g.ID_GRUPA_PARINTE " +
+                    "ORDER BY grupa ASC, g.ID_GRUPA_PARINTE ASC, g.denumire ASC ";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
 
+            groups2.clear();
+            while (resultSet.next()) {
+                int parentGroupId = resultSet.getInt("ID_GRUPA_PARINTE");
+                Group group = null;
+                if(resultSet.wasNull()) {
+                    group = new Group(
+                            resultSet.getInt("ID"),
+                            resultSet.getString("denumire")
+                    );
+                } else {
+                    group = new Group(
+                            resultSet.getInt("ID"),
+                            resultSet.getString("denumire"),
+                            parentGroupId
+                    );
+                }
+                groups2.add(group);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadUsers() {
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT " +
+                    "ID, " +
+                    "ID_ROL, " +
+                    "nume_utilizator, " +
+                    "parola, " +
+                    "ID_GRUPA, " +
+                    "ID_SUBGRUPA_PRODUSE " +
+                    "FROM UTILIZATORI";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
             users.clear();
             while (resultSet.next()) {
                 User user = new User();
-                user.setID(resultSet.getInt("ID"));
-                user.setID_ROLE(resultSet.getInt("ID_ROL"));
+                user.setId(resultSet.getInt("ID"));
+                user.setRoleId(resultSet.getInt("ID_ROL"));
                 user.setUsername(resultSet.getString("nume_utilizator"));
                 user.setPassword(resultSet.getString("parola"));
-                user.setID_ROLE(resultSet.getInt("ID_GRUPA"));
+                user.setGroupId(resultSet.getInt("ID_GRUPA"));
+                user.setSubgroupId(resultSet.getInt("ID_SUBGRUPA_PRODUSE"));
                 users.add(user);
             }
         } catch (SQLException e) {

@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Production;
+package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Production;
 
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
@@ -11,13 +11,10 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.OrderAssociationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
-
-import java.sql.Timestamp;
 
 public class ProductionController implements SceneController {
     private final ProductionView view;
@@ -48,7 +45,7 @@ public class ProductionController implements SceneController {
                                 // Update the product
                                 model.loadSelectedProduct();
                                 // When the user is not an administrator check the group of the product
-                                if(user.getID_ROLE() != 1 || user.getID_ROLE() != 2) {
+                                if(user.getRoleId() != 1 || user.getRoleId() != 2) {
                                     if(model.getSelectedProduct().getGroup() == null) {
                                         model.setSelectedProduct(null);
                                         model.setAssociatedOrder(null);
