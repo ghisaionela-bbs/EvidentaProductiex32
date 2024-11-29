@@ -188,12 +188,12 @@ public class DBConnectionService {
                 "[row_id] [int] NOT NULL) ")) {
             statement.execute();
         }
-        // Setting up the users groups table
-        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE_UTILIZATORI](  " +
-                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
-                "[denumire] [nvarchar](50) NOT NULL)")) {
-            statement.execute();
-        }
+//        // Setting up the users groups table
+//        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE_UTILIZATORI](  " +
+//                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+//                "[denumire] [nvarchar](50) NOT NULL)")) {
+//            statement.execute();
+//        }
         // Setting up the users groups table triggers
         createTableTriggers("GRUPE_UTILIZATORI");
 
@@ -233,6 +233,7 @@ public class DBConnectionService {
         // Setting up the orders table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[COMENZI](  " +
                 "[ID] [int] IDENTITY(1,1) NOT NULL," +
+                "[data_programata] [datetime] NOT NULL DEFAULT GETDATE(), " +
                 "[ID_PRODUS] [int] NOT NULL," +
                 "[cantitate] [decimal](38, 2) NOT NULL," +
                 "[datasiora_i] [datetime] NOT NULL," +

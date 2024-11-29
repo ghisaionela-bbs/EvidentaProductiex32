@@ -122,7 +122,7 @@ public class RecordModel {
             // if the user is not an adminstrator filter by the group of the user
             String whereCond = "";
             if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                whereCond += "g.ID = ? ";
+                whereCond += " AND g.ID = ? ";
             }
 
             Connection connection = DBConnectionService.getConnection();
@@ -144,10 +144,11 @@ public class RecordModel {
                     "FROM COMENZI c " +
                     "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
-                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE g ON g.ID = p.ID_GRUPA " +
                     "WHERE 1=1 AND p.ID = c.ID_PRODUS " +
                     whereCond +
                     "GROUP BY c.ID, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.um, " +

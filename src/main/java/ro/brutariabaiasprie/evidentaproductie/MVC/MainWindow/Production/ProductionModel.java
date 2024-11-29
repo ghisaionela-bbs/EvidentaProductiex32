@@ -29,10 +29,19 @@ public class ProductionModel {
         try {
             Connection connection = DBConnectionService.getConnection();
 
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                whereCond = "WHERE r.ID_UTILIZATOR_I = ? ";
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    whereCond += "WHERE g.ID = ? ";
+                    break;
+                case OPERATOR:
+                    whereCond += "WHERE r.ID_UTILIZATOR_I = ? ";
+                    break;
+                case UNAUTHORIZED:
+                    whereCond += "WHERE 1=0 ";
             }
 
             String sql = " SELECT TOP 100 " +
@@ -42,6 +51,7 @@ public class ProductionModel {
                     "p.um, " +
                     "p.ID_GRUPA, " +
                     "g.denumire AS denumire_grupa, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "r.cantitate, " +
                     "r.datasiora_i, " +
                     "r.ID_UTILIZATOR_I, " +
@@ -49,14 +59,26 @@ public class ProductionModel {
                     "r.ID_UTILIZATOR_M " +
                     "FROM REALIZARI r " +
                     "LEFT JOIN PRODUSE p ON p.ID = r.ID_PRODUS " +
-                    "LEFT JOIN GRUPE_UTILIZATORI g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
                     whereCond +
                     "ORDER BY r.datasiora_i DESC ";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                statement.setInt(1, user.getId());
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    break;
+                case OPERATOR:
+                    statement.setInt(1, ConfigApp.getUser().getId());
+                    break;
+                case UNAUTHORIZED:
+                    break;
             }
+
             ResultSet resultSet = statement.executeQuery();
             records.clear();
             while (resultSet.next()) {
@@ -70,6 +92,7 @@ public class ProductionModel {
                 product.setName(resultSet.getString("denumire"));
                 product.setUnitMeasurement(resultSet.getString("um"));
                 product.setGroup(group);
+                product.setSubgroupId(resultSet.getInt("ID_SUBGRUPA_PRODUSE"));
 
                 Record record = new Record();
                 record.setId(resultSet.getInt("ID"));
@@ -129,10 +152,19 @@ public class ProductionModel {
 
     public void loadProducts() {
         try {
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
             String whereCond = "";
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                whereCond = "WHERE p.ID_GRUPA = ? ";
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    whereCond += "WHERE gp.ID = ? ";
+                    break;
+                case OPERATOR:
+                    whereCond += "WHERE gp.ID = ? AND subg.ID = ? ";
+                    break;
+                case UNAUTHORIZED:
+                    whereCond += "WHERE 1=0 ";
             }
 
             Connection connection = DBConnectionService.getConnection();
@@ -145,11 +177,23 @@ public class ProductionModel {
                     "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
                     whereCond +
                     "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                statement.setInt(1, user.getGroupId());
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    break;
+                case OPERATOR:
+                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    statement.setInt(2, ConfigApp.getUser().getSubgroupId());
+                    break;
+                case UNAUTHORIZED:
+                    break;
             }
             ResultSet resultSet = statement.executeQuery();
 

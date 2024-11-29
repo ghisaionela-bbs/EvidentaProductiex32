@@ -13,6 +13,7 @@ public class Order {
     private Timestamp dateTimeModified;
     private int userIdModified;
     private boolean closed;
+    private Timestamp dateScheduled;
 
     public int getId() {
         return id;
@@ -92,5 +93,13 @@ public class Order {
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public Timestamp getDateScheduled() {
+        return dateScheduled;
+    }
+
+    public void setDateScheduled(Timestamp dateScheduled) {
+        this.dateScheduled = dateScheduled;
     }
 }

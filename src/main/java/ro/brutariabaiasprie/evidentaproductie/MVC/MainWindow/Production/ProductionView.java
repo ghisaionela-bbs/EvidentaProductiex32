@@ -148,7 +148,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         selectedProductNameLabel.setWrapText(true);
 
         orderLabel = new Label();
-        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
         orderLabel.textProperty().bind(Bindings.createStringBinding(() ->
                 {
                     if(model.getAssociatedOrder() == null) {
@@ -465,7 +465,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         });
         tableView.getColumns().add(quantityColumn);
 
-        if(user.getRoleId() == 1 || user.getRoleId() == 2) {
+        if(ConfigApp.getRole().canEditRecords()) {
             TableColumn<Record, Integer> editBtnColumn = new TableColumn<>();
             editBtnColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
             editBtnColumn.setCellFactory(column -> new TableCell<>() {
@@ -491,10 +491,18 @@ public class ProductionView extends Parent implements Builder<Region> {
                 }
             });
             tableView.getColumns().add(editBtnColumn);
+            editBtnColumn.setPrefWidth(64);
         }
 
+        dateAndTimeColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
+        if(ConfigApp.getRole().canEditRecords()) {
+            nameColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.5).subtract(64));
+        } else {
+            nameColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.5));
+        }
+        quantityColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.25));
 
-        tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+//        tableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 
         tableView.getStyleClass().add("main-table-view");
         tableView.setItems(model.getRecords());

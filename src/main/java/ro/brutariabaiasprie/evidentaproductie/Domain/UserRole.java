@@ -60,7 +60,6 @@ public class UserRole {
                 viewAdminTab = true;
                 viewOrders = true;
                 editOrders = true;
-                viewGroups = true;
                 description = "Are permisiuni limitate pentru administrarea operarii aplicatiei." +
                         "Poate interveni cand apar unele erori de operare a programului";
                 break;

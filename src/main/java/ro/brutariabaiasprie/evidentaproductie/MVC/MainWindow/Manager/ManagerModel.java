@@ -2,6 +2,7 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
@@ -169,11 +170,19 @@ public class ManagerModel {
 
     public void loadOrders() {
         try {
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-            // if the user is not an adminstrator filter by the group of the user
             String whereCond = "";
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                whereCond += "WHERE gp.ID = ? ";
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    whereCond += "WHERE gp.ID = ? ";
+                    break;
+                case OPERATOR:
+                    whereCond += "WHERE gp.ID = ? AND subg.ID = ? AND c.inchisa = 0 ";
+                    break;
+                case UNAUTHORIZED:
+                    whereCond += "WHERE 1=0 ";
             }
 
             Connection connection = DBConnectionService.getConnection();
@@ -184,6 +193,7 @@ public class ManagerModel {
                     "gp.ID AS ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
                     "gp.denumire AS denumire_grupa, " +
+                    "c.data_programata, " +
                     "c.cantitate, " +
                     "SUM(COALESCE(r.cantitate, 0.00)) AS realizat, " +
                     "c.cantitate - SUM(COALESCE(r.cantitate, 0.00)) AS rest, " +
@@ -196,8 +206,10 @@ public class ManagerModel {
                     "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
                     whereCond +
                     "GROUP BY c.ID, " +
+                    "c.data_programata, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.um, " +
@@ -210,12 +222,23 @@ public class ManagerModel {
                     "c.datasiora_m, " +
                     "c.ID_UTILIZATOR_M, " +
                     "c.inchisa " +
-                    "ORDER BY c.datasiora_i ASC ";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                statement.setInt(1, user.getGroupId());
-            }
+                    "ORDER BY c.data_programata ASC ";
 
+            PreparedStatement statement = connection.prepareStatement(sql);
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    break;
+                case OPERATOR:
+                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    statement.setInt(2, ConfigApp.getUser().getSubgroupId());
+                    break;
+                case UNAUTHORIZED:
+                    break;
+            }
             ResultSet resultSet = statement.executeQuery();
 
             orders.clear();
@@ -235,6 +258,7 @@ public class ManagerModel {
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 ));
+                order.setDateScheduled(resultSet.getTimestamp("data_programata"));
                 order.setQuantity(resultSet.getDouble("cantitate"));
                 order.setCompleted(resultSet.getDouble("realizat"));
                 order.setRemainder(resultSet.getDouble("rest"));

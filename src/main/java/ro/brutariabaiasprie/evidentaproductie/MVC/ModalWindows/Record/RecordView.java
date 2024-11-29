@@ -52,6 +52,7 @@ public class RecordView extends Parent implements Builder<Region> {
     private GridPane createContentSection() {
         //  Title
         Label recordIdLabel  = new Label();
+        recordIdLabel.getStyleClass().add("title");
         // Name
         Label productLabel = new Label("Produs:");
         productComboBox = new ComboBox<>();
@@ -76,6 +77,9 @@ public class RecordView extends Parent implements Builder<Region> {
         productComboBox.setItems(model.getProducts());
         productComboBox.setMaxWidth(Double.MAX_VALUE);
         productComboBox.setPromptText("Selecteaza produsul");
+        VBox productSection = new VBox(productLabel, productComboBox);
+        productSection.getStyleClass().add("section");
+        productSection.getStyleClass().add("vbox-layout");
 
         Label quantityLabel = new Label("Cantitate:");
         quantityTextField = createQuantityField();
@@ -88,7 +92,7 @@ public class RecordView extends Parent implements Builder<Region> {
         GridPane.setHalignment(editOrderButton, HPos.RIGHT);
 
         Label dateLabel = new Label();
-        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
 
         // Setting up the values and properties of controls
         switch (type) {
@@ -113,8 +117,7 @@ public class RecordView extends Parent implements Builder<Region> {
         gridPane.getStyleClass().add("grid-form");
         // Adding the controls
         gridPane.add(recordIdLabel, 0, 0, 2, 1);
-        gridPane.add(productLabel, 0, 1, 2, 1);
-        gridPane.add(productComboBox, 0, 2, 2, 1);
+        gridPane.add(productSection, 0, 1, 2, 1);
         gridPane.add(orderLabel, 0, 3);
         gridPane.add(editOrderButton, 1,3);
         gridPane.add(quantityLabel, 0, 4, 2, 1);

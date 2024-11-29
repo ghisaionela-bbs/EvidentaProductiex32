@@ -63,31 +63,31 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
         ordersTableView.setPlaceholder(new Label("Nu exista comenzi."));
         VBox.setVgrow(ordersTableView, Priority.ALWAYS);
 
-        TableColumn<Order, Boolean> isClosedColumn = new TableColumn<>();
-        isClosedColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().isClosed()));
-        isClosedColumn.setCellFactory(column -> new TableCell<>() {
-            final FontIcon fontIcon = new FontIcon("mdi2l-lock");
-            @Override
-            protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(null);
-                    if(item) {
-                        setGraphic(fontIcon);
-                        setStyle("-fx-alignment: CENTER;");
-                    } else {
-                        setGraphic(null);
-                    }
+//        TableColumn<Order, Boolean> isClosedColumn = new TableColumn<>();
+//        isClosedColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().isClosed()));
+//        isClosedColumn.setCellFactory(column -> new TableCell<>() {
+//            final FontIcon fontIcon = new FontIcon("mdi2l-lock");
+//            @Override
+//            protected void updateItem(Boolean item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if (empty) {
+//                    setText(null);
+//                    setGraphic(null);
+//                } else {
+//                    setText(null);
+//                    if(item) {
+//                        setGraphic(fontIcon);
+//                        setStyle("-fx-alignment: CENTER;");
+//                    } else {
+//                        setGraphic(null);
+//                    }
+//
+//                }
+//            }
+//        });
+//        ordersTableView.getColumns().add(isClosedColumn);
 
-                }
-            }
-        });
-        ordersTableView.getColumns().add(isClosedColumn);
-
-        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Comanda");
+        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Nr");
         orderIDColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
         orderIDColumn.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -194,11 +194,10 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
             }
         });
 
-        TableColumn<Order, String> productUnitMeasurementColumn = new TableColumn<>("UM");
-        productUnitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getUnitMeasurement()));
-        ordersTableView.getColumns().add(productUnitMeasurementColumn);
-
-        ordersTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+//        TableColumn<Order, String> productUnitMeasurementColumn = new TableColumn<>("UM");
+//        productUnitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getUnitMeasurement()));
+//        ordersTableView.getColumns().add(productUnitMeasurementColumn);
+        orderIDColumn.prefWidthProperty().set(100);
 
         ordersTableView.setItems(model.getOrders());
         ordersTableView.getStyleClass().add("main-table-view");

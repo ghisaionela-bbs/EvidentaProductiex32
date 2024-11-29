@@ -38,7 +38,7 @@ public class OrderController extends ModalWindow {
         this.model = new OrderModel();
         this.model.setOrder(order);
         this.runDatabaseTask(model::loadProducts);
-        this.view = new OrderView(this.model, type, this::onWindowAction);
+        this.view = new OrderView(this.stage, this.model, type, this::onWindowAction);
         this.view.setDeleteOrderHandler(this::deleteOrder);
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
@@ -94,6 +94,7 @@ public class OrderController extends ModalWindow {
         model.getOrder().setProduct(view.getProduct());
         model.getOrder().setQuantity(Double.parseDouble(view.getQuantityInput()));
         model.getOrder().setClosed(view.isClosed());
+        model.getOrder().setDateScheduled(view.getDateScheduled());
         model.addOrder();
     }
 
@@ -101,6 +102,7 @@ public class OrderController extends ModalWindow {
         model.getOrder().setProduct(view.getProduct());
         model.getOrder().setQuantity(Double.parseDouble(view.getQuantityInput()));
         model.getOrder().setClosed(view.isClosed());
+        model.getOrder().setDateScheduled(view.getDateScheduled());
 
         if(model.hasRecords()) {
             if(model.getOrder().getProduct() != view.getProduct()) {

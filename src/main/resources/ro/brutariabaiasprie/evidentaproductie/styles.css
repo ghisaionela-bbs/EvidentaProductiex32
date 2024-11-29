@@ -265,7 +265,7 @@
     -fx-border-color: transparent;
 }
 .modal-window.entry-view .text-area:focused {
-    -fx-text-fill: #59BDFF;
+    /*-fx-text-fill: #59BDFF;*/
     -fx-border-color: #59BDFF;
 }
 .modal-window.entry-view .text-area:focused .content{
@@ -280,7 +280,7 @@
     -fx-background-color: #fffbfa;
     -fx-border-style: hidden hidden solid hidden;
     -fx-border-color: #59BDFF;
-    -fx-text-fill: #59BDFF;
+    /*-fx-text-fill: #59BDFF;*/
 }
 
 .modal-window.entry-view .radio-button .radio {
@@ -615,13 +615,15 @@
 }
 
 .numpad .button {
-    -fx-font-size: 2em;
+    -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-background-color: COLOR_WHITE;
     -fx-text-fill: COLOR_DARK_BROWN_80;
     -fx-border-radius: 1em;
     -fx-border-color: COLOR_DARK_BROWN_50;
     -fx-background-radius: 1em;
+    -fx-min-width: 80;
+    -fx-min-height: 60;
 }
 .numpad .button .ikonli-font-icon {
      -fx-icon-color: COLOR_DARK_BROWN_80;

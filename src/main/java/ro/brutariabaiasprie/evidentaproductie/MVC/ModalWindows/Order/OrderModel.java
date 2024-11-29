@@ -31,10 +31,22 @@ public class OrderModel {
 
     public void loadProducts() {
         try {
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+//            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+//            String whereCond = "";
+//            if(user.getGroupId() != 0) {
+//                whereCond += "WHERE gp.ID = ? ";
+//            }
             String whereCond = "";
-            if(user.getGroupId() != 0) {
-                whereCond += "WHERE gp.ID = ? ";
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    whereCond += "WHERE gp.ID = ? ";
+                    break;
+                case OPERATOR:
+                case UNAUTHORIZED:
+                    whereCond += "WHERE 1=0 ";
             }
 
             Connection connection = DBConnectionService.getConnection();
@@ -51,8 +63,16 @@ public class OrderModel {
                     "ORDER BY p.UM, p.denumire";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getGroupId() != 0) {
-                statement.setInt(1, user.getRoleId());
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    break;
+                case OPERATOR:
+                case UNAUTHORIZED:
+                    break;
             }
             ResultSet resultSet = statement.executeQuery();
 
@@ -87,17 +107,18 @@ public class OrderModel {
             Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
             String sql = "INSERT INTO COMENZI " +
-                    "(ID_PRODUS, cantitate, datasiora_i, ID_UTILIZATOR_I, datasiora_m, ID_UTILIZATOR_M, inchisa) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    "(data_programata, ID_PRODUS, cantitate, datasiora_i, ID_UTILIZATOR_I, datasiora_m, ID_UTILIZATOR_M, inchisa) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setInt(1, order.getProduct().getId());
-            statement.setDouble(2, order.getQuantity());
-            statement.setTimestamp(3, timestamp);
-            statement.setInt(4, user.getId());
-            statement.setNull(5, Types.TIMESTAMP);
-            statement.setNull(6, Types.INTEGER);
-            statement.setBoolean(7, false);
+            statement.setTimestamp(1, order.getDateScheduled());
+            statement.setInt(2, order.getProduct().getId());
+            statement.setDouble(3, order.getQuantity());
+            statement.setTimestamp(4, timestamp);
+            statement.setInt(5, user.getId());
+            statement.setNull(6, Types.TIMESTAMP);
+            statement.setNull(7, Types.INTEGER);
+            statement.setBoolean(8, false);
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -109,6 +130,7 @@ public class OrderModel {
             Connection connection = DBConnectionService.getConnection();
             String sql = "UPDATE COMENZI SET " +
                     "ID_PRODUS = ?, " +
+                    "data_programata = ?, " +
                     "cantitate = ?, " +
                     "datasiora_i = ?, " +
                     "ID_UTILIZATOR_I = ?, " +
@@ -118,21 +140,22 @@ public class OrderModel {
                     "WHERE ID = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, order.getProduct().getId());
-            statement.setDouble(2, order.getQuantity());
-            statement.setTimestamp(3, order.getDateTimeInserted());
-            statement.setInt(4, order.getUserIdInserted());
+            statement.setTimestamp(2, order.getDateScheduled());
+            statement.setDouble(3, order.getQuantity());
+            statement.setTimestamp(4, order.getDateTimeInserted());
+            statement.setInt(5, order.getUserIdInserted());
             if(order.getDateTimeModified() == null) {
-                statement.setNull(5, Types.TIMESTAMP);
+                statement.setNull(6, Types.TIMESTAMP);
             } else {
-                statement.setTimestamp(5, order.getDateTimeModified());
+                statement.setTimestamp(6, order.getDateTimeModified());
             }
             if(order.getUserIdModified() == 0) {
-                statement.setNull(6, Types.INTEGER);
+                statement.setNull(7, Types.INTEGER);
             } else {
-                statement.setInt(6, order.getUserIdModified());
+                statement.setInt(7, order.getUserIdModified());
             }
-            statement.setBoolean(7, order.isClosed());
-            statement.setInt(8, order.getId());
+            statement.setBoolean(8, order.isClosed());
+            statement.setInt(9, order.getId());
             statement.executeUpdate();
 
             if(withDissociation) {

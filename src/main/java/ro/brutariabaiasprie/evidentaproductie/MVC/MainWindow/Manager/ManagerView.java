@@ -193,7 +193,10 @@ public class ManagerView extends Parent implements Builder<Region> {
 
                         editButton.setGraphic(fontIcon);
                         editButton.getStyleClass().add("filled-button");
-                        editButton.setOnAction(event -> new ProductController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                        editButton.setOnAction(event -> {
+                            productsTableView.getSelectionModel().select(getIndex());
+                            new ProductController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem());
+                        });
                         setGraphic(editButton);
                         setStyle("-fx-alignment:  TOP-RIGHT;");
                     }
@@ -294,7 +297,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         });
         ordersTableView.getColumns().add(isClosedColumn);
 
-        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Comanda");
+        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Nr");
         orderIDColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
         orderIDColumn.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -314,10 +317,10 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTableView.getColumns().add(orderIDColumn);
 
 
-        TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Plasata la");
-        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
+        TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Programata:");
+        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateScheduled()));
         ordersTableView.getColumns().add(dateTimeColumn);
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm dd/MM/yyyy");
         dateTimeColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Timestamp item, boolean empty) {
@@ -462,8 +465,15 @@ public class ManagerView extends Parent implements Builder<Region> {
         }
         ordersTableView.getColumns().add(actionBtnColumn);
 
-
-        ordersTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+        isClosedColumn.prefWidthProperty().set(64);
+        orderIDColumn.prefWidthProperty().set(64);
+        dateTimeColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+        productNameColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.5).subtract(192));
+        quantityColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+        completedColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+        remainderColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+        actionBtnColumn.prefWidthProperty().set(64);
+//        ordersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY );
 
         ordersTableView.setItems(model.getOrders());
         ordersTableView.getStyleClass().add("main-table-view");
@@ -870,7 +880,10 @@ public class ManagerView extends Parent implements Builder<Region> {
 
                     editButton.setGraphic(fontIcon);
                     editButton.getStyleClass().add("filled-button");
-                    editButton.setOnAction(event -> new UserController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
+                    editButton.setOnAction(event -> {
+                        tableView.getSelectionModel().select(getIndex());
+                        new UserController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem());
+                    });
                     setGraphic(editButton);
                     setStyle("-fx-alignment:  TOP-RIGHT;");
                 }
