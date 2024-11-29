@@ -125,6 +125,7 @@ public class OrderAssociationController extends ModalWindow{
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
         this.stage.setTitle("Va rugam asteptati");
         this.stage.setScene(scene);
+        this.stage.setMaximized(true);
         this.stage.initModality(Modality.APPLICATION_MODAL);
         Image icon16x16 = new Image("app-icon-16x16.png");
         Image icon32x32 = new Image("app-icon-32x32.png");

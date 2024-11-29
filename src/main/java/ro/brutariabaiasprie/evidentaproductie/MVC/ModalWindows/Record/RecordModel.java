@@ -75,22 +75,49 @@ public class RecordModel {
 
     public void loadProducts() {
         try {
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+//            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+//            String whereCond = "";
+//            if(user.getGroupId() != 0) {
+//                whereCond += "WHERE g.ID = ? ";
+//            }
+
             String whereCond = "";
-            if(user.getGroupId() != 0) {
-                whereCond += "WHERE g.ID = ? ";
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    whereCond += "WHERE gp.ID = ? ";
+                    break;
+                case OPERATOR:
+                case UNAUTHORIZED:
+                    whereCond += "WHERE 1=0 ";
             }
 
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT p.ID, p.denumire, p.UM, p.ID_GRUPA, p.ID_SUBGRUPA_PRODUSE, g.denumire AS denumire_grupa " +
+            String sql = "SELECT " +
+                    "p.ID, " +
+                    "p.denumire, " +
+                    "p.UM, " +
+                    "p.ID_GRUPA, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
+                    "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
-                    "LEFT JOIN GRUPE_PRODUSE g ON p.ID_GRUPA = g.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     whereCond +
                     "ORDER BY p.UM, p.denumire";
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getGroupId() != 0) {
-                statement.setInt(1, user.getRoleId());
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                case DIRECTOR:
+                    break;
+                case MANAGER:
+                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    break;
+                case OPERATOR:
+                case UNAUTHORIZED:
+                    break;
             }
             ResultSet resultSet = statement.executeQuery();
 

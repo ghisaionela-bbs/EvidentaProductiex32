@@ -20,6 +20,7 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.Excel
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderImport.OrderImportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ProductGroup.ProductGroupController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Record.RecordController;
@@ -36,9 +37,9 @@ public class ManagerView extends Parent implements Builder<Region> {
     //products tab
     private Button addProductButton;
     private Button importProductsButton;
-
     //orders tab
     private Button addOrderButton;
+    private Button importOrderButton;
     private Button excelExportButton;
 
     public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler) {
@@ -241,6 +242,22 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         sectionHeaderContainer.getChildren().addAll(ordersSectionTitle);
 
+//        addProductButton = new Button();
+//        addProductButton.setOnAction(event -> new ProductController(stage));
+//
+//        importProductsButton = new Button();
+//        importProductsButton.setOnAction(event -> new ExcelImportController(stage));
+//        importProductsButton.setTooltip(new Tooltip("Importa produse dintr-un fisier excel."));
+//        if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
+//            addProductButton.setText("➕");
+//            importProductsButton.setText("\uD83D\uDCE5");
+//        } else {
+//            addProductButton.setText("➕ Adauga un produs");
+//            importProductsButton.setText("Importa produse \uD83D\uDCE5");
+//        }
+//        addProductButton.getStyleClass().add("ghost-button");
+//        importProductsButton.getStyleClass().add("ghost-button");
+
         if(ConfigApp.getRole().canEditOrders()) {
             addOrderButton = new Button();
             addOrderButton.setOnAction(event -> {
@@ -250,6 +267,12 @@ public class ManagerView extends Parent implements Builder<Region> {
             excelExportButton.setOnAction(event -> {
                 ExcelExportController excelExportController = new ExcelExportController(stage);
             });
+            importOrderButton = new Button("Importa comenzi");
+            importOrderButton.setOnAction(event -> {
+                new OrderImportController(stage);
+            });
+            importOrderButton.setGraphic(new FontIcon("mdi2a-application-import"));
+            importOrderButton.getStyleClass().add("ghost-button");
 
             excelExportButton.setTooltip(new Tooltip("Exporta inregistrarile realizate intr-un excel."));
             if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
@@ -262,7 +285,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
             addOrderButton.getStyleClass().add("ghost-button");
             excelExportButton.getStyleClass().add("ghost-button");
-            sectionHeaderContainer.getChildren().addAll(addOrderButton, excelExportButton);
+            sectionHeaderContainer.getChildren().addAll(addOrderButton, importOrderButton, excelExportButton);
         }
 
         sectionHeaderContainer.getStyleClass().add("tab-section-header");
@@ -317,7 +340,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTableView.getColumns().add(orderIDColumn);
 
 
-        TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Programata:");
+        TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Programata la");
         dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateScheduled()));
         ordersTableView.getColumns().add(dateTimeColumn);
         SimpleDateFormat format = new SimpleDateFormat("HH:mm dd/MM/yyyy");
@@ -404,8 +427,6 @@ public class ManagerView extends Parent implements Builder<Region> {
                 }
             }
         });
-
-        User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
 
         TableColumn<Order, Integer> actionBtnColumn = new TableColumn<>();
         actionBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));

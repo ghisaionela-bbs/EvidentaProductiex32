@@ -40,6 +40,7 @@ public class RecordController extends ModalWindow {
         this.model.loadProducts();
         this.model.loadOrders();
         this.view = new RecordView(this.model, type, this::onWindowAction, this::editOrder);
+        this.view.setOrderId(record.getOrderId());
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
 

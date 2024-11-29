@@ -30,11 +30,15 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
 
     @Override
     public Region build() {
-        VBox root = new VBox();
+        BorderPane root = new BorderPane();
         Node ordersSection = createOrdersSection();
 
-        root.getChildren().addAll(ordersSection, createButtonsContainer());
+        root.setCenter(ordersSection);
+        root.setBottom(createButtonsContainer());
+
+//        root.getChildren().addAll(ordersSection, createButtonsContainer());
         root.getStyleClass().add("modal-window");
+
         return root;
     }
 
@@ -202,6 +206,15 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
         ordersTableView.setItems(model.getOrders());
         ordersTableView.getStyleClass().add("main-table-view");
         ordersTableView.getSelectionModel().select(0);
+
+        orderIDColumn.prefWidthProperty().set(64);
+        dateTimeColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+        productNameColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.5).subtract(64));
+        quantityColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+        completedColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+        remainderColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
+
+        VBox.setVgrow(ordersTableView, Priority.ALWAYS);
 
         container.getChildren().addAll(infoLabel, ordersTableView);
 

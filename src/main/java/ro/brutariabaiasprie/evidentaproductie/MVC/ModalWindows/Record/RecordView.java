@@ -29,7 +29,7 @@ public class RecordView extends Parent implements Builder<Region> {
 
     private TextField quantityTextField;
     private ComboBox<Product> productComboBox;
-    private Label orderLabel;
+    private final Label orderLabel = new Label();
 
     public RecordView(RecordModel model, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler, Consumer<Product> editOrderHandler) {
         this.model = model;
@@ -46,6 +46,7 @@ public class RecordView extends Parent implements Builder<Region> {
         root.getCenter().getStyleClass().add("center");
         root.getBottom().getStyleClass().add("bottom");
         root.getStyleClass().add("modal-window");
+        root.getStyleClass().add("entry-view");
         return root;
     }
 
@@ -84,7 +85,6 @@ public class RecordView extends Parent implements Builder<Region> {
         Label quantityLabel = new Label("Cantitate:");
         quantityTextField = createQuantityField();
 
-        orderLabel = new Label();
         Button editOrderButton = new Button();
         editOrderButton.setGraphic(new FontIcon("mdi2s-square-edit-outline"));
         editOrderButton.getStyleClass().add("filled-button");
@@ -104,7 +104,7 @@ public class RecordView extends Parent implements Builder<Region> {
                 if(model.getRecord().getOrderId() == 0) {
                     orderLabel.setText("Comanda: fara comanda");
                 } else {
-                    orderLabel.setText("Comanda" + model.getRecord().getOrderId());
+                    orderLabel.setText("Comanda: " + model.getRecord().getOrderId());
                 }
                 quantityTextField.setText(String.valueOf(model.getRecord().getQuantity()));
                 productComboBox.getSelectionModel().select(model.getRecord().getProduct());

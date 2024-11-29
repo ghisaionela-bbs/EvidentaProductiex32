@@ -46,6 +46,7 @@ public class ProductionModel {
 
             String sql = " SELECT TOP 100 " +
                     "r.ID, " +
+                    "r.ID_COMANDA, " +
                     "r.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.um, " +
@@ -58,6 +59,7 @@ public class ProductionModel {
                     "r.datasiora_m, " +
                     "r.ID_UTILIZATOR_M " +
                     "FROM REALIZARI r " +
+                    "LEFT JOIN COMENZI c ON c.ID = r.ID_COMANDA " +
                     "LEFT JOIN PRODUSE p ON p.ID = r.ID_PRODUS " +
                     "LEFT JOIN GRUPE_PRODUSE g ON g.ID = p.ID_GRUPA " +
                     "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
@@ -102,6 +104,7 @@ public class ProductionModel {
                 record.setUserIdInserted(resultSet.getInt("ID_UTILIZATOR_I"));
                 record.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
                 record.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
+                record.setOrderId(resultSet.getInt("ID_COMANDA"));
                 records.add(record);
             }
 
@@ -333,6 +336,10 @@ public class ProductionModel {
 
     public void loadAssociatedOrder() {
         try {
+            if(associatedOrder.get() == null) {
+                return;
+            }
+
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT c.ID, " +
                     "c.ID_PRODUS, " +
@@ -352,10 +359,11 @@ public class ProductionModel {
                     "FROM COMENZI c " +
                     "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
-                    "LEFT JOIN GRUPE g ON g.ID = p.ID_GRUPA " +
+                    "LEFT JOIN GRUPE_PRODUSE g ON g.ID = p.ID_GRUPA " +
                     "WHERE c.ID = ? " +
                     "GROUP BY c.ID, " +
                     "c.ID_PRODUS, " +
+                    "p.ID_SUBGRUPA_PRODUSE, " +
                     "p.denumire, " +
                     "p.um, " +
                     "g.ID, " +

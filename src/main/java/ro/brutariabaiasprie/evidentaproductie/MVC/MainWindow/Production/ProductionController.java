@@ -30,6 +30,7 @@ public class ProductionController implements SceneController {
         User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
 
         DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, ModifiedTableData>) change -> {
+            Platform.runLater(model::loadAssociatedOrder);
             if(change.wasAdded()) {
                 Platform.runLater(() -> {
                     if(change.getKey().equals("PRODUSE")) {

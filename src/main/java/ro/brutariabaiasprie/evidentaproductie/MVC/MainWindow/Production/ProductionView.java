@@ -92,7 +92,6 @@ public class ProductionView extends Parent implements Builder<Region> {
         unitMeasurementLabel.getStyleClass().add("unit-measurement-indicator");
         unitMeasurementLabel.setMaxWidth(Region.USE_COMPUTED_SIZE);
 
-
         quantityInputContainer = new HBox(quantityTextField, unitMeasurementLabel);
         quantityInputContainer.setAlignment(Pos.CENTER);
         quantityInputContainer.setSpacing(8);
@@ -105,7 +104,6 @@ public class ProductionView extends Parent implements Builder<Region> {
 
         btnProductChoice.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
         quantityTextField.prefHeightProperty().bind(leftSection.heightProperty().divide(6));
-
 
         VBox.setVgrow(numpad, Priority.ALWAYS);
         productsListView = createProductListView();
@@ -157,7 +155,8 @@ public class ProductionView extends Parent implements Builder<Region> {
                     }
                     orderLabel.getStyleClass().remove("warning");
                     Order order = model.getAssociatedOrder();
-                    return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
+                    return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted()) +
+                            "\nNecesar: " + order.getRemainder();
 
                 },
                 model.associatedOrderProperty()
@@ -414,7 +413,7 @@ public class ProductionView extends Parent implements Builder<Region> {
 
         TableColumn<Record, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
         dateAndTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm dd/MM/yyyy");
         dateAndTimeColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Timestamp item, boolean empty) {
@@ -569,6 +568,6 @@ public class ProductionView extends Parent implements Builder<Region> {
             leftSection.getChildren().remove(productsListView);
             setSelectedProductHandler.accept(product, orderAssociationController.getOrder());
         }
-
     }
+
 }

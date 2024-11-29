@@ -105,68 +105,68 @@ public class ManagerModel {
         }
     }
 
-    public void loadRecords() {
-        try {
-            Connection connection = DBConnectionService.getConnection();
-
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-            String whereCond = "";
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                whereCond = " AND r.ID_UTILIZATOR_I = ? ";
-            }
-
-            String sql = " SELECT TOP 100 " +
-                    "r.ID, " +
-                    "r.ID_PRODUS, " +
-                    "p.denumire, " +
-                    "p.um, " +
-                    "p.ID_GRUPA, " +
-                    "gp.denumire AS denumire_grupa, " +
-                    "r.cantitate, " +
-                    "r.datasiora_i, " +
-                    "r.ID_UTILIZATOR_I, " +
-                    "r.datasiora_m, " +
-                    "r.ID_UTILIZATOR_M " +
-                    "FROM REALIZARI r " +
-                    "LEFT JOIN PRODUSE p ON p.ID = r.ID_PRODUS " +
-                    "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
-                    "WHERE (r.ID_COMANDA IS NULL OR r.ID_COMANDA = 0) " +
-                    whereCond +
-                    "ORDER BY r.datasiora_i DESC ";
-
-            PreparedStatement statement = connection.prepareStatement(sql);
-            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
-                statement.setInt(1, user.getId());
-            }
-            ResultSet resultSet = statement.executeQuery();
-            records.clear();
-            while (resultSet.next()) {
-                Group group = null;
-                int groupId = resultSet.getInt("ID_GRUPA");
-                if(!resultSet.wasNull()) {
-                    group = new Group(groupId, resultSet.getString("denumire_grupa"));
-                }
-                Product product = new Product();
-                product.setId(resultSet.getInt("ID_PRODUS"));
-                product.setName(resultSet.getString("denumire"));
-                product.setUnitMeasurement(resultSet.getString("um"));
-                product.setGroup(group);
-
-                ro.brutariabaiasprie.evidentaproductie.Domain.Record record = new Record();
-                record.setId(resultSet.getInt("ID"));
-                record.setProduct(product);
-                record.setQuantity(resultSet.getDouble("cantitate"));
-                record.setDateTimeInserted(resultSet.getTimestamp("datasiora_i"));
-                record.setUserIdInserted(resultSet.getInt("ID_UTILIZATOR_I"));
-                record.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
-                record.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
-                records.add(record);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public void loadRecords() {
+//        try {
+//            Connection connection = DBConnectionService.getConnection();
+//
+//            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+//            String whereCond = "";
+//            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
+//                whereCond = " AND r.ID_UTILIZATOR_I = ? ";
+//            }
+//
+//            String sql = " SELECT TOP 100 " +
+//                    "r.ID, " +
+//                    "r.ID_PRODUS, " +
+//                    "p.denumire, " +
+//                    "p.um, " +
+//                    "p.ID_GRUPA, " +
+//                    "gp.denumire AS denumire_grupa, " +
+//                    "r.cantitate, " +
+//                    "r.datasiora_i, " +
+//                    "r.ID_UTILIZATOR_I, " +
+//                    "r.datasiora_m, " +
+//                    "r.ID_UTILIZATOR_M " +
+//                    "FROM REALIZARI r " +
+//                    "LEFT JOIN PRODUSE p ON p.ID = r.ID_PRODUS " +
+//                    "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
+//                    "WHERE (r.ID_COMANDA IS NULL OR r.ID_COMANDA = 0) " +
+//                    whereCond +
+//                    "ORDER BY r.datasiora_i DESC ";
+//
+//            PreparedStatement statement = connection.prepareStatement(sql);
+//            if(user.getRoleId() != 1 && user.getRoleId() != 2) {
+//                statement.setInt(1, user.getId());
+//            }
+//            ResultSet resultSet = statement.executeQuery();
+//            records.clear();
+//            while (resultSet.next()) {
+//                Group group = null;
+//                int groupId = resultSet.getInt("ID_GRUPA");
+//                if(!resultSet.wasNull()) {
+//                    group = new Group(groupId, resultSet.getString("denumire_grupa"));
+//                }
+//                Product product = new Product();
+//                product.setId(resultSet.getInt("ID_PRODUS"));
+//                product.setName(resultSet.getString("denumire"));
+//                product.setUnitMeasurement(resultSet.getString("um"));
+//                product.setGroup(group);
+//
+//                ro.brutariabaiasprie.evidentaproductie.Domain.Record record = new Record();
+//                record.setId(resultSet.getInt("ID"));
+//                record.setProduct(product);
+//                record.setQuantity(resultSet.getDouble("cantitate"));
+//                record.setDateTimeInserted(resultSet.getTimestamp("datasiora_i"));
+//                record.setUserIdInserted(resultSet.getInt("ID_UTILIZATOR_I"));
+//                record.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
+//                record.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
+//                records.add(record);
+//            }
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public void loadOrders() {
         try {

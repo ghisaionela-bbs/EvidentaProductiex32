@@ -23,7 +23,7 @@ public class ManagerController implements SceneController {
             model.loadProducts();
             model.loadOrders();
             model.loadGroups2();
-            model.loadRecords();
+//            model.loadRecords();
             model.loadUsers();
         });
         DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, ModifiedTableData>) change -> {
@@ -33,7 +33,7 @@ public class ManagerController implements SceneController {
                     model.loadGroups2();
                     model.loadProducts();
                     model.loadOrders();
-                    model.loadRecords();
+//                    model.loadRecords();
                     model.loadUsers();
                 });
 
