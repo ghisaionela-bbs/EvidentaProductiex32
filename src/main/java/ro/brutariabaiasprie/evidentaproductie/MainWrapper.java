@@ -14,7 +14,7 @@ public class MainWrapper {
     public static void main(String[] args) {
 //        Properties properties = System.getProperties();
 //        properties.forEach((k, v) -> System.out.println(k + ":" + v));
-        AppProperties.load();
+//        AppProperties.load();
         ConfigApp.check_config();
         EvidentaProductie.main(args);
     }

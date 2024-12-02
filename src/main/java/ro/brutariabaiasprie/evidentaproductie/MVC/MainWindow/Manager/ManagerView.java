@@ -20,6 +20,7 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.Excel
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderExport.OrderExportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderImport.OrderImportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product.ProductController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ProductGroup.ProductGroupController;
@@ -40,6 +41,7 @@ public class ManagerView extends Parent implements Builder<Region> {
     //orders tab
     private Button addOrderButton;
     private Button importOrderButton;
+    private Button orderExportButton;
     private Button excelExportButton;
 
     public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler) {
@@ -219,6 +221,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
     //region Orders Tab
     private Tab createOrdersTab() {
+        System.out.println("creating orders tab");
         Tab ordersTab = new Tab("Comenzi");
         ordersTab.setClosable(false);
 
@@ -263,6 +266,11 @@ public class ManagerView extends Parent implements Builder<Region> {
             addOrderButton.setOnAction(event -> {
                 new OrderController(stage, WINDOW_TYPE.ADD);
             });
+            System.out.println("creating export button");
+            orderExportButton = new Button("Exporta comenzi");
+            orderExportButton.getStyleClass().add("ghost-button");
+            orderExportButton.setOnAction(event -> new OrderExportController(stage));
+
             excelExportButton = new Button();
             excelExportButton.setOnAction(event -> {
                 ExcelExportController excelExportController = new ExcelExportController(stage);
@@ -273,6 +281,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             });
             importOrderButton.setGraphic(new FontIcon("mdi2a-application-import"));
             importOrderButton.getStyleClass().add("ghost-button");
+
 
             excelExportButton.setTooltip(new Tooltip("Exporta inregistrarile realizate intr-un excel."));
             if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
@@ -285,7 +294,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
             addOrderButton.getStyleClass().add("ghost-button");
             excelExportButton.getStyleClass().add("ghost-button");
-            sectionHeaderContainer.getChildren().addAll(addOrderButton, importOrderButton, excelExportButton);
+
+            sectionHeaderContainer.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton, excelExportButton);
         }
 
         sectionHeaderContainer.getStyleClass().add("tab-section-header");

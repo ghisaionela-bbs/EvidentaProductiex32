@@ -154,9 +154,9 @@ public class DBConnectionService {
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             String version = resultSet.getString("valoare");
-            if(!version.equals(AppProperties.properties.getProperty("version"))) {
-                throw new VersionCompatibility("App version is not compatible with database version");
-            }
+//            if(!version.equals(AppProperties.properties.getProperty("version"))) {
+//                throw new VersionCompatibility("App version is not compatible with database version");
+//            }
         }
     }
 
@@ -176,7 +176,8 @@ public class DBConnectionService {
         try(PreparedStatement statement = connection.prepareStatement("INSERT INTO [dbo].[APP_INFO] " +
                 "(proprietate, valoare) VALUES (?, ?)")) {
             statement.setString(1,"version");
-            statement.setString(2, AppProperties.get("version"));
+//            statement.setString(2, AppProperties.get("version"));
+            statement.setString(2, "1.0.0");
             statement.executeUpdate();
         }
 
@@ -195,7 +196,7 @@ public class DBConnectionService {
 //            statement.execute();
 //        }
         // Setting up the users groups table triggers
-        createTableTriggers("GRUPE_UTILIZATORI");
+//        createTableTriggers("GRUPE_UTILIZATORI");
 
         // Setting up the products groups table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE_PRODUSE](  " +
@@ -212,7 +213,8 @@ public class DBConnectionService {
                 "[ID] [int] IDENTITY(1,1) NOT NULL, " +
                 "[denumire] [nvarchar](255) NOT NULL, " +
                 "[um] [nvarchar](5) NOT NULL, " +
-                "[ID_GRUPA] [int] NULL)")) {
+                "[ID_GRUPA] [int] NULL," +
+                "[ID_SUBGRUPA_PRODUSE] [int] NULL)")) {
             statement.execute();
         }
         // Setting up the products table triggers
@@ -224,7 +226,8 @@ public class DBConnectionService {
                 "[ID_ROL] [int] NOT NULL, " +
                 "[nume_utilizator] [varchar](255) NOT NULL, " +
                 "[parola] [varchar](255) NOT NULL, " +
-                "[ID_GRUPA] [int] NULL)")) {
+                "[ID_GRUPA] [int] NULL," +
+                "[ID_SUBGRUPA_PRODUSE] [int] NULL)")) {
             statement.execute();
         }
         // Setting up the users table triggers
