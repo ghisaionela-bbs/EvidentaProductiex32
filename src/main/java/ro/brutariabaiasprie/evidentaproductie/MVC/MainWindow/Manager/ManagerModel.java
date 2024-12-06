@@ -58,28 +58,19 @@ public class ManagerModel {
 
     public void loadProducts() {
         try {
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-//            String whereCond = "";
-//            if(user.getID_GROUP() != 0 && user.getID_ROLE() != 1) {
-//                whereCond = "WHERE p.ID_GRUPA = ? ";
-//            }
-
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT " +
                     "p.ID, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
                     "gp.denumire AS denumire_grupa " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
-//                    whereCond +
                     "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
-//            if(user.getID_GROUP() != 0 && user.getID_ROLE() != 1) {
-//                statement.setInt(1, user.getID_GROUP());
-//            }
             ResultSet resultSet = statement.executeQuery();
 
             products.clear();
@@ -93,6 +84,7 @@ public class ManagerModel {
                 Product product = new Product(
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
+                        resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
@@ -189,6 +181,7 @@ public class ManagerModel {
             String sql = "SELECT c.ID, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "gp.ID AS ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -212,6 +205,7 @@ public class ManagerModel {
                     "c.data_programata, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "gp.ID, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -254,6 +248,7 @@ public class ManagerModel {
                 order.setProduct(new Product(
                         resultSet.getInt("ID_PRODUS"),
                         resultSet.getString("denumire"),
+                        resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")

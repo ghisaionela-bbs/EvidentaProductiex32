@@ -3,12 +3,9 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.NumericInput;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.Images;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupModel;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupView;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 
 import java.util.Objects;
@@ -28,7 +25,11 @@ public class NumericInputController extends ModalWindow {
 
     private void initStage(Stage owner, Double defaultValue) {
         this.stage = new Stage();
-        this.view = new NumericInputView(this::onWindowAction, defaultValue.toString());
+        String numericFieldValue = "";
+        if (defaultValue != 0) {
+            numericFieldValue = defaultValue.toString();
+        }
+        this.view = new NumericInputView(this::onWindowAction, numericFieldValue);
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
         this.stage.getIcons().addAll(Images.icon16x16, Images.icon32x32, Images.icon64x64);

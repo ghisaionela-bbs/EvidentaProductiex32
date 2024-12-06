@@ -11,11 +11,13 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Builder;
+import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import ro.brutariabaiasprie.evidentaproductie.Data.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
+import ro.brutariabaiasprie.evidentaproductie.MVC.Components.ColoredProgressBar;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
@@ -221,7 +223,6 @@ public class ManagerView extends Parent implements Builder<Region> {
 
     //region Orders Tab
     private Tab createOrdersTab() {
-        System.out.println("creating orders tab");
         Tab ordersTab = new Tab("Comenzi");
         ordersTab.setClosable(false);
 
@@ -266,36 +267,29 @@ public class ManagerView extends Parent implements Builder<Region> {
             addOrderButton.setOnAction(event -> {
                 new OrderController(stage, WINDOW_TYPE.ADD);
             });
-            System.out.println("creating export button");
-            orderExportButton = new Button("Exporta comenzi");
+            orderExportButton = new Button("Exporta");
+            FontIcon fontIcon = new FontIcon("mdi2f-file-export-outline");
+            orderExportButton.setGraphic(fontIcon);
             orderExportButton.getStyleClass().add("ghost-button");
             orderExportButton.setOnAction(event -> new OrderExportController(stage));
 
             excelExportButton = new Button();
-            excelExportButton.setOnAction(event -> {
-                ExcelExportController excelExportController = new ExcelExportController(stage);
-            });
+            excelExportButton.setOnAction(event -> new ExcelExportController(stage));
             importOrderButton = new Button("Importa comenzi");
-            importOrderButton.setOnAction(event -> {
-                new OrderImportController(stage);
-            });
+            importOrderButton.setOnAction(event -> new OrderImportController(stage));
             importOrderButton.setGraphic(new FontIcon("mdi2a-application-import"));
             importOrderButton.getStyleClass().add("ghost-button");
 
 
-            excelExportButton.setTooltip(new Tooltip("Exporta inregistrarile realizate intr-un excel."));
             if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
                 addOrderButton.setText("➕");
-                excelExportButton.setText("");
             } else {
                 addOrderButton.setText("➕ Adauga o comanda");
-                excelExportButton.setText("Exporta realizari in excel");
                 excelExportButton.setGraphic(new FontIcon("mdi2m-microsoft-excel"));
             }
             addOrderButton.getStyleClass().add("ghost-button");
-            excelExportButton.getStyleClass().add("ghost-button");
 
-            sectionHeaderContainer.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton, excelExportButton);
+            sectionHeaderContainer.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton);
         }
 
         sectionHeaderContainer.getStyleClass().add("tab-section-header");
@@ -353,36 +347,88 @@ public class ManagerView extends Parent implements Builder<Region> {
         TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Programata la");
         dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateScheduled()));
         ordersTableView.getColumns().add(dateTimeColumn);
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         dateTimeColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Timestamp item, boolean empty) {
+                final Label timeLabel = new Label();
+                final Label dateLabel = new Label();
                 super.updateItem(item, empty);
                 if (item == null || empty) {
                     setText(null);
+                    setGraphic(null);
                 } else {
-                    setText(format.format(item));
+                    setText(null);
+                    timeLabel.setText(timeFormat.format(item));
+                    dateLabel.setText(dateFormat.format(item));
+                    FlowPane flowPane = new FlowPane(timeLabel, dateLabel);
+                    flowPane.setHgap(8);
+                    flowPane.setVgap(4);
+                    setGraphic(flowPane);
                 }
             }
         });
 
         TableColumn<Order, String> productNameColumn = new TableColumn<>("Produs");
         productNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getName()));
-        productNameColumn.setCellFactory(column -> new TableCell<>() {
+        productNameColumn.setCellFactory(new Callback<TableColumn<Order, String>, TableCell<Order, String>>() {
             @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    Text txtName = new Text(item);
-                    txtName.getStyleClass().add("text");
-                    txtName.wrappingWidthProperty().bind(widthProperty());
-                    setGraphic(txtName);
-                    setWrapText(true);
-                    setText(item);
-                }
+            public TableCell<Order, String> call(TableColumn<Order, String> param) {
+                return new TableCell<>(){
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        final Label batchNumber = new Label();
+                        final Label percentageLabel = new Label();
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                            setGraphic(null);
+                            setStyle(null);
+                        } else {
+                            Text txtName = new Text(item);
+                            txtName.getStyleClass().add("text");
+                            txtName.wrappingWidthProperty().bind(widthProperty());
+
+                            int currentIndex = indexProperty().getValue() < 0 ? 0 : indexProperty().getValue();
+                            Order order = param.getTableView().getItems().get(currentIndex);
+
+                            if(order.getProduct().getBatchValue() > 0) {
+                                double quantity = order.getQuantity();
+                                double completed = order.getCompleted();
+                                double batchValue = order.getProduct().getBatchValue();
+                                double percentage = 0.0;
+                                double completedBatches = Math.ceil(completed / batchValue);
+                                double totalBatches = Math.ceil(quantity / batchValue);
+
+                                if(completed < quantity) {
+                                    if(completedBatches == 0) {
+                                        percentage = completed / batchValue;
+                                    }
+                                    else {
+                                        percentage = (completed - (completedBatches - 1) * batchValue ) / batchValue;
+                                    }
+                                } else {
+                                    percentage = 1 + (completed - quantity) / batchValue;
+                                }
+
+                                batchNumber.setText("Sarja: " + (int)completedBatches + "/" + (int)totalBatches);
+                                ColoredProgressBar progressBar = new ColoredProgressBar(percentage);
+                                percentageLabel.setText(percentage * 100.0 + "%");
+                                HBox progressContainer = new HBox(batchNumber, progressBar, percentageLabel);
+                                VBox container = new VBox(txtName, progressContainer);
+                                progressContainer.setSpacing(8);
+                                setGraphic(container);
+                            }
+
+                            else {
+                                setGraphic(txtName);
+                                setText(null);
+                                setStyle(null);
+                            }
+                        }
+                    }
+                };
             }
         });
         ordersTableView.getColumns().add(productNameColumn);
@@ -424,19 +470,53 @@ public class ManagerView extends Parent implements Builder<Region> {
         TableColumn<Order, Double> remainderColumn = new TableColumn<>("Rest");
         remainderColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getRemainder()));
         ordersTableView.getColumns().add(remainderColumn);
-        remainderColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Double item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(String.format("%.2f", item));
-                    setStyle("-fx-alignment: TOP-RIGHT;");
+        if(ConfigApp.getRole().canEditOrders()) {
+            remainderColumn.setCellFactory(column -> new TableCell<>() {
+                @Override
+                protected void updateItem(Double item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        setText(null);
+                        Text remainderText = new Text(String.format("%.2f", item));
+                        final Order order = getTableRow().getItem();
+                        if(order != null) {
+                            setStyle("-fx-alignment: TOP-RIGHT;");
+                            remainderText.getStyleClass().add("remainder");
+                            if(order.getCompleted() > order.getQuantity()) {
+                                remainderText.getStyleClass().add("exceeded");
+                            } else if (order.getCompleted() == order.getQuantity()) {
+                                remainderText.getStyleClass().add("exact");
+                            } else {
+                                remainderText.getStyleClass().add("text");
+                            }
+                        } else {
+                            remainderText.getStyleClass().add("text");
+                        }
+                        setGraphic(remainderText);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            remainderColumn.setCellFactory(column -> new TableCell<>() {
+                @Override
+                protected void updateItem(Double item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        setText(null);
+                        Text remainderText = new Text(String.format("%.2f", item));
+                        remainderText.getStyleClass().add("text");
+                        setGraphic(remainderText);
+                    }
+                }
+            });
+        }
+
 
         TableColumn<Order, Integer> actionBtnColumn = new TableColumn<>();
         actionBtnColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
@@ -495,6 +575,19 @@ public class ManagerView extends Parent implements Builder<Region> {
             });
         }
         ordersTableView.getColumns().add(actionBtnColumn);
+
+        ordersTableView.setRowFactory(tv -> {
+            TableRow<Order> row = new TableRow<>();
+//            row.setOnMouseClicked(event -> {
+//                if(!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+//                    System.out.println(Arrays.toString(row.getStyleClass().toArray()));
+//                    System.out.println("row");
+//                } else {
+//                    System.out.println("empty");
+//                }
+//            });
+            return row;
+        });
 
         isClosedColumn.prefWidthProperty().set(64);
         orderIDColumn.prefWidthProperty().set(64);

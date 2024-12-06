@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues;
+package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning;
 
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -8,7 +8,6 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Widget for creating a modal warning stage

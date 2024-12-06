@@ -49,7 +49,7 @@ public class NumericInputView extends Parent implements Builder<Region> {
 
     private TextField createQuantityField() {
         TextField quantityTextField = new TextField();
-        quantityTextField.promptTextProperty().set("0.00");
+        quantityTextField.promptTextProperty().set("");
 
         quantityTextField.textProperty().set(defaultValue);
 

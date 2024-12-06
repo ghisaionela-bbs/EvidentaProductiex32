@@ -6,7 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.io.File;
@@ -15,19 +15,26 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ExcelImportModel {
-    private final ObservableList<String[]> data = FXCollections.observableArrayList();
-    private String[][] dataArray;
+    private final ObservableList<Object[]> data = FXCollections.observableArrayList();
+    private Object[][] dataArray;
     private int numRows = 0;
     private int numCols = 0;
     private final StringProperty filename = new SimpleStringProperty();
     private File file;
+    private int sheetNumber;
+    private int startRow;
+    private int prodNameCol;
+    private int batchCol;
+    private int umCol;
+    private int maxSheetNumber;
 
 
-    public ObservableList<String[]> getData() {
+    public ObservableList<Object[]> getData() {
         return data;
     }
 
@@ -59,13 +66,39 @@ public class ExcelImportModel {
         this.file = file;
     }
 
-    public void readWorkbook() {
+    public void setUmCol(int umCol) {
+        this.umCol = umCol;
+    }
+
+    public void setBatchCol(int batchCol) {
+        this.batchCol = batchCol;
+    }
+
+    public void setProdNameCol(int prodNameCol) {
+        this.prodNameCol = prodNameCol;
+    }
+
+    public void setStartRow(int startRow) {
+        this.startRow = startRow;
+    }
+
+    public void setSheetNumber(int sheetNumber) {
+        this.sheetNumber = sheetNumber;
+    }
+
+    public String readWorkbook() {
         try {
             FileInputStream fileStream = new FileInputStream(file);
             XSSFWorkbook workbook = new XSSFWorkbook(fileStream);
 
-            Sheet sheet = workbook.getSheetAt(0);
-            numRows = sheet.getLastRowNum();
+            maxSheetNumber = workbook.getNumberOfSheets();
+            if(maxSheetNumber < sheetNumber) {
+                workbook.close();
+                return "Numarul sheet-ului din care doriti sa preluati datele este mai mare decat numarul total de sheet-uri din document!";
+            }
+
+            Sheet sheet = workbook.getSheetAt(sheetNumber);
+            numRows = sheet.getLastRowNum() + 1;
             numCols = 0;
             for(int i = 0; i < numRows; i ++){
                 Row row = sheet.getRow(i);
@@ -75,11 +108,11 @@ public class ExcelImportModel {
                 }
             }
 
-            dataArray = new String[numRows + 1][numCols + 1];
+            dataArray = new Object[numRows + 1][numCols + 1];
 
             Row row;
             Cell cell;
-            String value = "";
+            Object value = "";
 
             for(int r = 1; r <= numRows; r ++) {
                 dataArray[r][0] = String.valueOf(r);
@@ -100,7 +133,7 @@ public class ExcelImportModel {
                                 value = String.valueOf(cell.getBooleanCellValue());
                                 break;
                             case NUMERIC:
-                                value = String.valueOf(cell.getNumericCellValue());
+                                value = cell.getNumericCellValue();
                                 break;
                             case STRING:
                                 value = cell.getStringCellValue();
@@ -114,8 +147,11 @@ public class ExcelImportModel {
                             case FORMULA:
                                 break;
                             case _NONE:
-                                value = String.valueOf(cell.getStringCellValue());
+                                value = "";
+                                break;
                         }
+                    } else {
+                        value = null;
                     }
                     dataArray[rowIndex + 1][columnIndex + 1] = value;
                 }
@@ -128,20 +164,29 @@ public class ExcelImportModel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        return "";
     }
 
-    public String validateData(int startRow, int prodNamCol, int umCol) {
+    public String validateData() {
 
         ArrayList<String> ums = new ArrayList<>();
         ums.add("KG");
         ums.add("BUC");
 
         for(int rowIndex = startRow; rowIndex <= numRows; rowIndex ++) {
-            String productName = dataArray[rowIndex][prodNamCol];
-            String unitMeasurement = dataArray[rowIndex][umCol];
+            String productName = (String) dataArray[rowIndex][prodNameCol];
+            String unitMeasurement = (String) dataArray[rowIndex][umCol];
 
             if(productName.isEmpty()) {
                 return "Aveti campuri goale in denumirile produselor.";
+            }
+            if(dataArray[rowIndex][batchCol] != null) {
+                try {
+                    Double.parseDouble(dataArray[rowIndex][batchCol].toString());
+                } catch (Exception e) {
+                    return "Toate datele din coloana de valori sarja trebuie sa fie numerice.";
+                }
             }
             if(unitMeasurement.isEmpty()) {
                 return "Aveti campuri goale in unitatile de masura ale produselor.";
@@ -154,20 +199,25 @@ public class ExcelImportModel {
         return "";
     }
 
-    public void insertData(int startRow, int prodNamCol, int umCol) {
+    public void insertData() {
 
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "INSERT INTO [dbo].[PRODUSE] (denumire, um) VALUES (?, ?)";
+            String sql = "INSERT INTO [dbo].[PRODUSE] (denumire, sarja, um) VALUES (?, ?, ?)";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             for(int rowIndex = startRow; rowIndex <= numRows; rowIndex ++) {
-                String productName = dataArray[rowIndex][prodNamCol];
-                String unitMeasurement = dataArray[rowIndex][umCol];
+                String productName = (String) dataArray[rowIndex][prodNameCol];
+                String unitMeasurement = (String) dataArray[rowIndex][umCol];
 
                 preparedStatement.setString(1, productName.trim());
-                preparedStatement.setString(2, unitMeasurement.trim().toUpperCase());
+                if(dataArray[rowIndex][batchCol] == null) {
+                    preparedStatement.setDouble(2, 0.00);
+                } else {
+                    preparedStatement.setDouble(2, (double) dataArray[rowIndex][batchCol]);
+                }
+                preparedStatement.setString(3, unitMeasurement.trim().toUpperCase());
                 preparedStatement.addBatch();
             }
             preparedStatement.executeBatch();

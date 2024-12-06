@@ -1,13 +1,11 @@
 package ro.brutariabaiasprie.evidentaproductie.DTO;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 public class Product {
     private final IntegerProperty id = new SimpleIntegerProperty();
     private final StringProperty name = new SimpleStringProperty();
+    private final DoubleProperty batchValue = new SimpleDoubleProperty(0.00);
     private final StringProperty unitMeasurement = new SimpleStringProperty();
     private final IntegerProperty groupId = new SimpleIntegerProperty();
     private final StringProperty groupName = new SimpleStringProperty();
@@ -34,6 +32,18 @@ public class Product {
 
     public void setName(String name) {
         this.name.set(name);
+    }
+
+    public double getBatchValue() {
+        return batchValue.get();
+    }
+
+    public DoubleProperty batchValueProperty() {
+        return batchValue;
+    }
+
+    public void setBatchValue(double batchValue) {
+        this.batchValue.set(batchValue);
     }
 
     public String getUnitMeasurement() {

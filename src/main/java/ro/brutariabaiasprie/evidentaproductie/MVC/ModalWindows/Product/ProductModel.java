@@ -49,24 +49,26 @@ public class ProductModel {
             Connection connection = DBConnectionService.getConnection();
             String sql = "UPDATE PRODUSE SET " +
                     "denumire = ?, " +
+                    "sarja = ?, " +
                     "um = ?, " +
                     "ID_GRUPA = ?, " +
                     "ID_SUBGRUPA_PRODUSE = ? " +
                     "WHERE ID = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, product.getName());
-            statement.setString(2, product.getUnitMeasurement());
+            statement.setDouble(2, product.getBatchValue());
+            statement.setString(3, product.getUnitMeasurement());
             if(product.getGroup() == null) {
-                statement.setNull(3, Types.INTEGER);
-            } else {
-                statement.setInt(3, product.getGroup().getId());
-            }
-            if(product.getSubgroupId() == 0) {
                 statement.setNull(4, Types.INTEGER);
             } else {
-                statement.setInt(4, product.getSubgroupId());
+                statement.setInt(4, product.getGroup().getId());
             }
-            statement.setInt(5, product.getId());
+            if(product.getSubgroupId() == 0) {
+                statement.setNull(5, Types.INTEGER);
+            } else {
+                statement.setInt(5, product.getSubgroupId());
+            }
+            statement.setInt(6, product.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -76,19 +78,20 @@ public class ProductModel {
     public void addProduct() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "INSERT INTO PRODUSE (denumire, um, ID_GRUPA, ID_SUBGRUPA_PRODUSE) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO PRODUSE (denumire, sarja, um, ID_GRUPA, ID_SUBGRUPA_PRODUSE) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, product.getName());
-            statement.setString(2, product.getUnitMeasurement());
+            statement.setDouble(2, product.getBatchValue());
+            statement.setString(3, product.getUnitMeasurement());
             if(product.getGroup() == null) {
-                statement.setNull(3, Types.INTEGER);
-            } else {
-                statement.setInt(3, product.getGroup().getId());
-            }
-            if(product.getSubgroupId() == 0) {
                 statement.setNull(4, Types.INTEGER);
             } else {
-                statement.setInt(4, product.getSubgroupId());
+                statement.setInt(4, product.getGroup().getId());
+            }
+            if(product.getSubgroupId() == 0) {
+                statement.setNull(5, Types.INTEGER);
+            } else {
+                statement.setInt(5, product.getSubgroupId());
             }
             statement.executeUpdate();
         } catch (SQLException e) {

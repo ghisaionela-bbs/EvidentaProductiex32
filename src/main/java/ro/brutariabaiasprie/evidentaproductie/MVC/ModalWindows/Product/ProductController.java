@@ -1,18 +1,14 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Product;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Confirmation.ConfirmationController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 
 import java.util.Objects;
@@ -58,7 +54,7 @@ public class ProductController extends ModalWindow {
         this.stage = new Stage();
         this.model = new ProductModel();
         this.model.setProduct(product);
-        this.view = new ProductView(this.model, type, this::onWindowAction);
+        this.view = new ProductView(this.model, this.stage, type, this::onWindowAction);
         this.view.setDeleteProductHandler(this::deleteProduct);
         this.view.groupComboBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if(oldValue != newValue) {
@@ -100,6 +96,10 @@ public class ProductController extends ModalWindow {
         this.stage.showAndWait();
     }
 
+    /***
+     * Deletes the product loaded in the model.
+     * Can be called only when the WINDOW_TYPE is EDIT.
+     */
     private void deleteProduct() {
         if(new ConfirmationController(stage, "Confirmati stergerea",
                 String.format("Sunteti sigur ca doriti sa stergeti produsul %s?", model.getProduct().getName())).isSUCCESS()) {
@@ -119,8 +119,21 @@ public class ProductController extends ModalWindow {
             if(!this.isInputValid(type)) {
                 return;
             }
+
+            double batchValue = 0.00;
+            if(!view.getBatchValue().isEmpty()) {
+                batchValue = Double.parseDouble(view.getBatchValue());
+            }
+            if(batchValue == 0.00) {
+                if(!new ConfirmationController(stage, "Atentie!",
+                        "Daca nu setati cantitatea unei sarje, nu se va afisa procentajul de completare a comenzilor pe acest produs.\n" +
+                                "Continuati?").isSUCCESS()) {
+                    return;
+                }
+            }
             // Set the data in the model
             model.getProduct().setName(view.getName());
+            model.getProduct().setBatchValue(batchValue);
             model.getProduct().setUnitMeasurement(view.getUnitMeasurement());
             model.getProduct().setGroup(view.getGroup());
             model.getProduct().setSubgroupId(view.getSubgroup());

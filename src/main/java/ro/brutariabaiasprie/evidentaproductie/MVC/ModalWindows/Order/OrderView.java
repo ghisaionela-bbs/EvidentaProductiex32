@@ -4,7 +4,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -12,18 +12,14 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
-import org.apache.poi.ss.formula.functions.T;
 import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.NumericInput.NumericInputController;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -147,7 +143,8 @@ public class OrderView extends Parent implements Builder<Region> {
         hourSection.getStyleClass().add("section");
         hourSection.getStyleClass().add("vbox-layout");
 
-        isClosedCheckBox = new CheckBox("Inchisa");
+        isClosedCheckBox = new CheckBox("Comanda inchisa:");
+        isClosedCheckBox.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 
 //        GridPane numpad = createNumpad();
 
@@ -203,7 +200,7 @@ public class OrderView extends Parent implements Builder<Region> {
         gridPane.add(dateSection, 0, 3);
         gridPane.add(hourSection, 0, 4);
         gridPane.add(isClosedCheckBox, 0, 5);
-        GridPane.setHalignment(isClosedCheckBox, HPos.RIGHT);
+//        GridPane.setHalignment(isClosedCheckBox, HPos.RIGHT);
         // adding constraints
         for (int i = 0 ; i < gridPane.getRowCount(); i++) {
             RowConstraints row = new RowConstraints();

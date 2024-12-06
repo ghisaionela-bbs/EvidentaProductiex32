@@ -212,6 +212,7 @@ public class DBConnectionService {
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[PRODUSE](" +
                 "[ID] [int] IDENTITY(1,1) NOT NULL, " +
                 "[denumire] [nvarchar](255) NOT NULL, " +
+                "[sarja] [decimal](38, 2) NOT NULL DEFAULT 0.00," +
                 "[um] [nvarchar](5) NOT NULL, " +
                 "[ID_GRUPA] [int] NULL," +
                 "[ID_SUBGRUPA_PRODUSE] [int] NULL)")) {

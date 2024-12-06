@@ -7,8 +7,9 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 
 import java.util.Objects;
 
@@ -26,10 +27,7 @@ public class ExcelExportController extends ModalWindow {
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
 
         stage.setTitle("Exporta in excel");
-        Image icon16x16 = new Image("app-icon-16x16.png");
-        Image icon32x32 = new Image("app-icon-32x32.png");
-        Image icon64x64 = new Image("app-icon-64x64.png");
-        stage.getIcons().addAll(icon16x16, icon32x32, icon64x64);
+        stage.getIcons().addAll(Images.icon16x16, Images.icon32x32, Images.icon64x64);
         stage.setScene(scene);
         stage.initOwner(owner);
         stage.initModality(Modality.APPLICATION_MODAL);

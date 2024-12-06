@@ -6,9 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
-import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
@@ -17,8 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,17 +23,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OrderImportModel {
-    private final ObservableList<String[]> data = FXCollections.observableArrayList();
-    private String[][] dataArray;
+    private final ObservableList<Object[]> data = FXCollections.observableArrayList();
+    private Object[][] dataArray;
     private int numRows = 0;
     private int numCols = 0;
     private final StringProperty filename = new SimpleStringProperty();
     private File file;
     private int[] idArray;
+    public DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//    public SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+    public DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+//    public SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+    private int sheetNumber;
+    private int startRow;
+    private int prodNameCol;
+    private int quantityCol;
+    private int dateCol;
+    private int timeCol;
 
-
-    public ObservableList<String[]> getData() {
+    public ObservableList<Object[]> getData() {
         return data;
+    }
+
+    public int getSheetNumber() {
+        return sheetNumber;
+    }
+
+    public void setSheetNumber(int sheetNumber) {
+        this.sheetNumber = sheetNumber;
     }
 
     public int getNumRows() {
@@ -68,13 +81,53 @@ public class OrderImportModel {
         this.file = file;
     }
 
+    public int getTimeCol() {
+        return timeCol;
+    }
+
+    public void setTimeCol(int timeCol) {
+        this.timeCol = timeCol;
+    }
+
+    public int getDateCol() {
+        return dateCol;
+    }
+
+    public void setDateCol(int dateCol) {
+        this.dateCol = dateCol;
+    }
+
+    public int getQuantityCol() {
+        return quantityCol;
+    }
+
+    public void setQuantityCol(int quantityCol) {
+        this.quantityCol = quantityCol;
+    }
+
+    public int getProdNameCol() {
+        return prodNameCol;
+    }
+
+    public void setProdNameCol(int prodNameCol) {
+        this.prodNameCol = prodNameCol;
+    }
+
+    public int getStartRow() {
+        return startRow;
+    }
+
+    public void setStartRow(int startRow) {
+        this.startRow = startRow;
+    }
+
     public void readWorkbook() {
         try {
             FileInputStream fileStream = new FileInputStream(file);
             XSSFWorkbook workbook = new XSSFWorkbook(fileStream);
 
-            Sheet sheet = workbook.getSheetAt(0);
-            numRows = sheet.getLastRowNum();
+            Sheet sheet = workbook.getSheetAt(sheetNumber);
+            numRows = sheet.getLastRowNum() + 1;
             numCols = 0;
             for(int i = 0; i < numRows; i ++){
                 Row row = sheet.getRow(i);
@@ -84,12 +137,12 @@ public class OrderImportModel {
                 }
             }
 
-            dataArray = new String[numRows + 1][numCols + 1];
+            dataArray = new Object[numRows + 1][numCols + 1];
             idArray = new int[numRows + 1];
 
             Row row;
             Cell cell;
-            String value = "";
+            Object value = "";
 
             for(int r = 1; r <= numRows; r ++) {
                 dataArray[r][0] = String.valueOf(r);
@@ -107,11 +160,16 @@ public class OrderImportModel {
                     if (cellValue!=null) {
                         switch (cellValue.getCellType()) {
                             case BOOLEAN:
+                                cell.getCellStyle().getDataFormat();
                                 value = String.valueOf(cell.getBooleanCellValue());
                                 break;
                             case NUMERIC:
                                 if(DateUtil.isCellDateFormatted(cell)) {
-                                    value = String.valueOf(cell.getDateCellValue());
+                                    value = switch (BuiltinFormats.getBuiltinFormat(cell.getCellStyle().getDataFormat())) {
+                                        case "m/d/yy" -> cell.getLocalDateTimeCellValue().toLocalDate();
+                                        case "h:mm" -> cell.getLocalDateTimeCellValue().toLocalTime();
+                                        default -> String.valueOf(cell.getLocalDateTimeCellValue());
+                                    };
                                 } else {
                                     value = String.valueOf(cell.getNumericCellValue());
                                 }
@@ -144,13 +202,14 @@ public class OrderImportModel {
         }
     }
 
-    public String validateData(int startRow, int prodNamCol, int quantityCol, int dateCol, int timeCol) {
+    public String validateData() {
         ArrayList<Product> products = new ArrayList<>();
         try {
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT " +
                     "p.ID, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -172,6 +231,7 @@ public class OrderImportModel {
                 Product product = new Product(
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
+                        resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
@@ -183,86 +243,78 @@ public class OrderImportModel {
             throw new RuntimeException(e);
         }
 
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm");
-
         for(int rowIndex = startRow; rowIndex <= numRows; rowIndex ++) {
-            String productName = dataArray[rowIndex][prodNamCol];
-            String quantity = dataArray[rowIndex][quantityCol];
-            String date = dataArray[rowIndex][dateCol];
-            String time = dataArray[rowIndex][timeCol];
+            String productName = dataArray[rowIndex][prodNameCol].toString();
+            String quantity = dataArray[rowIndex][quantityCol].toString();
+            Object date = dataArray[rowIndex][dateCol];
+            Object time = dataArray[rowIndex][timeCol];
 
             if(productName.isEmpty()) {
-                return "Aveti campuri goale in denumirile produselor.";
+                return "Aveti campuri goale in denumirile produselor.\n" +
+                        "\nColoana: " + prodNameCol + " Rand: " + rowIndex;
             } else {
                 boolean found = false;
-                for(Product product : products) {
-                    if(product.getName().equals(productName.trim())) {
-                        idArray[rowIndex] = product.getId();
+                for( int i = 0; i < products.size() && !found; i++) {
+                    if(products.get(i).getName().equals(productName.trim())) {
+                        idArray[rowIndex] = products.get(i).getId();
                         found = true;
                     }
                 }
                 if(!found) {
-                    idArray = new int[rowIndex + 1];
-                    return "Produsul cu numele " + productName.trim() + " nu a fost gasit in baza da date!";
+                    return "Produsul cu numele " + productName.trim() + " nu a fost gasit in baza da date!" +
+                            "\nColoana: " + prodNameCol + " Rand: " + rowIndex;
                 }
             }
             if(quantity.isEmpty()) {
-                return "Aveti campuri goale in unitatile de masura ale produselor.";
+                return "Aveti campuri goale in cantitatile comandate ale produselor." +
+                        "\nColoana: " + quantityCol + " Rand: " + rowIndex;
             } else {
                 try {
                     Double.parseDouble(quantity);
                 } catch (Exception e) {
-                    return "Aveti campuri in coloana de cantitate care nu contin un format numeric corect.";
+                    return "Aveti campuri in coloana de cantitate care nu contin un format numeric corect." +
+                            "\nColoana: " + quantityCol + " Rand: " + rowIndex;
                 }
             }
-            if(date.isEmpty()) {
-                return "Aveti campuri goale in coloana pentru data.";
+            if(date == null) {
+                return "Aveti campuri goale in coloana pentru data programata." +
+                        "\nColoana: " + dateCol + " Rand: " + rowIndex;
             } else {
-                try{
-                    dateFormatter.parse(date);
-                } catch (ParseException e) {
-                    return "Exista campuri in care data nu respecta formatul dd/MM/yyyy";
+                if(!(date instanceof LocalDate)) {
+                    return "Exista campuri in care data nu respecta formatul dd/mm/yyyy." +
+                            "\nColoana: " + dateCol + " Rand: " + rowIndex;
                 }
             }
-            if(time.isEmpty()) {
-                return "Aveti campuri goale in coloana pentru ora.";
+            if(time == null) {
+                return "Aveti campuri goale in coloana pentru ora." +
+                        "\nColoana: " + dateCol + " Rand: " + rowIndex;
             } else {
-                try{
-                    timeFormatter.parse(date);
-                } catch (ParseException e) {
-                    return "Exista campuri in care ora nu respecta formatul hh:mm";
+                if(!(time instanceof LocalTime)) {
+                    return "Exista campuri in care ora nu respecta formatul hh:mm." +
+                            "\nColoana: " + dateCol + " Rand: " + rowIndex;
                 }
             }
         }
-
-
-
         return "";
     }
 
-    public void insertData(int startRow, int prodNamCol, int quantityCol, int dateCol, int timeCol) {
+    public void insertData() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "INSERT INTO [dbo].[COMENZI] (denumire, cantitate, data_programata, ID_PRODUS, ID_UTILIZATOR_I) " +
-                    "VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO [dbo].[COMENZI] (ID_PRODUS, cantitate, data_programata, ID_UTILIZATOR_I) " +
+                    "VALUES (?, ?, ?, ?)";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             for(int rowIndex = startRow; rowIndex <= numRows; rowIndex ++) {
-                String productName = dataArray[rowIndex][prodNamCol];
-                double quantity = Double.parseDouble(dataArray[rowIndex][quantityCol]);
-                String date = dataArray[rowIndex][dateCol];
-                String time = dataArray[rowIndex][timeCol];
-                LocalDate localDate = LocalDate.parse(date);
-                LocalTime localTime = LocalTime.parse(time);
-                Timestamp dateScheduled = Timestamp.valueOf(LocalDateTime.of(localDate, localTime));
-
-                preparedStatement.setString(1, productName.trim());
+                double quantity = Double.parseDouble(dataArray[rowIndex][quantityCol].toString());
+                LocalDate date = (LocalDate) dataArray[rowIndex][dateCol];
+                LocalTime time = (LocalTime) dataArray[rowIndex][timeCol];
+                Timestamp dateScheduled = Timestamp.valueOf(LocalDateTime.of(date, time));
+                preparedStatement.setInt(1, idArray[rowIndex]);
                 preparedStatement.setDouble(2, quantity);
                 preparedStatement.setTimestamp(3, dateScheduled);
-                preparedStatement.setInt(4, idArray[rowIndex]);
-                preparedStatement.setInt(5, ConfigApp.getUser().getId());
+                preparedStatement.setInt(4, ConfigApp.getUser().getId());
                 preparedStatement.addBatch();
             }
             preparedStatement.executeBatch();

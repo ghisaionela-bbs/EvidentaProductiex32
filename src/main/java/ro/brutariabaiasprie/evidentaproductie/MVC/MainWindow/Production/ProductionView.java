@@ -24,8 +24,8 @@ import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.ConfirmationController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Confirmation.ConfirmationController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.OrderAssociationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Record.RecordController;
 
@@ -155,8 +155,14 @@ public class ProductionView extends Parent implements Builder<Region> {
                     }
                     orderLabel.getStyleClass().remove("warning");
                     Order order = model.getAssociatedOrder();
-                    return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted()) +
-                            "\nNecesar: " + order.getRemainder();
+                    if(order.getRemainder() > 0) {
+                        return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted()) +
+                                "\nNecesar: " + order.getRemainder();
+                    } else {
+                        return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted()) +
+                                "\nComanda completa";
+                    }
+
 
                 },
                 model.associatedOrderProperty()
@@ -209,7 +215,12 @@ public class ProductionView extends Parent implements Builder<Region> {
                                 String newValue) {
                 if (newValue != null && !newValue.isEmpty()) {
                     if(model.getSelectedProduct() == null) {
-                        WarningController warningController = new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
+                        new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
+                        quantityTextField.clear();
+                        return;
+                    }
+                    if(model.getAssociatedOrder() == null) {
+                        new WarningController(stage, "Selectati o comanda pentru a introduce inregistrari!");
                         quantityTextField.clear();
                         return;
                     }
@@ -367,6 +378,10 @@ public class ProductionView extends Parent implements Builder<Region> {
                     new WarningController(stage, "Selectati produsul pentru care doriti sa adaugati inregistrarea!");
                     return;
                 }
+                if(model.getAssociatedOrder() == null) {
+                    new WarningController(stage, "Selectati o comanda pentru a introduce inregistrari!");
+                    return;
+                }
                 if("0123456789.".contains(value)) {
                     String quantity = quantityTextField.getText();
                     quantityTextField.setText(quantity + value);
@@ -413,15 +428,25 @@ public class ProductionView extends Parent implements Builder<Region> {
 
         TableColumn<Record, Timestamp> dateAndTimeColumn = new TableColumn<>("Data si ora");
         dateAndTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         dateAndTimeColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Timestamp item, boolean empty) {
+                final Label timeLabel = new Label();
+                final Label dateLabel = new Label();
                 super.updateItem(item, empty);
-                if (empty) {
+                if (item == null || empty) {
                     setText(null);
+                    setGraphic(null);
                 } else {
-                    setText(format.format(item));
+                    setText(null);
+                    timeLabel.setText(timeFormat.format(item));
+                    dateLabel.setText(dateFormat.format(item));
+                    FlowPane flowPane = new FlowPane(timeLabel, dateLabel);
+                    flowPane.setHgap(8);
+                    flowPane.setVgap(4);
+                    setGraphic(flowPane);
                 }
             }
         });

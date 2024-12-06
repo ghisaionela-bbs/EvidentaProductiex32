@@ -174,6 +174,7 @@ public class ProductionModel {
             String sql = "SELECT " +
                     "p.ID, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -211,6 +212,7 @@ public class ProductionModel {
                 Product product = new Product(
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
+                        resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
@@ -227,9 +229,6 @@ public class ProductionModel {
     public void addProductRecordToDB(double quantity) {
         try {
             Connection connection = DBConnectionService.getConnection();
-
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
@@ -244,15 +243,31 @@ public class ProductionModel {
             statement.setInt(1, selectedProduct.get().getId());
             statement.setDouble(2, quantity);
             statement.setTimestamp(3, timestamp);
-            statement.setInt(4, user.getId());
-            if(associatedOrder.get() != null) {
-                statement.setInt(5, associatedOrder.get().getId());
-            }
+            statement.setInt(4, ConfigApp.getUser().getId());
+            statement.setInt(5, associatedOrder.get().getId());
             statement.executeUpdate();
-
             ResultSet key = statement.getGeneratedKeys();
             key.next();
             int ID = key.getInt(1);
+
+            String selectSql = "SELECT SUM(COALESCE(r.cantitate, 0.00)) AS realizat, c.cantitate from COMENZI AS c " +
+                    "LEFT JOIN REALIZARI AS r ON r.ID_COMANDA = c.ID " +
+                    "WHERE c.ID = ? " +
+                    "GROUP BY c.cantitate ";
+            PreparedStatement selectStatement = connection.prepareStatement(selectSql);
+            selectStatement.setInt(1, associatedOrder.get().getId());
+            ResultSet resultSet = selectStatement.executeQuery();
+            resultSet.next();
+            double completed = resultSet.getDouble("realizat");
+            double orderQuantity = resultSet.getDouble("cantitate");
+
+            if(completed >= orderQuantity) {
+                String closeOrderSql = "UPDATE COMENZI SET inchisa = 1 WHERE ID = ?";
+                PreparedStatement closeOrderStatement = connection.prepareStatement(closeOrderSql);
+                closeOrderStatement.setInt(1, associatedOrder.get().getId());
+                closeOrderStatement.executeUpdate();
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -301,6 +316,7 @@ public class ProductionModel {
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT TOP 1 " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -322,6 +338,7 @@ public class ProductionModel {
             Product product = new Product(
                     selectedProduct.get().getId(),
                     resultSet.getString("denumire"),
+                    resultSet.getDouble("sarja"),
                     resultSet.getString("um"),
                     group,
                     resultSet.getInt("ID_SUBGRUPA_PRODUSE")
@@ -344,6 +361,7 @@ public class ProductionModel {
             String sql = "SELECT c.ID, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "g.ID AS ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -365,6 +383,7 @@ public class ProductionModel {
                     "c.ID_PRODUS, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "g.ID, " +
                     "g.denumire, " +
@@ -391,6 +410,7 @@ public class ProductionModel {
             order.setProduct(new Product(
                     resultSet.getInt("ID_PRODUS"),
                     resultSet.getString("denumire"),
+                    resultSet.getDouble("sarja"),
                     resultSet.getString("um"),
                     group,
                     resultSet.getInt("ID_SUBGRUPA_PRODUSE")

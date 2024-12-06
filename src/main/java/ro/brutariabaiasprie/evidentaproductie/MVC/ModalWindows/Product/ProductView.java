@@ -5,12 +5,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.NumericInput.NumericInputController;
 
 import java.util.function.Consumer;
 
@@ -20,6 +23,7 @@ import java.util.function.Consumer;
  */
 public class ProductView extends Parent implements Builder<Region> {
     private final ProductModel model;
+    private final Stage stage;
     private final WINDOW_TYPE type;
     private final Consumer<ACTION_TYPE> actionHandler;
 
@@ -27,6 +31,7 @@ public class ProductView extends Parent implements Builder<Region> {
 
     private TextArea productNameTextArea;
     private ToggleGroup unitMeasurementGroup;
+    private TextField batchTextField;
     final ComboBox<Group> groupComboBox = new ComboBox<>();
     final ComboBox<Group> subgroupComboBox = new ComboBox<>();
 
@@ -36,8 +41,9 @@ public class ProductView extends Parent implements Builder<Region> {
      * @param type the WINDOW_TYPE, can be EDIT, ADD or VIEW. The components in the view will be created depending on it.
      * @param actionHandler the handler for the SceneButtons
      */
-    public ProductView(ProductModel model, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler) {
+    public ProductView(ProductModel model, Stage stage, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler) {
         this.model = model;
+        this.stage = stage;
         this.actionHandler = actionHandler;
         this.type = type;
     }
@@ -67,6 +73,10 @@ public class ProductView extends Parent implements Builder<Region> {
         //  Title
         Label productIdLabel  = new Label();
         productIdLabel.getStyleClass().add("title");
+        productIdLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(productIdLabel, Priority.ALWAYS);
+        HBox titleContainer = new HBox(productIdLabel);
+        titleContainer.setAlignment(Pos.CENTER_LEFT);
 
         // Name section
         Label productNameLabel = new Label("Denumire:");
@@ -86,11 +96,37 @@ public class ProductView extends Parent implements Builder<Region> {
         RadioButton bucRadioButton = new RadioButton("BUC");
         bucRadioButton.setUserData("BUC");
         bucRadioButton.setToggleGroup(unitMeasurementGroup);
+        HBox.setHgrow(kgRadioButton, Priority.ALWAYS);
+        HBox.setHgrow(bucRadioButton, Priority.ALWAYS);
         HBox unitMeasurementChoiceBox = new HBox(kgRadioButton, bucRadioButton);
         unitMeasurementChoiceBox.setSpacing(16);
         VBox unitMeasurementSection = new VBox(unitMeasurementLabel, unitMeasurementChoiceBox);
         unitMeasurementSection.getStyleClass().add("section");
         unitMeasurementSection.getStyleClass().add("vbox-layout");
+        GridPane.setHgrow(unitMeasurementChoiceBox, Priority.ALWAYS);
+
+        Label batchLabel = new Label("Cantitate sarja:");
+        batchTextField = new TextField();
+        batchTextField.setPromptText("0.00");
+        HBox.setHgrow(batchTextField, Priority.ALWAYS);
+        Button numpadButton = new Button();
+        numpadButton.setGraphic(new FontIcon("mdi2n-numeric"));
+        numpadButton.setOnAction(event -> {
+            Double quantity = 0.00;
+            if(!batchTextField.getText().isEmpty()) {
+                quantity = Double.parseDouble(batchTextField.getText());
+            }
+            NumericInputController numericInputController = new NumericInputController(stage, quantity);
+            if(numericInputController.isSUCCESS()) {
+                batchTextField.textProperty().set(numericInputController.getInput());
+            }
+        });
+        numpadButton.getStyleClass().add("filled-button");
+        numpadButton.setMaxHeight(Double.MAX_VALUE);
+        HBox batchTextFieldContainer = new HBox(batchTextField, numpadButton);
+        VBox batchSection = new VBox(batchLabel, batchTextFieldContainer);
+        batchSection.getStyleClass().add("section");
+        batchSection.getStyleClass().add("vbox-layout");
 
         // User group section
         Label groupLabel = new Label("Grupa:");
@@ -173,6 +209,7 @@ public class ProductView extends Parent implements Builder<Region> {
             case EDIT:
                 productIdLabel.setText("Produs " + model.getProduct().getId());
                 productNameTextArea.setText(model.getProduct().getName());
+                batchTextField.setText(String.valueOf(model.getProduct().getBatchValue()));
                 if(model.getProduct().getUnitMeasurement().equals("KG")) {
                     unitMeasurementGroup.selectToggle(kgRadioButton);
                 } else if (model.getProduct().getUnitMeasurement().equals("BUC")) {
@@ -192,7 +229,7 @@ public class ProductView extends Parent implements Builder<Region> {
         // Setting up the container
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-form");
-        gridPane.add(productIdLabel, 0, 0);
+        gridPane.add(titleContainer, 0, 0, 2, 1);
         // Adding the controls
         if(type == WINDOW_TYPE.EDIT) {
             Button deleteButton = new Button("Stergere");
@@ -200,12 +237,13 @@ public class ProductView extends Parent implements Builder<Region> {
             deleteButton.getStyleClass().add("filled-button");
             deleteButton.setStyle("-fx-background-color: red;");
             GridPane.setHalignment(deleteButton, HPos.RIGHT);
-            gridPane.add(deleteButton, 2, 0);
+            titleContainer.getChildren().add(deleteButton);
         }
-        gridPane.add(productNameSection, 0, 1, 3, 1);
-        gridPane.add(unitMeasurementSection, 0, 2, 3, 1);
-        gridPane.add(groupSection, 0, 3, 3, 1);
-        gridPane.add(subgroupSection, 0, 4, 3, 1);
+        gridPane.add(productNameSection, 0, 1, 2, 1);
+        gridPane.add(batchSection, 0, 2);
+        gridPane.add(unitMeasurementSection, 1, 2);
+        gridPane.add(groupSection, 0, 3, 2, 1);
+        gridPane.add(subgroupSection, 0, 4, 2, 1);
         // adding constraints
 //        for (int i = 0 ; i < gridPane.getRowCount(); i++) {
 //            RowConstraints row = new RowConstraints();
@@ -218,6 +256,7 @@ public class ProductView extends Parent implements Builder<Region> {
             gridPane.getColumnConstraints().add(col);
         }
 
+        gridPane.setHgap(8);
         return gridPane;
     }
 
@@ -250,6 +289,10 @@ public class ProductView extends Parent implements Builder<Region> {
         return productNameTextArea.getText().trim();
     }
 
+    public String getBatchValue() {
+        return batchTextField.getText();
+    }
+
     public String getUnitMeasurement() {
         return (String) unitMeasurementGroup.getSelectedToggle().getUserData();
     }
@@ -264,6 +307,8 @@ public class ProductView extends Parent implements Builder<Region> {
         }
         return subgroupComboBox.getValue().getId();
     }
+
+
 
     public void loadProductData() {
         // Setting up the values and properties of controls

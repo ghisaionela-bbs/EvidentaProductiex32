@@ -1,6 +1,6 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -23,8 +23,10 @@ public class ExcelImportView extends Parent implements Builder<Region> {
     private final Stage PARENT_STAGE;
 
     private TextField fileNameTextField;
+    private Spinner<Integer> sheetNumberSpinner;
     private Spinner<Integer> productNameColumnSpinner;
     private Spinner<Integer> unitMeasurementColumnSpinner;
+    private Spinner<Integer> batchColumnSpinner;
     private Spinner<Integer> startingRowSpinner;
     private int SCENE_NO = -1;
     private final int LAST_SCENE_NO = 4;
@@ -43,6 +45,7 @@ public class ExcelImportView extends Parent implements Builder<Region> {
         SCENE_NO = 0;
         showConfigurationOptions();
         root.getStyleClass().add("modal-window");
+        root.getStyleClass().add("entry-view");
         return root;
     }
 
@@ -120,29 +123,61 @@ public class ExcelImportView extends Parent implements Builder<Region> {
         Button browseFileButton = new Button("Cauta");
         browseFileButton.setOnAction(event -> browseActionHandler.run());
 
+        sheetNumberSpinner = new Spinner<>(1, 1000, 1);
+        sheetNumberSpinner.getValueFactory().setValue(1);
+        VBox sheetNumberSection = new VBox(new Label("Numar sheet:"), sheetNumberSpinner);
+        sheetNumberSection.getStyleClass().add("section");
+        sheetNumberSection.getStyleClass().add("vbox-layout");
+
         productNameColumnSpinner = new Spinner<>(1,1000,1);
         productNameColumnSpinner.getValueFactory().setValue(1);
+        VBox productSection = new VBox(productNameLabel, productNameColumnSpinner);
+        productSection.getStyleClass().add("section");
+        productSection.getStyleClass().add("vbox-layout");
+
+        batchColumnSpinner = new Spinner<>(1, 1000, 1);
+        batchColumnSpinner.getValueFactory().setValue(2);
+        VBox batchSection = new VBox(new Label("Coloana sarja:"), batchColumnSpinner);
+        batchSection.getStyleClass().add("section");
+        batchSection.getStyleClass().add("vbox-layout");
 
         unitMeasurementColumnSpinner = new Spinner<>(1,1000,1);
-        unitMeasurementColumnSpinner.getValueFactory().setValue(2);
+        unitMeasurementColumnSpinner.getValueFactory().setValue(3);
+        VBox unitMeasurementSection = new VBox(unitMeasurementLabel, unitMeasurementColumnSpinner);
+        unitMeasurementSection.getStyleClass().add("section");
+        unitMeasurementSection.getStyleClass().add("vbox-layout");
 
         Label startingRowLabel = new Label("Randul de inceput (fara cap de tabel):");
         startingRowLabel.setWrapText(true);
         GridPane.setFillWidth(startingRowLabel, true);
         startingRowSpinner = new Spinner<>(1,1000,1);
         startingRowSpinner.getValueFactory().setValue(1);
+        VBox startingRowSection = new VBox(startingRowLabel, startingRowSpinner);
+        startingRowSection.getStyleClass().add("section");
+        startingRowSection.getStyleClass().add("vbox-layout");
 
         gridPane.add(fileNameTextField, 0, 0, 2, 1);
         gridPane.add(browseFileButton, 2, 0);
 
-        gridPane.add(productNameLabel, 0, 1);
-        gridPane.add(productNameColumnSpinner, 1, 1);
+        gridPane.add(new Label("Numar sheet:"), 0, 1);
+        gridPane.add(sheetNumberSpinner, 1, 1);
 
-        gridPane.add(unitMeasurementLabel, 0, 2);
-        gridPane.add(unitMeasurementColumnSpinner, 1, 2);
+        gridPane.add(productNameLabel, 0, 2);
+        gridPane.add(productNameColumnSpinner, 1, 2);
 
-        gridPane.add(startingRowLabel, 0, 3, 1, 2);
-        gridPane.add(startingRowSpinner, 1, 3);
+        gridPane.add(new Label("Coloana sarja:"), 0, 3);
+        gridPane.add(batchColumnSpinner, 1, 3);
+
+//        gridPane.add(sheetNumberSection, 0, 1);
+//        gridPane.add(productSection, 0, 2);
+//        gridPane.add(batchSection, 0, 3);
+//        gridPane.add(unitMeasurementSection, 0, 4);
+//        gridPane.add(startingRowSection, 0, 5);
+        gridPane.add(unitMeasurementLabel, 0, 4);
+        gridPane.add(unitMeasurementColumnSpinner, 1, 4);
+
+        gridPane.add(startingRowLabel, 0, 5);
+        gridPane.add(startingRowSpinner, 1, 5);
 
         gridPane.getStyleClass().add("grid-form");
 
@@ -158,30 +193,35 @@ public class ExcelImportView extends Parent implements Builder<Region> {
     private void showDataPreview() {
         Label infoLabel = new Label("Datele care vor fi importate sunt cele evidentiate mai jos:");
 
-        TableView<String[]> excelDataView = new TableView<>();
+        TableView<Object[]> excelDataView = new TableView<>();
         excelDataView.setSelectionModel(null);
         excelDataView.getStyleClass().add("excel-import-table");
         VBox.setVgrow(excelDataView, Priority.ALWAYS);
         for (int columnIndex = 0; columnIndex <= model.getNumCols(); columnIndex++) {
-            TableColumn<String[], String> column = new TableColumn<>();
+            TableColumn<Object[], Object> column = new TableColumn<>();
             final int colIndex = columnIndex;
-            column.setCellValueFactory(stringCellDataFeatures -> new SimpleStringProperty((stringCellDataFeatures.getValue()[colIndex])));
+            column.setCellValueFactory(stringCellDataFeatures -> new SimpleObjectProperty<>((stringCellDataFeatures.getValue()[colIndex])));
             column.setCellFactory(tableColumn -> new TableCell<>() {
                 @Override
-                protected void updateItem(String item, boolean empty) {
+                protected void updateItem(Object item, boolean empty) {
                     super.updateItem(item, empty);
                     if(empty || item == null) {
                         setText(null);
                         setGraphic(null);
-                        setStyle(null);
                     } else {
-                        setText(item);
-                        if(getIndex() >= startingRowSpinner.getValue() &&
-                                (colIndex == productNameColumnSpinner.getValue() || colIndex == unitMeasurementColumnSpinner.getValue())) {
-                            setStyle("-fx-background-color: COLOR_WHITE; -fx-border-color: derive(COLOR_WHITE, -20%)");
-                        } else {
-                            setStyle("-fx-background-color: derive(COLOR_WHITE, -10%); -fx-border-color: derive(COLOR_WHITE, -20%)");
+                        if(item instanceof String) {
+                            setText((String) item);
+                        } else if (item instanceof Double) {
+                            setText(String.format("%.2f", item));
                         }
+                    }
+                    if(getIndex() >= startingRowSpinner.getValue() &&
+                            (colIndex == productNameColumnSpinner.getValue()
+                                    || colIndex == batchColumnSpinner.getValue()
+                                    || colIndex == unitMeasurementColumnSpinner.getValue())) {
+                        setStyle("-fx-background-color: COLOR_WHITE; -fx-border-color: derive(COLOR_WHITE, -20%)");
+                    } else {
+                        setStyle("-fx-background-color: derive(COLOR_WHITE, -10%); -fx-border-color: derive(COLOR_WHITE, -20%)");
                     }
                 }
             });
@@ -207,8 +247,16 @@ public class ExcelImportView extends Parent implements Builder<Region> {
 //        root.getChildren().addAll(infoLabel, createWindowActionButtons());
     }
 
+    public int getSheetNumber() {
+        return sheetNumberSpinner.getValue() - 1;
+    }
+
     public int getProductNameColumn(){
         return productNameColumnSpinner.getValue();
+    }
+
+    public int getBatchValueColumn() {
+        return batchColumnSpinner.getValue();
     }
 
     public int getUnitMeasurementColumn(){
@@ -218,5 +266,6 @@ public class ExcelImportView extends Parent implements Builder<Region> {
     public int getStartingRow(){
         return startingRowSpinner.getValue();
     }
+
 
 }

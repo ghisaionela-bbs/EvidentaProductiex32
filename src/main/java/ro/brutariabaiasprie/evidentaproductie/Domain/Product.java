@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Product {
     private int id;
     private String name;
+    private double batchValue;
     private String unitMeasurement;
     private Group group;
     private int subgroupId;
@@ -12,14 +13,16 @@ public class Product {
     public Product() {
         this.id = 0;
         this.name = "";
+        this.batchValue = 0.00;
         this.unitMeasurement = "";
         this.group = null;
         this.subgroupId = 0;
     }
 
-    public Product(int id, String name, String unitMeasurement, Group group, int subgroupId) {
+    public Product(int id, String name, double batchValue, String unitMeasurement, Group group, int subgroupId) {
         this.id = id;
         this.name = name;
+        this.batchValue = batchValue;
         this.unitMeasurement = unitMeasurement;
         this.group = group;
         this.subgroupId = subgroupId;
@@ -39,6 +42,14 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double getBatchValue() {
+        return batchValue;
+    }
+
+    public void setBatchValue(double batchValue) {
+        this.batchValue = batchValue;
     }
 
     public String getUnitMeasurement() {

@@ -53,6 +53,7 @@ public class OrderModel {
             String sql = "SELECT " +
                     "p.ID, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.UM, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -86,6 +87,7 @@ public class OrderModel {
                 Product product = new Product(
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
+                        resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")

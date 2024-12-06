@@ -1,5 +1,6 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderImport;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,6 +14,9 @@ import javafx.util.Builder;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.function.Consumer;
 
 public class OrderImportView extends Parent implements Builder<Region> {
@@ -23,6 +27,7 @@ public class OrderImportView extends Parent implements Builder<Region> {
     private final Stage PARENT_STAGE;
 
     private TextField fileNameTextField;
+    private Spinner<Integer> sheetSpinner;
     private Spinner<Integer> productNameColumnSpinner;
     private Spinner<Integer> quantityColumnSpinner;
     private Spinner<Integer> dateColumnSpinner;
@@ -122,6 +127,9 @@ public class OrderImportView extends Parent implements Builder<Region> {
         Button browseFileButton = new Button("Cauta");
         browseFileButton.setOnAction(event -> browseActionHandler.run());
 
+        sheetSpinner = new Spinner<>(1, 1000, 1);
+        sheetSpinner.getValueFactory().setValue(1);
+
         productNameColumnSpinner = new Spinner<>(1,1000,1);
         productNameColumnSpinner.getValueFactory().setValue(1);
 
@@ -143,20 +151,23 @@ public class OrderImportView extends Parent implements Builder<Region> {
         gridPane.add(fileNameTextField, 0, 0, 2, 1);
         gridPane.add(browseFileButton, 2, 0);
 
-        gridPane.add(productNameLabel, 0, 1);
-        gridPane.add(productNameColumnSpinner, 1, 1);
+        gridPane.add(new Label("Numar sheet: "), 0, 1);
+        gridPane.add(sheetSpinner, 1, 1);
 
-        gridPane.add(unitMeasurementLabel, 0, 2);
-        gridPane.add(quantityColumnSpinner, 1, 2);
+        gridPane.add(productNameLabel, 0, 2);
+        gridPane.add(productNameColumnSpinner, 1, 2);
 
-        gridPane.add(new Label("Coloana data:"), 0, 3);
-        gridPane.add(dateColumnSpinner, 1, 3);
+        gridPane.add(unitMeasurementLabel, 0, 3);
+        gridPane.add(quantityColumnSpinner, 1, 3);
 
-        gridPane.add(new Label("Coloana ora:"), 0, 4);
-        gridPane.add(timeColumnSpinner, 1, 4);
+        gridPane.add(new Label("Coloana data:"), 0, 4);
+        gridPane.add(dateColumnSpinner, 1, 4);
 
-        gridPane.add(startingRowLabel, 0, 5, 1, 2);
-        gridPane.add(startingRowSpinner, 1, 5);
+        gridPane.add(new Label("Coloana ora:"), 0, 5);
+        gridPane.add(timeColumnSpinner, 1, 5);
+
+        gridPane.add(startingRowLabel, 0, 6, 1, 2);
+        gridPane.add(startingRowSpinner, 1, 6);
 
         gridPane.getStyleClass().add("grid-form");
 
@@ -168,26 +179,25 @@ public class OrderImportView extends Parent implements Builder<Region> {
 
 
     private void showDataPreview() {
-        Label infoLabel = new Label("Datele care vor fi importate sunt cele evidentiate mai jos:");
+        Label infoLabel = new Label("Date sheet " + sheetSpinner.getValue());
 
-        TableView<String[]> excelDataView = new TableView<>();
+        TableView<Object[]> excelDataView = new TableView<>();
         excelDataView.setSelectionModel(null);
         excelDataView.getStyleClass().add("excel-import-table");
         VBox.setVgrow(excelDataView, Priority.ALWAYS);
         for (int columnIndex = 0; columnIndex <= model.getNumCols(); columnIndex++) {
-            TableColumn<String[], String> column = new TableColumn<>();
+            TableColumn<Object[], Object> column = new TableColumn<>();
             final int colIndex = columnIndex;
-            column.setCellValueFactory(stringCellDataFeatures -> new SimpleStringProperty((stringCellDataFeatures.getValue()[colIndex])));
+            column.setCellValueFactory(stringCellDataFeatures -> new SimpleObjectProperty<>((stringCellDataFeatures.getValue()[colIndex])));
             column.setCellFactory(tableColumn -> new TableCell<>() {
                 @Override
-                protected void updateItem(String item, boolean empty) {
+                protected void updateItem(Object item, boolean empty) {
                     super.updateItem(item, empty);
                     if(empty || item == null) {
                         setText(null);
                         setGraphic(null);
                         setStyle(null);
                     } else {
-                        setText(item);
                         if(getIndex() >= startingRowSpinner.getValue() && (
                                 colIndex == productNameColumnSpinner.getValue() ||
                                 colIndex == quantityColumnSpinner.getValue() ||
@@ -198,6 +208,40 @@ public class OrderImportView extends Parent implements Builder<Region> {
                         } else {
                             setStyle("-fx-background-color: derive(COLOR_WHITE, -10%); -fx-border-color: derive(COLOR_WHITE, -20%)");
                         }
+
+                        if(getIndex() >= startingRowSpinner.getValue()
+                                && colIndex == dateColumnSpinner.getValue()
+                                && !(item instanceof LocalDate)) {
+                            setStyle("-fx-background-color: RED; -fx-text-fill: COLOR_WHITE");
+                        }
+
+                        if(getIndex() >= startingRowSpinner.getValue()
+                                && colIndex == timeColumnSpinner.getValue()
+                                && !(item instanceof LocalTime)) {
+                            setStyle("-fx-background-color: RED; -fx-text-fill: COLOR_WHITE");
+                        }
+
+                        if(item instanceof LocalDate) {
+                            try{
+                                setText(model.dateFormatter.format((LocalDate) item));
+                            } catch (Exception e) {
+                                setText(item.toString());
+                                setStyle("-fx-background-color: RED; -fx-text-fill: COLOR_WHITE");
+                            }
+                            return;
+                        }
+
+                        if(item instanceof LocalTime) {
+                            try {
+                                setText(model.timeFormatter.format((LocalTime) item));
+                            } catch (Exception e) {
+                                setText(item.toString());
+                                setStyle("-fx-background-color: RED; -fx-text-fill: COLOR_WHITE");
+                            }
+                            return;
+                        }
+
+                        setText(item.toString());
                     }
                 }
             });
@@ -221,6 +265,10 @@ public class OrderImportView extends Parent implements Builder<Region> {
 
 //        root.getChildren().clear();
 //        root.getChildren().addAll(infoLabel, createWindowActionButtons());
+    }
+
+    public int getSheetNumber() {
+        return sheetSpinner.getValue() - 1;
     }
 
     public int getProductNameColumn(){

@@ -98,6 +98,7 @@ public class RecordModel {
             String sql = "SELECT " +
                     "p.ID, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.UM, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -131,6 +132,7 @@ public class RecordModel {
                 Product product = new Product(
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
+                        resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
@@ -156,6 +158,7 @@ public class RecordModel {
             String sql = "SELECT c.ID, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "g.ID AS ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -178,6 +181,7 @@ public class RecordModel {
                     "p.ID_SUBGRUPA_PRODUSE, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "g.ID, " +
                     "g.denumire, " +
@@ -208,6 +212,7 @@ public class RecordModel {
                 order.setProduct(new Product(
                         resultSet.getInt("ID_PRODUS"),
                         resultSet.getString("denumire"),
+                        resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")

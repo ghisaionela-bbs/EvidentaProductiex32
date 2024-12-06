@@ -57,6 +57,7 @@ public class OrderAssociationModel {
                     "c.ID, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "g.ID AS ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
@@ -77,6 +78,7 @@ public class OrderAssociationModel {
                     "GROUP BY c.ID, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
+                    "p.sarja, " +
                     "p.um, " +
                     "g.ID, " +
                     "g.denumire, " +
@@ -95,14 +97,14 @@ public class OrderAssociationModel {
 
             orders.clear();
             while(resultSet.next()){
-                orders.add(getOrderFromResultset(resultSet));
+                orders.add(getOrderFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Order getOrderFromResultset(ResultSet resultSet) throws SQLException {
+    private Order getOrderFromResultSet(ResultSet resultSet) throws SQLException {
         Group group = null;
         int groupId = resultSet.getInt("ID_GRUPA");
         if(!resultSet.wasNull()) {
@@ -114,6 +116,7 @@ public class OrderAssociationModel {
         order.setProduct(new Product(
                 resultSet.getInt("ID_PRODUS"),
                 resultSet.getString("denumire"),
+                resultSet.getDouble("sarja"),
                 resultSet.getString("um"),
                 group,
                 resultSet.getInt("ID_SUBGRUPA_PRODUSE")

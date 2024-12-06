@@ -7,8 +7,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportView;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 
 import java.util.Objects;
@@ -44,7 +43,9 @@ public class OrderExportController extends ModalWindow {
                 @Override
                 protected Void call() {
                     try {
-                        model.export(view.getFromDateValue(), view.getToDateValue());
+                        model.setDateFrom(view.getFromDateValue());
+                        model.setDateTo(view.getToDateValue());
+                        model.export();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

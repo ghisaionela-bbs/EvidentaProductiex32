@@ -1,10 +1,9 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues;
+package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Choice;
 
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Builder;
@@ -12,7 +11,6 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
 import java.util.Map;
-import java.util.concurrent.Flow;
 import java.util.function.Consumer;
 
 public class ChoiceView extends Parent implements Builder<Region> {

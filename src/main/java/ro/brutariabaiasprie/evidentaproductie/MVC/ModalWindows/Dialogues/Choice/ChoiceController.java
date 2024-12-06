@@ -1,4 +1,4 @@
-package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues;
+package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Choice;
 
 import javafx.scene.Scene;
 import javafx.scene.image.Image;

@@ -17,7 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Builder;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.kordamp.ikonli.javafx.FontIcon;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.WarningController;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 
 import java.io.IOException;
 
