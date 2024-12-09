@@ -70,6 +70,7 @@ public class ProductionController implements SceneController {
                         model.loadRecords();
                     }
                     if(change.getKey().equals("COMENZI")) {
+                        model.loadProducts();
                         //when we have an assciated order
                         if(model.getAssociatedOrder() != null) {
                             ModifiedTableData tableData = change.getValueAdded();

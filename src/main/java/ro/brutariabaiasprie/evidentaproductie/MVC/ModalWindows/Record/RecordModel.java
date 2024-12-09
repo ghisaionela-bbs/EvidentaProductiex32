@@ -39,8 +39,6 @@ public class RecordModel {
         try {
             Connection connection = DBConnectionService.getConnection();
 
-            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
@@ -59,7 +57,7 @@ public class RecordModel {
             statement.setTimestamp(3, record.getDateTimeInserted());
             statement.setInt(4, record.getUserIdInserted());
             statement.setTimestamp(5, timestamp);
-            statement.setInt(6, user.getId());
+            statement.setInt(6, ConfigApp.getUser().getId());
             if(record.getOrderId() == 0) {
                 statement.setNull(7, Types.INTEGER);
             } else {
@@ -75,12 +73,6 @@ public class RecordModel {
 
     public void loadProducts() {
         try {
-//            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-//            String whereCond = "";
-//            if(user.getGroupId() != 0) {
-//                whereCond += "WHERE g.ID = ? ";
-//            }
-
             String whereCond = "";
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:

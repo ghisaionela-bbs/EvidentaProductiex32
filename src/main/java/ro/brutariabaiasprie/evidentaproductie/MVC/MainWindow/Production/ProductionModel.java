@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ro.brutariabaiasprie.evidentaproductie.DTO.OrderResultsDTO;
+import ro.brutariabaiasprie.evidentaproductie.DTO.ProductionProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
@@ -20,9 +21,46 @@ import java.util.Calendar;
 
 public class ProductionModel {
     private final ObservableList<Record> records = FXCollections.observableArrayList();
+    private final ObservableList<ProductionProductDTO> products;
+    private final ObservableList<OrderResultsDTO> orderSearchResults;
+    private final ObjectProperty<Product> selectedProduct = new SimpleObjectProperty<>();
+    private final ObjectProperty<Order> associatedOrder = new SimpleObjectProperty<>();
+
+    public ProductionModel() {
+        this.products = FXCollections.observableArrayList();
+        this.orderSearchResults = FXCollections.observableArrayList();
+    }
 
     public ObservableList<Record> getRecords() {
         return records;
+    }
+
+    public ObservableList<ProductionProductDTO> getProducts() {
+        return products;
+    }
+
+    public Order getAssociatedOrder() {
+        return associatedOrder.get();
+    }
+
+    public ObjectProperty<Order> associatedOrderProperty() {
+        return associatedOrder;
+    }
+
+    public void setAssociatedOrder(Order associatedOrder) {
+        this.associatedOrder.set(associatedOrder);
+    }
+
+    public Product getSelectedProduct() {
+        return selectedProduct.get();
+    }
+
+    public ObjectProperty<Product> selectedProductProperty() {
+        return selectedProduct;
+    }
+
+    public void setSelectedProduct(Product selectedProduct) {
+        this.selectedProduct.set(selectedProduct);
     }
 
     public void loadRecords() {
@@ -113,46 +151,6 @@ public class ProductionModel {
         }
     }
 
-
-    private final ObservableList<Product> products;
-    private final ObservableList<OrderResultsDTO> orderSearchResults;
-    private final ObjectProperty<Product> selectedProduct = new SimpleObjectProperty<>();
-    private final ObjectProperty<Order> associatedOrder = new SimpleObjectProperty<>();
-
-    public ProductionModel() {
-        this.products = FXCollections.observableArrayList();
-        this.orderSearchResults = FXCollections.observableArrayList();
-    }
-
-    public ObservableList<Product> getProducts() {
-        return products;
-    }
-
-
-    public Order getAssociatedOrder() {
-        return associatedOrder.get();
-    }
-
-    public ObjectProperty<Order> associatedOrderProperty() {
-        return associatedOrder;
-    }
-
-    public void setAssociatedOrder(Order associatedOrder) {
-        this.associatedOrder.set(associatedOrder);
-    }
-
-    public Product getSelectedProduct() {
-        return selectedProduct.get();
-    }
-
-    public ObjectProperty<Product> selectedProductProperty() {
-        return selectedProduct;
-    }
-
-    public void setSelectedProduct(Product selectedProduct) {
-        this.selectedProduct.set(selectedProduct);
-    }
-
     public void loadProducts() {
         try {
             String whereCond = "";
@@ -178,7 +176,8 @@ public class ProductionModel {
                     "p.um, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
-                    "gp.denumire AS denumire_grupa " +
+                    "gp.denumire AS denumire_grupa, " +
+                    "(SELECT DISTINCT COUNT(ID) FROM COMENZI AS c WHERE c.ID_PRODUS = P.ID AND c.inchisa != 1) AS nr_comenzi " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
@@ -218,7 +217,8 @@ public class ProductionModel {
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 );
                 product.setGroup(group);
-                products.add(product);
+                ProductionProductDTO productionProductDTO = new ProductionProductDTO(product, resultSet.getInt("nr_comenzi"));
+                products.add(productionProductDTO);
             }
 
         } catch (SQLException e) {

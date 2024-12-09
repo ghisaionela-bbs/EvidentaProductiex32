@@ -8,6 +8,7 @@ import ro.brutariabaiasprie.evidentaproductie.Data.Images;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Confirmation.ConfirmationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
@@ -36,7 +37,7 @@ public class RecordController extends ModalWindow {
         this.model.setRecord(record);
         this.model.loadProducts();
         this.model.loadOrders();
-        this.view = new RecordView(this.model, type, this::onWindowAction, this::editOrder);
+        this.view = new RecordView(this.model, stage, type, this::onWindowAction, this::editOrder);
         this.view.setOrderId(record.getOrderId());
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
@@ -105,8 +106,9 @@ public class RecordController extends ModalWindow {
         }
         double quantity = Double.parseDouble(view.getQuantityInput());
         if(quantity <= 0) {
-            new WarningController(stage, "Cantitatea trebuie sa fie mai mare de 0!");
-            return false;
+            if(!new ConfirmationController(stage, "Atentie!", "Sunteti sigur ca doriti sa setati cantitatea la 0?").isSUCCESS()) {
+                return false;
+            }
         }
         return true;
     }

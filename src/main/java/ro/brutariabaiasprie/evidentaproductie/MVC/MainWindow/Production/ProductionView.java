@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
+import ro.brutariabaiasprie.evidentaproductie.DTO.ProductionProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
@@ -51,7 +52,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     private TextField quantityTextField;
     private GridPane numpad;
     private VBox leftSection;
-    private ListView<Product> productsListView;
+    private ListView<ProductionProductDTO> productsListView;
     private Label arrowIcon;
     private Label orderLabel;
     private HBox quantityInputContainer;
@@ -78,7 +79,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     public Region build() {
         Button btnProductChoice = createBtnProductChoice();
         quantityTextField = createQuantityField();
-        quantityTextField.setMaxWidth(Region.USE_COMPUTED_SIZE);
+        quantityTextField.setMaxWidth(Double.MAX_VALUE);
         Label unitMeasurementLabel = new Label();
         unitMeasurementLabel.textProperty().bind(Bindings.createStringBinding(() ->
         {
@@ -90,7 +91,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         }, model.selectedProductProperty()));
         HBox.setHgrow(quantityTextField, Priority.ALWAYS);
         unitMeasurementLabel.getStyleClass().add("unit-measurement-indicator");
-        unitMeasurementLabel.setMaxWidth(Region.USE_COMPUTED_SIZE);
+        unitMeasurementLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(unitMeasurementLabel, Priority.ALWAYS);
 
         quantityInputContainer = new HBox(quantityTextField, unitMeasurementLabel);
         quantityInputContainer.setAlignment(Pos.CENTER);
@@ -269,6 +271,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         Button numDot = new Button(".");
         numDot.setOnAction(handleBtnNumpadOnAction());
         Button numDel = new Button("⌫");
+        numDel.setGraphic(new FontIcon("mdi2b-backspace"));
+        numDel.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         numDel.setOnAction(handleBtnNumpadOnAction());
         Button numAdd = new Button("Adauga +");
         numAdd.setOnAction(handleBtnNumpadOnAction());
@@ -534,26 +538,47 @@ public class ProductionView extends Parent implements Builder<Region> {
         return tableView;
     }
 
-    private ListView<Product> createProductListView() {
-        ListView<Product> listView = new ListView<>();
-        listView.setCellFactory(new Callback<ListView<Product>, ListCell<Product>>() {
+    private ListView<ProductionProductDTO> createProductListView() {
+        ListView<ProductionProductDTO> listView = new ListView<>();
+        listView.setCellFactory(new Callback<ListView<ProductionProductDTO>, ListCell<ProductionProductDTO>>() {
             @Override
-            public ListCell<Product> call(ListView<Product> param) {
-                return new ListCell<Product>() {
+            public ListCell<ProductionProductDTO> call(ListView<ProductionProductDTO> param) {
+                return new ListCell<ProductionProductDTO>() {
                     {
                         setPrefWidth(0);
                     }
                     @Override
-                    protected void updateItem(Product item, boolean empty) {
+                    protected void updateItem(ProductionProductDTO item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
                             setText(null);
                             setGraphic(null);
                         } else {
-                            setText(item.getName());
+                            setText(null);
+                            Label productLabel = new Label(item.getProduct().getName());
+                            productLabel.setMaxWidth(Double.MAX_VALUE);
+                            productLabel.setWrapText(true);
+                            HBox.setHgrow(productLabel, Priority.ALWAYS);
+
+                            HBox container = new HBox(productLabel);
+
+                            if(item.getOrderCount() > 0) {
+                                Label orderCountLabel = new Label(String.valueOf(item.getOrderCount()));
+                                orderCountLabel.setStyle("-fx-background-radius: 50px; " +
+                                        "-fx-border-radius: 50px; " +
+                                        "-fx-background-color: derive(COLOR_BRAND_BROWN, 90%); " +
+                                        "-fx-text-fill: COLOR_WHITE; " +
+                                        "-fx-font-weight: bold; " +
+                                        "-fx-padding: 0.3em; " +
+                                        "-fx-min-width: 40px; " +
+                                        "-fx-text-alignment: CENTER; " +
+                                        "-fx-alignment: CENTER; ");
+                                container.getChildren().add(orderCountLabel);
+                            }
+
                             setWrapText(true);
                             setPadding(new Insets(20));
-                            setGraphic(null);
+                            setGraphic(container);
                         }
                     }
                 };
@@ -563,8 +588,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         listView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 //Use ListView's getSelected Item
-                Product product = listView.getSelectionModel().getSelectedItem();
-                handleListViewItemSelected(product);
+                ProductionProductDTO productionProductDTO = listView.getSelectionModel().getSelectedItem();
+                handleListViewItemSelected(productionProductDTO.getProduct());
                 arrowIcon.setText("▼");
             }
         });
@@ -572,8 +597,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         listView.setOnTouchPressed(event -> {
             if (event.getTouchCount() == 2) {
                 //Use ListView's getSelected Item
-                Product product = listView.getSelectionModel().getSelectedItem();
-                handleListViewItemSelected(product);
+                ProductionProductDTO productionProductDTO = listView.getSelectionModel().getSelectedItem();
+                handleListViewItemSelected(productionProductDTO.getProduct());
                 arrowIcon.setText("▼");
             }
         });

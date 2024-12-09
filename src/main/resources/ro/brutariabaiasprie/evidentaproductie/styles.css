@@ -419,22 +419,25 @@
     -fx-font-weight: BOLD;
 }
 /* CONTENT -> MANAGER VIEW -> TAB*/
-.main-window .tab-header-area {
-    -fx-background-color: #D3D3D3;
+.main-window .tab-header-area .tab-header-background {
+    /*-fx-background-color: #D3D3D3;*/
+    -fx-background-color: derive(COLOR_BRAND_BROWN, 80%);
     -fx-padding: 0;
 }
-.main-window .tab{
+.main-window .tab {
      -fx-background-color: transparent;
      -fx-padding: 0.2em 2em 0.2em 2em;
 }
 .main-window .tab .tab-label {
     -fx-alignment: CENTER;
+    -fx-text-fill: COLOR_BRAND_BROWN;
 }
 .main-window .tab:hover {
     -fx-cursor: hand;
 }
 .main-window .tab:selected .tab-label {
-    -fx-text-fill: #59BDFF;
+    /*-fx-text-fill: #59BDFF;*/
+    -fx-text-fill: COLOR_WHITE;
 }
 .main-window .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
      -fx-border-width: 0;
@@ -561,7 +564,7 @@
     -fx-background-color: TRANSPARENT;
 }
 .main-table-view .column-header-background {
-    -fx-background-color: COLOR_BRAND_BROWN_10;
+    -fx-background-color: derive(COLOR_WHITE, -10%);
     -fx-text-fill: COLOR_BRAND_BROWN;
 }
 .main-table-view .column-header-background .filler {

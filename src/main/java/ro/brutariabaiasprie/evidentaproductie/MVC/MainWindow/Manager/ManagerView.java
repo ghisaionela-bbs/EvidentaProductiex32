@@ -273,12 +273,13 @@ public class ManagerView extends Parent implements Builder<Region> {
             orderExportButton.getStyleClass().add("ghost-button");
             orderExportButton.setOnAction(event -> new OrderExportController(stage));
 
-            excelExportButton = new Button();
-            excelExportButton.setOnAction(event -> new ExcelExportController(stage));
             importOrderButton = new Button("Importa comenzi");
             importOrderButton.setOnAction(event -> new OrderImportController(stage));
             importOrderButton.setGraphic(new FontIcon("mdi2a-application-import"));
             importOrderButton.getStyleClass().add("ghost-button");
+
+            excelExportButton = new Button();
+            excelExportButton.setOnAction(event -> new ExcelExportController(stage));
 
 
             if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
@@ -532,6 +533,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                         setGraphic(null);
                     } else {
                         setText(null);
+
                         actionButton.getStyleClass().add("filled-button");
                         actionButton.setGraphic(fontIcon);
                         actionButton.setOnAction(event -> new OrderController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));

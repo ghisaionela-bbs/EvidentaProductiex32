@@ -73,7 +73,7 @@ public class OrderAssociationModel {
                     "FROM COMENZI c LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
                     "LEFT JOIN GRUPE_PRODUSE g ON g.ID = p.ID_GRUPA " +
-                    "WHERE p.ID = ? " +
+                    "WHERE p.ID = ? AND c.inchisa = 0 " +
                     whereCond +
                     "GROUP BY c.ID, " +
                     "c.ID_PRODUS, " +

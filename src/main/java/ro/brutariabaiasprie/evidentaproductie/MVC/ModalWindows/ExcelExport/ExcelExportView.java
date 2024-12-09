@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
@@ -17,6 +18,11 @@ public class ExcelExportView extends Parent implements Builder<Region> {
     private DatePicker fromDatePicker;
     private DatePicker toDatePicker;
     private final Consumer<ACTION_TYPE> actionHandler;
+
+    private final Spinner<Integer> fromHourStartSpinner = new Spinner<>(0, 23, 0);
+    private final Spinner<Integer> fromMinuteStartSpinner = new Spinner<>(0, 59, 0);
+    private final Spinner<Integer> fromHourEndSpinner = new Spinner<>(0, 23, 0);
+    private final Spinner<Integer> fromMinuteEndSpinner = new Spinner<>(0, 59, 0);
 
     public ExcelExportView(Consumer<ACTION_TYPE> actionHandler) {
         this.actionHandler = actionHandler;
@@ -42,12 +48,23 @@ public class ExcelExportView extends Parent implements Builder<Region> {
         Button clearToDateButton = new Button("\uD83D\uDDD9");
         clearToDateButton.setOnAction(event -> toDatePicker.setValue(null));
 
+        Label hourLabel = new Label("Interval orar:");
+        VBox fromTimeStartSection = new VBox(hourLabel, new HBox(fromHourStartSpinner, fromMinuteStartSpinner));
+        fromTimeStartSection.getStyleClass().add("section");
+        fromTimeStartSection.getStyleClass().add("vbox-layout");
+        VBox fromTimeEndSection = new VBox(hourLabel, new HBox(fromHourEndSpinner, fromMinuteEndSpinner));
+        fromTimeEndSection.getStyleClass().add("section");
+        fromTimeEndSection.getStyleClass().add("vbox-layout");
+
+
         gridPane.add(lblFromDate, 0, 0);
         gridPane.add(fromDatePicker, 1, 0);
         gridPane.add(clearFromDateButton, 2, 0);
-        gridPane.add(lblToDate, 0, 1);
-        gridPane.add(toDatePicker, 1, 1);
-        gridPane.add(clearToDateButton, 2, 1);
+        gridPane.add(fromTimeStartSection, 0, 1, 3, 1);
+        gridPane.add(fromTimeEndSection, 0, 2, 3, 1);
+        gridPane.add(lblToDate, 0, 3);
+        gridPane.add(toDatePicker, 1, 3);
+        gridPane.add(clearToDateButton, 2, 3);
 
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setPercentWidth(60);

@@ -7,10 +7,12 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
@@ -102,6 +104,8 @@ public class NumericInputView extends Parent implements Builder<Region> {
         Button numDot = new Button(".");
         numDot.setOnAction(handleBtnNumpadOnAction());
         Button numDel = new Button("⌫");
+        numDel.setGraphic(new FontIcon("mdi2b-backspace"));
+        numDel.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         numDel.setOnAction(handleBtnNumpadOnAction());
 
         numpad.add(num1, 0, 0);

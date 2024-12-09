@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -15,6 +16,7 @@ import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
+import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.NumericInput.NumericInputController;
 
 import java.text.SimpleDateFormat;
 import java.util.function.Consumer;
@@ -23,6 +25,7 @@ import java.util.regex.Pattern;
 
 public class RecordView extends Parent implements Builder<Region> {
     private final RecordModel model;
+    private final Stage stage;
     private final WINDOW_TYPE type;
     private final Consumer<ACTION_TYPE> actionHandler;
     private final Consumer<Product> editOrderHandler;
@@ -31,8 +34,9 @@ public class RecordView extends Parent implements Builder<Region> {
     private ComboBox<Product> productComboBox;
     private final Label orderLabel = new Label();
 
-    public RecordView(RecordModel model, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler, Consumer<Product> editOrderHandler) {
+    public RecordView(RecordModel model, Stage stage, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler, Consumer<Product> editOrderHandler) {
         this.model = model;
+        this.stage = stage;
         this.actionHandler = actionHandler;
         this.type = type;
         this.editOrderHandler = editOrderHandler;
@@ -84,6 +88,26 @@ public class RecordView extends Parent implements Builder<Region> {
 
         Label quantityLabel = new Label("Cantitate:");
         quantityTextField = createQuantityField();
+        quantityTextField.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(quantityTextField, Priority.ALWAYS);
+        Button numpadButton = new Button();
+        numpadButton.setGraphic(new FontIcon("mdi2n-numeric"));
+        numpadButton.setOnAction(event -> {
+            double quantity = 0.00;
+            if(!quantityTextField.getText().isEmpty()) {
+                quantity = Double.parseDouble(quantityTextField.getText());
+            }
+            NumericInputController numericInputController = new NumericInputController(stage, quantity);
+            if(numericInputController.isSUCCESS()) {
+                quantityTextField.textProperty().set(numericInputController.getInput());
+            }
+        });
+        numpadButton.getStyleClass().add("filled-button");
+        numpadButton.setMaxHeight(Double.MAX_VALUE);
+        HBox quantityFieldContainer = new HBox(quantityTextField, numpadButton);
+        VBox quantitySection = new VBox(quantityLabel, quantityFieldContainer);
+        quantitySection.getStyleClass().add("section");
+        quantitySection.getStyleClass().add("vbox-layout");
 
         Button editOrderButton = new Button();
         editOrderButton.setGraphic(new FontIcon("mdi2s-square-edit-outline"));
@@ -120,9 +144,8 @@ public class RecordView extends Parent implements Builder<Region> {
         gridPane.add(productSection, 0, 1, 2, 1);
         gridPane.add(orderLabel, 0, 3);
         gridPane.add(editOrderButton, 1,3);
-        gridPane.add(quantityLabel, 0, 4, 2, 1);
-        gridPane.add(quantityTextField, 0, 5, 2, 1);
-        gridPane.add(dateLabel, 0, 6, 2, 1);
+        gridPane.add(quantitySection, 0, 4, 2, 1);
+        gridPane.add(dateLabel, 0, 5, 2, 1);
         // adding constraints
         for (int i = 0 ; i < gridPane.getRowCount(); i++) {
             RowConstraints row = new RowConstraints();
