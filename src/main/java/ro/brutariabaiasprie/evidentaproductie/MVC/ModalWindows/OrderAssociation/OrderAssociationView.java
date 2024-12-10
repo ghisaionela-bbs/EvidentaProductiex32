@@ -91,9 +91,9 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
 //        });
 //        ordersTableView.getColumns().add(isClosedColumn);
 
-        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Nr");
-        orderIDColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
-        orderIDColumn.setCellFactory(column -> new TableCell<>() {
+        TableColumn<Order, Integer> orderCounterColumn = new TableColumn<>("Nr");
+        orderCounterColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getCounter()));
+        orderCounterColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
@@ -108,7 +108,7 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
                 }
             }
         });
-        ordersTableView.getColumns().add(orderIDColumn);
+        ordersTableView.getColumns().add(orderCounterColumn);
 
         TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Plasata la");
         dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
@@ -201,13 +201,13 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
 //        TableColumn<Order, String> productUnitMeasurementColumn = new TableColumn<>("UM");
 //        productUnitMeasurementColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getUnitMeasurement()));
 //        ordersTableView.getColumns().add(productUnitMeasurementColumn);
-        orderIDColumn.prefWidthProperty().set(100);
+        orderCounterColumn.prefWidthProperty().set(100);
 
         ordersTableView.setItems(model.getOrders());
         ordersTableView.getStyleClass().add("main-table-view");
         ordersTableView.getSelectionModel().select(0);
 
-        orderIDColumn.prefWidthProperty().set(64);
+        orderCounterColumn.prefWidthProperty().set(64);
         dateTimeColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
         productNameColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.5).subtract(64));
         quantityColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));

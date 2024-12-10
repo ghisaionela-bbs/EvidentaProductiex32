@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
-import ro.brutariabaiasprie.evidentaproductie.Exceptions.VersionCompatibility;
 
 import java.sql.*;
 
@@ -67,12 +66,43 @@ public class DBConnectionService {
                 while (true) {
                     checkForNotifications(connection);
                     cleanupNotifications(connection);
+                    checkOrderCounter(connection);
                     Thread.sleep(1000); // Poll every second
                 }
             }
         };
         Thread syncThread = new Thread(syncTask);
         syncThread.start();
+    }
+
+    private static void checkOrderCounter(Connection connection) throws SQLException {
+        String sql = "SELECT (CASE " +
+                "WHEN CAST(timestamp_value AS DATE) < CAST(GETDATE() AS DATE) THEN 1 " +
+                "ELSE 0 " +
+                "END) AS is_outdated " +
+                "FROM utils " +
+                "WHERE property_name = ?";
+
+        try(PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, "order_counter_last_updated");
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            int is_outdated = resultSet.getInt("is_outdated");
+            if(is_outdated == 1) {
+                try(PreparedStatement updateStatement1 = connection.prepareStatement("UPDATE utils SET " +
+                        "int_value = 0" +
+                        "WHERE property_name = ?")) {
+                    updateStatement1.setString(1,"order_daily_counter");
+                    updateStatement1.executeUpdate();
+                }
+                try(PreparedStatement updateStatement2 = connection.prepareStatement("UPDATE utils SET " +
+                        "timestamp_value = GETDATE()" +
+                        "WHERE property_name = ?")) {
+                    updateStatement2.setString(1,"order_counter_last_updated");
+                    updateStatement2.executeUpdate();
+                }
+            }
+        }
     }
 
     private static void checkForNotifications(Connection connection) throws SQLException {
@@ -181,6 +211,29 @@ public class DBConnectionService {
             statement.executeUpdate();
         }
 
+        // Setting up the table for storing different types of data
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[utils](" +
+                "[property_name] [nvarchar](50) NOT NULL, " +
+                "[string_value] [nvarchar](100), " +
+                "[int_value] [int], " +
+                "[double_value] [numeric](38, 2), " +
+                "[timestamp_value] [datetime] " +
+                ")")) {
+            statement.execute();
+        }
+        // Adding the rows necessary for tracking the number of the last order
+        try(PreparedStatement statement = connection.prepareStatement("INSERT INTO [dbo].[utils] " +
+                "(property_name, int_value) VALUES (?, ?)")) {
+            statement.setString(1, "order_daily_counter");
+            statement.setInt(2, 0);
+            statement.execute();
+        }
+        try(PreparedStatement statement = connection.prepareStatement("INSERT INTO [dbo].[utils] " +
+                "(property_name, timestamp_value) VALUES (?, GETDATE())")) {
+            statement.setString(1, "order_counter_last_updated");
+            statement.execute();
+        }
+
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[change_notifications]( " +
                 "[id] [int] IDENTITY(1,1) NOT NULL, " +
                 "[table_name] [nvarchar](50) NOT NULL, " +
@@ -236,7 +289,8 @@ public class DBConnectionService {
 
         // Setting up the orders table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[COMENZI](  " +
-                "[ID] [int] IDENTITY(1,1) NOT NULL," +
+                "[ID] [int] IDENTITY(1,1) NOT NULL, " +
+                "[contor] INT NOT NULL, " +
                 "[data_programata] [datetime] NOT NULL DEFAULT GETDATE(), " +
                 "[ID_PRODUS] [int] NOT NULL," +
                 "[cantitate] [decimal](38, 2) NOT NULL," +
@@ -249,6 +303,16 @@ public class DBConnectionService {
         }
         // Setting up the orders table triggers
         createTableTriggers("COMENZI");
+        // Setting up the trigger that will increment the order daily counter
+        try(PreparedStatement statement = connection.prepareStatement("EXEC('CREATE TRIGGER [dbo].[trg_order_counter_update] ON [dbo].[COMENZI] AFTER INSERT " +
+                "AS " +
+                "BEGIN " +
+                "DECLARE @order_counter INT " +
+                "SET @order_counter = (SELECT int_value + 1 AS value FROM utils WHERE property_name = ''order_daily_counter'') " +
+                "UPDATE utils SET int_value = @order_counter WHERE property_name = ''order_daily_counter'' " +
+                "END')")) {
+            statement.execute();
+        }
 
         // Setting up the records table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[REALIZARI]( " +

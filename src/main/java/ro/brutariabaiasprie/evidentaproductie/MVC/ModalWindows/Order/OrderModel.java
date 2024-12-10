@@ -109,8 +109,17 @@ public class OrderModel {
             Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
             String sql = "INSERT INTO COMENZI " +
-                    "(data_programata, ID_PRODUS, cantitate, datasiora_i, ID_UTILIZATOR_I, datasiora_m, ID_UTILIZATOR_M, inchisa) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    "(data_programata, " +
+                    "ID_PRODUS, " +
+                    "cantitate, " +
+                    "datasiora_i, " +
+                    "ID_UTILIZATOR_I, " +
+                    "datasiora_m, " +
+                    "ID_UTILIZATOR_M, " +
+                    "inchisa, " +
+                    "contor) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?," +
+                    "(SELECT int_value + 1 FROM utils WHERE property_name = ?))";
             PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setTimestamp(1, order.getDateScheduled());
@@ -121,6 +130,7 @@ public class OrderModel {
             statement.setNull(6, Types.TIMESTAMP);
             statement.setNull(7, Types.INTEGER);
             statement.setBoolean(8, false);
+            statement.setString(9, "order_daily_counter");
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

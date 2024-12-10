@@ -179,6 +179,7 @@ public class ManagerModel {
 
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT c.ID, " +
+                    "c.contor, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.sarja, " +
@@ -202,6 +203,7 @@ public class ManagerModel {
                     "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
                     whereCond +
                     "GROUP BY c.ID, " +
+                    "c.contor, " +
                     "c.data_programata, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
@@ -245,6 +247,7 @@ public class ManagerModel {
 
                 Order order = new Order();
                 order.setId(resultSet.getInt("ID"));
+                order.setCounter(resultSet.getInt("contor"));
                 order.setProduct(new Product(
                         resultSet.getInt("ID_PRODUS"),
                         resultSet.getString("denumire"),

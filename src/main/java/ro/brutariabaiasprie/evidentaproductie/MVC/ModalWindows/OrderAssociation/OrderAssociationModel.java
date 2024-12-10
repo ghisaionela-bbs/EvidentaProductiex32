@@ -55,6 +55,7 @@ public class OrderAssociationModel {
 
             String sql = "SELECT " +
                     "c.ID, " +
+                    "c.contor, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.sarja, " +
@@ -76,6 +77,7 @@ public class OrderAssociationModel {
                     "WHERE p.ID = ? AND c.inchisa = 0 " +
                     whereCond +
                     "GROUP BY c.ID, " +
+                    "c.contor, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.sarja, " +
@@ -113,6 +115,7 @@ public class OrderAssociationModel {
 
         Order order = new Order();
         order.setId(resultSet.getInt("ID"));
+        order.setCounter(resultSet.getInt("contor"));
         order.setProduct(new Product(
                 resultSet.getInt("ID_PRODUS"),
                 resultSet.getString("denumire"),

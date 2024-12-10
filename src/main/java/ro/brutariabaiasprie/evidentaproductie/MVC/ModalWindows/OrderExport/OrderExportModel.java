@@ -22,6 +22,8 @@ import java.util.List;
 public class OrderExportModel {
     private LocalDate dateFrom;
     private LocalDate dateTo;
+    private LocalTime timeStart;
+    private LocalTime timeEnd;
     private Workbook workbook;
 
     public LocalDate getDateFrom() {
@@ -38,6 +40,22 @@ public class OrderExportModel {
 
     public void setDateTo(LocalDate dateTo) {
         this.dateTo = dateTo;
+    }
+
+    public LocalTime getTimeEnd() {
+        return timeEnd;
+    }
+
+    public void setTimeEnd(LocalTime timeEnd) {
+        this.timeEnd = timeEnd;
+    }
+
+    public LocalTime getTimeStart() {
+        return timeStart;
+    }
+
+    public void setTimeStart(LocalTime timeStart) {
+        this.timeStart = timeStart;
     }
 
     public void export() {
@@ -99,6 +117,9 @@ public class OrderExportModel {
         } else if(dateTo != null) {
             whereCond += " AND c.data_programata <= ? ";
         }
+
+        whereCond += " AND CAST(c.data_programata AS TIME) >= CAST(? AS TIME) ";
+        whereCond += " AND CAST(c.data_programata AS TIME) < CAST(? AS TIME) ";
 
         //Select records from database
         String sql = "SELECT c.ID, " +
@@ -172,6 +193,10 @@ public class OrderExportModel {
             curr_param += 1;
         }
 
+        statement.setTime(curr_param, Time.valueOf(timeStart));
+        curr_param += 1;
+        statement.setTime(curr_param, Time.valueOf(timeEnd));
+        curr_param += 1;
 
         //Select records from database
         ResultSet resultSet = statement.executeQuery();
@@ -203,6 +228,9 @@ public class OrderExportModel {
             whereCond += " AND r.datasiora_i <= ? ";
         }
 
+        whereCond += " AND CAST(r.datasiora_i AS TIME) >= CAST(? AS TIME) ";
+        whereCond += " AND CAST(r.datasiora_i AS TIME) < CAST(? AS TIME) ";
+
         //Select records from database
         String sql = "SELECT p.ID, " +
                 "p.denumire, " +
@@ -213,18 +241,29 @@ public class OrderExportModel {
                 "WHERE 1=1 " + whereCond +
                 "ORDER BY r.datasiora_i DESC";
 
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        int curr_param = 1;
+
+        PreparedStatement statement = connection.prepareStatement(sql);
         if(dateFrom != null && dateTo != null) {
-            preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            statement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
+            curr_param += 1;
+            statement.setTimestamp(2, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            curr_param += 1;
         } else if(dateFrom != null){
-            preparedStatement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
+            statement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
+            curr_param += 1;
         } else if(dateTo != null) {
-            preparedStatement.setTimestamp(1, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            statement.setTimestamp(1, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            curr_param += 1;
         }
 
+        statement.setTime(curr_param, Time.valueOf(timeStart));
+        curr_param += 1;
+        statement.setTime(curr_param, Time.valueOf(timeEnd));
+        curr_param += 1;
+
         //Select records from database
-        ResultSet resultSet = preparedStatement.executeQuery();
+        ResultSet resultSet = statement.executeQuery();
         List<Object[]> recordData = new ArrayList<>();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");

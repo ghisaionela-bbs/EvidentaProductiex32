@@ -325,24 +325,20 @@ public class ManagerView extends Parent implements Builder<Region> {
         });
         ordersTableView.getColumns().add(isClosedColumn);
 
-        TableColumn<Order, Integer> orderIDColumn = new TableColumn<>("Nr");
-        orderIDColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
-        orderIDColumn.setCellFactory(column -> new TableCell<>() {
+        TableColumn<Order, Integer> orderCounterColumn = new TableColumn<>("Nr");
+        orderCounterColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getCounter()));
+        orderCounterColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
                     setText(null);
                 } else {
-                    if(item == 0) {
-                        setText(null);
-                    } else {
-                        setText(item.toString());
-                    }
+                    setText(item.toString());
                 }
             }
         });
-        ordersTableView.getColumns().add(orderIDColumn);
+        ordersTableView.getColumns().add(orderCounterColumn);
 
 
         TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Programata la");
@@ -592,7 +588,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         });
 
         isClosedColumn.prefWidthProperty().set(64);
-        orderIDColumn.prefWidthProperty().set(64);
+        orderCounterColumn.prefWidthProperty().set(64);
         dateTimeColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
         productNameColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.5).subtract(192));
         quantityColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));

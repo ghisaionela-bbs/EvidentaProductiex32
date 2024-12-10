@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 public class Order {
     private int id;
+    private int counter;
     private Product product;
     private double quantity;
     private double completed;
@@ -21,6 +22,14 @@ public class Order {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
     }
 
     public Product getProduct() {

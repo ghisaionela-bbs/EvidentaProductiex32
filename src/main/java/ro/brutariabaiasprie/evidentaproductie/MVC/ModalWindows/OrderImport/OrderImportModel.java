@@ -301,8 +301,8 @@ public class OrderImportModel {
     public void insertData() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "INSERT INTO [dbo].[COMENZI] (ID_PRODUS, cantitate, data_programata, ID_UTILIZATOR_I) " +
-                    "VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO [dbo].[COMENZI] (ID_PRODUS, cantitate, data_programata, ID_UTILIZATOR_I, contor) " +
+                    "VALUES (?, ?, ?, ?, (SELECT int_value + 1 FROM utils WHERE property_name = ?))";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
@@ -315,6 +315,7 @@ public class OrderImportModel {
                 preparedStatement.setDouble(2, quantity);
                 preparedStatement.setTimestamp(3, dateScheduled);
                 preparedStatement.setInt(4, ConfigApp.getUser().getId());
+                preparedStatement.setString(5, "order_daily_counter");
                 preparedStatement.addBatch();
             }
             preparedStatement.executeBatch();

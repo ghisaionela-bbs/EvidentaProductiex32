@@ -45,6 +45,8 @@ public class OrderExportController extends ModalWindow {
                     try {
                         model.setDateFrom(view.getFromDateValue());
                         model.setDateTo(view.getToDateValue());
+                        model.setTimeStart(view.getTimeStartValue());
+                        model.setTimeEnd(view.getTimeEndValue());
                         model.export();
                     } catch (Exception e) {
                         e.printStackTrace();

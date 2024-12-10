@@ -148,6 +148,7 @@ public class RecordModel {
 
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT c.ID, " +
+                    "c.contor, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.sarja, " +
@@ -170,6 +171,7 @@ public class RecordModel {
                     "WHERE 1=1 AND p.ID = c.ID_PRODUS " +
                     whereCond +
                     "GROUP BY c.ID, " +
+                    "c.contor, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
@@ -201,6 +203,7 @@ public class RecordModel {
 
                 Order order = new Order();
                 order.setId(resultSet.getInt("ID"));
+                order.setCounter(resultSet.getInt("contor"));
                 order.setProduct(new Product(
                         resultSet.getInt("ID_PRODUS"),
                         resultSet.getString("denumire"),

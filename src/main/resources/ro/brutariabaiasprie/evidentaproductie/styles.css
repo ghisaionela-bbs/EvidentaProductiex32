@@ -51,6 +51,7 @@
     COLOR_WHITE_30: rgba(255, 255, 255, 0.3);
     COLOR_WHITE_30: rgba(255, 255, 255, 0.2);
     COLOR_WHITE_10: rgba(255, 255, 255, 0.1);
+    COLOR_BLUE: #59BDFF;
 }
 
 /* GENERAL CLASSES*/
@@ -265,7 +266,6 @@
     -fx-border-color: transparent;
 }
 .modal-window.entry-view .text-area:focused {
-    /*-fx-text-fill: #59BDFF;*/
     -fx-border-color: #59BDFF;
 }
 .modal-window.entry-view .text-area:focused .content{
@@ -318,6 +318,10 @@
 }
 .modal-window.entry-view .combo-box:hover .arrow {
     -fx-background-color: COLOR_BRAND_BROWN;
+}
+
+.modal-window.entry-view .standalone-icon.ikonli-font-icon {
+    -fx-icon-color: COLOR_BRAND_BROWN;
 }
 
 /*
@@ -419,8 +423,50 @@
     -fx-font-weight: BOLD;
 }
 /* CONTENT -> MANAGER VIEW -> TAB*/
+.tab-header-area .tab-header-background {
+    -fx-background-color: derive(COLOR_BRAND_BROWN, 90%);
+}
+.tab-pane .tab:hover {
+    -fx-cursor: hand;
+}
+.tab-pane .tab:selected {
+	-fx-background-color: derive(COLOR_BRAND_BROWN, 60%);
+	-fx-background-insets: 0 0 0 0;
+	-fx-background-radius: 0 0 0 0;
+}
+.tab .tab-label {
+ 	-fx-alignment: CENTER;
+	-fx-text-fill: COLOR_BRAND_BROWN;
+	-fx-padding: 0 10 0 10;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: COLOR_WHITE;
+}
+
+.tab-pane:top *.tab-header-area {
+	-fx-padding: 0 0 0 30;
+
+	/* NO SPACE LEFT OF FIRST TAB */
+	/* -fx-padding: 0 0 0 30; */
+}
+.tab-pane {
+	-fx-background-color: transparent;
+	-fx-tab-min-width: 100px;
+	-fx-tab-min-height: 66px;
+	-fx-tab-max-height: 66px;
+}
+.tab-pane .tab {
+	-fx-background-color: transparent;
+}
+.tab-pane:focused .tab-header-area .headers-region .tab:selected .focus-indicator {
+ 	-fx-border-width: 0;
+	-fx-border-insets: 0 0 0 0;
+	-fx-border-radius: 0;
+}
+
+/*
 .main-window .tab-header-area .tab-header-background {
-    /*-fx-background-color: #D3D3D3;*/
     -fx-background-color: derive(COLOR_BRAND_BROWN, 80%);
     -fx-padding: 0;
 }
@@ -431,17 +477,20 @@
 .main-window .tab .tab-label {
     -fx-alignment: CENTER;
     -fx-text-fill: COLOR_BRAND_BROWN;
+    -fx-font-weight: BOLD;
 }
 .main-window .tab:hover {
     -fx-cursor: hand;
 }
 .main-window .tab:selected .tab-label {
-    /*-fx-text-fill: #59BDFF;*/
     -fx-text-fill: COLOR_WHITE;
+    -fx-background-color: derive(COLOR_BRAND_BROWN, 60%);
 }
 .main-window .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
      -fx-border-width: 0;
 }
+*/
+
 /* CONTENT -> MANAGER VIEW -> TAB CONTENT*/
 .main-window .sub-main-window-content-container {
     -fx-alignment: TOP-CENTER;
@@ -716,3 +765,137 @@
 }
 
 
+.calendar-grid {
+    -fx-background-color: rgb(20, 156, 255);
+}
+
+.combo-box-popup > .list-view > .placeholder > .label {
+    -fx-text-fill: BLACK;
+}
+
+
+/*
+.calendar-grid {
+    -fx-background-color: rgb(20, 156, 255);
+}
+
+.combo-box-popup > .list-view > .placeholder > .label {
+    -fx-text-fill: white;
+}
+
+.calendar-header {
+    -fx-background-color: #1d1d1d;
+    -fx-base: #1d1d1d;
+    -fx-text-fill: white;
+}
+
+
+.date-picker-popup {
+    -fx-text-fill: white;
+    -fx-background-color:
+        linear-gradient(to bottom,
+        derive(-fx-color,-17%),
+        derive(-fx-color,-30%)
+        ),
+        -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+    -fx-alignment: CENTER;
+    -fx-spacing: 0;
+    -fx-padding: 0.083333em;
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.2) , 12, 0.0 , 0 , 8 );
+}
+
+.date-picker > .text-field {
+    -fx-text-fill: white;
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: #1d1d1d;
+    -fx-text-fill: white;
+}
+
+
+.date-picker-popup > .month-year-pane {
+    -fx-base: #1d1d1d ;
+    -fx-mark-highlight-color: -fx-light-text-color ;
+}
+*/
+
+/*date picker*/
+.date-picker > .text-field {
+    -fx-text-fill: black;
+    -fx-background-radius: 0;
+}
+.date-picker .arrow-button {
+	-fx-background-color: COLOR_BRAND_BROWN;
+	-fx-background-radius: 0;
+}
+.date-picker .arrow-button:hover {
+	-fx-background-color: derive(COLOR_BRAND_BROWN, -20%);
+	-fx-cursor: hand;
+}
+.date-picker .arrow-button .arrow {
+	-fx-background-color: white;
+}
+/*
+.date-picker .cell {
+	-fx-background-color: white;
+	-fx-text-fill: BLACK;
+}
+.date-picker .cell:hover {
+	-fx-background-color: derive(COLOR_WHITE, -10%);
+}
+
+.date-picker .cell:focused {
+	-fx-background-color: derive(COLOR_WHITE, -10%);
+}
+
+.date-picker .selected {
+	-fx-background-color: #59BDFF;
+	-fx-text-fill: white;
+}
+.date-picker .selected:focused {
+	-fx-background-color: #59BDFF;
+	-fx-text-fill: white;
+}
+*/
+.date-picker-popup  {
+	-fx-border-color: transparent;
+	-fx-background-color: COLOR_BRAND_BROWN;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+}
+.date-picker-popup .month-year-pane {
+	-fx-background-color: COLOR_BRAND_BROWN;
+}
+.date-picker-popup .month-year-pane .label {
+	-fx-text-fill: white;
+}
+.date-picker-popup .week-number-cell {
+	-fx-text-fill: #59BDFF;
+}
+.date-picker-popup .spinner .button .left-arrow,
+.date-picker-popup .spinner .button .right-arrow {
+	-fx-background-color: white;
+}
+.date-picker-popup .spinner .button:hover,
+.date-picker-popup .spinner .button:focused {
+    -fx-background-color: transparent;
+}
+
+/* CHECKBOX */
+.check-box .box {
+	-fx-background-color: white;
+	-fx-border-color: COLOR_BRAND_BROWN;
+	-fx-border-radius: 0;
+}
+.check-box .mark {
+ 	-fx-shape: "M1.73,12.91 8.1,19.28 22.79,4.59 22.79,1.59 8.1,16.28 1.73,9.91";
+}
+.check-box:selected .mark {
+	-fx-background-color: white;
+}
+.check-box:selected .box {
+	-fx-background-color: COLOR_BRAND_BROWN;
+}

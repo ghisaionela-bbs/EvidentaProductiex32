@@ -359,6 +359,7 @@ public class ProductionModel {
 
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT c.ID, " +
+                    "c.contor, " +
                     "c.ID_PRODUS, " +
                     "p.denumire, " +
                     "p.sarja, " +
@@ -380,6 +381,7 @@ public class ProductionModel {
                     "LEFT JOIN GRUPE_PRODUSE g ON g.ID = p.ID_GRUPA " +
                     "WHERE c.ID = ? " +
                     "GROUP BY c.ID, " +
+                    "c.contor, " +
                     "c.ID_PRODUS, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
                     "p.denumire, " +
@@ -407,6 +409,7 @@ public class ProductionModel {
 
             Order order = new Order();
             order.setId(resultSet.getInt("ID"));
+            order.setCounter(resultSet.getInt("contor"));
             order.setProduct(new Product(
                     resultSet.getInt("ID_PRODUS"),
                     resultSet.getString("denumire"),
