@@ -37,6 +37,7 @@ public class ManagerView extends Parent implements Builder<Region> {
     private final Stage stage;
     private final ManagerModel model;
     private final Consumer<Order> productionShortcutHandler;
+    private final Consumer<Boolean> reloadOrders;
     //products tab
     private Button addProductButton;
     private Button importProductsButton;
@@ -45,11 +46,13 @@ public class ManagerView extends Parent implements Builder<Region> {
     private Button importOrderButton;
     private Button orderExportButton;
     private Button excelExportButton;
+    private CheckBox closedOrdersCheckbox = new CheckBox("Afiseaza comenzi inchise");
 
-    public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler) {
+    public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders) {
         this.model = model;
         this.stage = stage;
         this.productionShortcutHandler = productionShortcutHandler;
+        this.reloadOrders = reloadOrders;
     }
 
     @Override
@@ -140,6 +143,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
             addProductButton.getStyleClass().add("ghost-button");
             importProductsButton.getStyleClass().add("ghost-button");
+
         }
 
         sectionHeaderContainer.getChildren().addAll(productsSectionTitle, addProductButton, importProductsButton);
@@ -263,6 +267,9 @@ public class ManagerView extends Parent implements Builder<Region> {
 //        importProductsButton.getStyleClass().add("ghost-button");
 
         if(ConfigApp.getRole().canEditOrders()) {
+            closedOrdersCheckbox.setSelected(true);
+            closedOrdersCheckbox.setOnAction(event -> reloadOrders.accept(closedOrdersCheckbox.isSelected()));
+
             addOrderButton = new Button();
             addOrderButton.setOnAction(event -> {
                 new OrderController(stage, WINDOW_TYPE.ADD);
@@ -290,7 +297,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
             addOrderButton.getStyleClass().add("ghost-button");
 
-            sectionHeaderContainer.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton);
+            sectionHeaderContainer.getChildren().addAll(closedOrdersCheckbox, addOrderButton, importOrderButton, orderExportButton);
         }
 
         sectionHeaderContainer.getStyleClass().add("tab-section-header");

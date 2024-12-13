@@ -23,6 +23,7 @@ public class ManagerModel {
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<Group> groups2 = FXCollections.observableArrayList();
 
+    private boolean showClosedOrdersFilter = true;
 
     public ManagerModel() {
         CONNECTED_USER = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
@@ -54,6 +55,14 @@ public class ManagerModel {
 
     public ObservableList<User> getUsers() {
         return users;
+    }
+
+    public boolean isShowClosedOrdersFilter() {
+        return showClosedOrdersFilter;
+    }
+
+    public void setShowClosedOrdersFilter(boolean showClosedOrdersFilter) {
+        this.showClosedOrdersFilter = showClosedOrdersFilter;
     }
 
     public void loadProducts() {
@@ -168,13 +177,17 @@ public class ManagerModel {
                 case DIRECTOR:
                     break;
                 case MANAGER:
-                    whereCond += "WHERE gp.ID = ? ";
+                    whereCond += " AND gp.ID = ? ";
                     break;
                 case OPERATOR:
-                    whereCond += "WHERE gp.ID = ? AND subg.ID = ? AND c.inchisa = 0 ";
+                    whereCond += " AND gp.ID = ? AND subg.ID = ? AND c.inchisa = 0 ";
                     break;
                 case UNAUTHORIZED:
-                    whereCond += "WHERE 1=0 ";
+                    whereCond += " AND 1=0 ";
+            }
+
+            if(!showClosedOrdersFilter) {
+                whereCond += " AND c.inchisa != ? ";
             }
 
             Connection connection = DBConnectionService.getConnection();
@@ -201,7 +214,7 @@ public class ManagerModel {
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
                     "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
-                    whereCond +
+                    "WHERE 1=1 " + whereCond +
                     "GROUP BY c.ID, " +
                     "c.contor, " +
                     "c.data_programata, " +
@@ -220,21 +233,30 @@ public class ManagerModel {
                     "c.inchisa " +
                     "ORDER BY c.data_programata ASC ";
 
+            int paramCount = 1;
             PreparedStatement statement = connection.prepareStatement(sql);
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:
                 case DIRECTOR:
                     break;
                 case MANAGER:
-                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    statement.setInt(paramCount, ConfigApp.getUser().getGroupId());
+                    paramCount += 1;
                     break;
                 case OPERATOR:
-                    statement.setInt(1, ConfigApp.getUser().getGroupId());
-                    statement.setInt(2, ConfigApp.getUser().getSubgroupId());
+                    statement.setInt(paramCount, ConfigApp.getUser().getGroupId());
+                    paramCount += 1;
+                    statement.setInt(paramCount, ConfigApp.getUser().getSubgroupId());
+                    paramCount += 1;
                     break;
                 case UNAUTHORIZED:
                     break;
             }
+
+            if(!showClosedOrdersFilter) {
+                statement.setBoolean(paramCount, true);
+            }
+
             ResultSet resultSet = statement.executeQuery();
 
             orders.clear();

@@ -18,7 +18,7 @@ public class ManagerController implements SceneController {
 
     public ManagerController(Stage parentStage, Consumer<Order> productionShortcutHandler) {
         this.PARENT_STAGE = parentStage;
-        this.view = new ManagerView(this.model, parentStage, productionShortcutHandler);
+        this.view = new ManagerView(this.model, parentStage, productionShortcutHandler, this::reloadOrders);
         Platform.runLater(() -> {
             model.loadProducts();
             model.loadOrders();
@@ -53,6 +53,11 @@ public class ManagerController implements SceneController {
 //                }
             }
         });
+    }
+
+    private void reloadOrders(Boolean showClosedOrders) {
+        model.setShowClosedOrdersFilter(showClosedOrders);
+        Platform.runLater(model::loadOrders);
     }
 
     @Override
