@@ -21,6 +21,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 public class OrderImportModel {
     private final ObservableList<Object[]> data = FXCollections.observableArrayList();
@@ -301,8 +302,11 @@ public class OrderImportModel {
     public void insertData() {
         try {
             Connection connection = DBConnectionService.getConnection();
-            String sql = "INSERT INTO [dbo].[COMENZI] (ID_PRODUS, cantitate, data_programata, ID_UTILIZATOR_I, contor) " +
-                    "VALUES (?, ?, ?, ?, (SELECT int_value + 1 FROM utils WHERE property_name = ?))";
+            String sql = "INSERT INTO [dbo].[COMENZI] (ID_PRODUS, cantitate, data_programata, ID_UTILIZATOR_I, contor, datasiora_i) " +
+                    "VALUES (?, ?, ?, ?, (SELECT int_value + 1 FROM utils WHERE property_name = ?), ?)";
+
+            Calendar calendar = Calendar.getInstance();
+            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
@@ -316,6 +320,7 @@ public class OrderImportModel {
                 preparedStatement.setTimestamp(3, dateScheduled);
                 preparedStatement.setInt(4, ConfigApp.getUser().getId());
                 preparedStatement.setString(5, "order_daily_counter");
+                preparedStatement.setTimestamp(6, timestamp);
                 preparedStatement.addBatch();
             }
             preparedStatement.executeBatch();

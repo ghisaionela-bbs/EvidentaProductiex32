@@ -50,6 +50,8 @@ public class OrderImportView extends Parent implements Builder<Region> {
         SCENE_NO = 0;
         showConfigurationOptions();
         root.getStyleClass().add("modal-window");
+        root.getStyleClass().add("entry-view");
+
         return root;
     }
 
@@ -126,6 +128,7 @@ public class OrderImportView extends Parent implements Builder<Region> {
 
         Button browseFileButton = new Button("Cauta");
         browseFileButton.setOnAction(event -> browseActionHandler.run());
+        browseFileButton.getStyleClass().add("filled-button");
 
         sheetSpinner = new Spinner<>(1, 1000, 1);
         sheetSpinner.getValueFactory().setValue(1);

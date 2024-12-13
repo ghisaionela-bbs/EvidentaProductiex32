@@ -34,6 +34,7 @@ public class GroupView extends Parent implements Builder<Region> {
         root.getCenter().getStyleClass().add("center");
         root.getBottom().getStyleClass().add("bottom");
         root.getStyleClass().add("modal-window");
+        root.getStyleClass().add("entry-view");
         return root;
     }
 
@@ -48,6 +49,12 @@ public class GroupView extends Parent implements Builder<Region> {
     private GridPane createContentSection() {
         //  Title
         Label groupIdLabel  = new Label();
+        groupIdLabel.getStyleClass().add("title");
+        groupIdLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(groupIdLabel, Priority.ALWAYS);
+        HBox titleContainer = new HBox(groupIdLabel);
+        titleContainer.setAlignment(Pos.CENTER_LEFT);
+
         // Name
         Label groupNameLabel = new Label("Denumire:");
         groupNameTextArea = new TextArea();
@@ -71,14 +78,14 @@ public class GroupView extends Parent implements Builder<Region> {
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-form");
         // Adding the controls
-        gridPane.add(groupIdLabel, 0, 0);
+        gridPane.add(titleContainer, 0, 0, 2, 1);
         if(type == WINDOW_TYPE.EDIT) {
             Button deleteButton = new Button("Stergere");
             deleteButton.setOnAction(event -> deleteGroupHandler.run());
             deleteButton.getStyleClass().add("filled-button");
             deleteButton.setStyle("-fx-background-color: red;");
             GridPane.setHalignment(deleteButton, HPos.RIGHT);
-            gridPane.add(deleteButton, 1, 0);
+            titleContainer.getChildren().add(deleteButton);
         }
         gridPane.add(groupNameLabel, 0, 1, 2, 1);
         gridPane.add(groupNameTextArea, 0, 2, 2, 1);

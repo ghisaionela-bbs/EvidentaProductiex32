@@ -46,7 +46,7 @@ public class OrderExportView extends Parent implements Builder<Region> {
         fromDatePicker.setShowWeekNumbers(false);
 
         Button clearFromDateButton = new Button();
-        clearFromDateButton.setGraphic(new FontIcon("mdi2e-eraser"));
+        clearFromDateButton.setGraphic(new FontIcon("mdi2c-close"));
         clearFromDateButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         clearFromDateButton.setOnAction(event -> fromDatePicker.setValue(null));
         clearFromDateButton.getStyleClass().add("filled-button");
@@ -58,7 +58,7 @@ public class OrderExportView extends Parent implements Builder<Region> {
         toDatePicker.setShowWeekNumbers(false);
 
         Button clearToDateButton = new Button();
-        clearToDateButton.setGraphic(new FontIcon("mdi2e-eraser"));
+        clearToDateButton.setGraphic(new FontIcon("mdi2c-close"));
         clearToDateButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         clearToDateButton.setOnAction(event -> toDatePicker.setValue(null));
         clearToDateButton.getStyleClass().add("filled-button");

@@ -107,6 +107,14 @@ public class ExcelImportView extends Parent implements Builder<Region> {
     }
 
     private void showConfigurationOptions() {
+        //  Title
+        Label titleLabel  = new Label("Import excel produse");
+        titleLabel.getStyleClass().add("title");
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(titleLabel, Priority.ALWAYS);
+        HBox titleContainer = new HBox(titleLabel);
+        titleContainer.setAlignment(Pos.CENTER_LEFT);
+
         TextFlow info = new TextFlow(new Text("Configurati coloanele si randul de la care se va incepe citirea fisierului excel\n(fara cap de tabel):"));
 
         GridPane gridPane = new GridPane();
@@ -122,6 +130,7 @@ public class ExcelImportView extends Parent implements Builder<Region> {
 
         Button browseFileButton = new Button("Cauta");
         browseFileButton.setOnAction(event -> browseActionHandler.run());
+        browseFileButton.getStyleClass().add("filled-button");
 
         sheetNumberSpinner = new Spinner<>(1, 1000, 1);
         sheetNumberSpinner.getValueFactory().setValue(1);
@@ -183,8 +192,10 @@ public class ExcelImportView extends Parent implements Builder<Region> {
 
         VBox.setVgrow(gridPane, Priority.ALWAYS);
 
-        root.setCenter(new VBox(info, gridPane));
+        root.setCenter(new VBox(titleContainer, info, gridPane));
         root.setBottom(createWindowActionButtons());
+        root.getStyleClass().add("modal-window");
+        root.getStyleClass().add("entry-view");
 //        root.getChildren().clear();
 //        root.getChildren().addAll(info, gridPane, createWindowActionButtons());
     }

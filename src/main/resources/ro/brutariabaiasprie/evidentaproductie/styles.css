@@ -84,11 +84,11 @@
 }
 .ghost-button {
     -fx-background-color: COLOR_WHITE;
-    -fx-background-radius: 2em;
+    -fx-background-radius: 0.2em;
     -fx-text-fill: COLOR_BRAND_BROWN;
     -fx-text-alignment: CENTER;
     -fx-border-color: COLOR_BRAND_BROWN;
-    -fx-border-radius: 2em;
+    -fx-border-radius: 0.2em;
     -fx-cursor: HAND;
 }
 .ghost-button:hover {
@@ -505,6 +505,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 1, 0.1, 1, 1);
     -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-alignment: CENTER-LEFT;
+    -fx-spacing: 8px;
 }
 .main-window .sub-main-window-title {
     -fx-font-size: 1.5em;

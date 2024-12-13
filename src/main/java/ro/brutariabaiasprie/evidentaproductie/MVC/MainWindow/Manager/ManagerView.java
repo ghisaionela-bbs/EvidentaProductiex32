@@ -18,7 +18,6 @@ import ro.brutariabaiasprie.evidentaproductie.Data.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.ColoredProgressBar;
-import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelExport.ExcelExportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ExcelImport.ExcelImportController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Group.GroupController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order.OrderController;
@@ -38,15 +37,17 @@ public class ManagerView extends Parent implements Builder<Region> {
     private final ManagerModel model;
     private final Consumer<Order> productionShortcutHandler;
     private final Consumer<Boolean> reloadOrders;
-    //products tab
+    // Products tab
     private Button addProductButton;
     private Button importProductsButton;
-    //orders tab
+    // Orders tab
     private Button addOrderButton;
     private Button importOrderButton;
     private Button orderExportButton;
     private Button excelExportButton;
     private CheckBox closedOrdersCheckbox = new CheckBox("Afiseaza comenzi inchise");
+    // Users tab
+    private Button addUserButton;
 
     public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders) {
         this.model = model;
@@ -69,15 +70,29 @@ public class ManagerView extends Parent implements Builder<Region> {
         if(model.getCONNECTED_USER().getRoleId() == 1 || model.getCONNECTED_USER().getRoleId() == 2) {
             ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
                 if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                    addProductButton.setText("➕");
-                    importProductsButton.setText("\uD83D\uDCE5");
-                    addOrderButton.setText("➕");
-                    excelExportButton.setText("");
+                    // Users tab
+                    addUserButton.setText("");
+
+                    // Products tab
+                    addProductButton.setText("");
+                    importProductsButton.setText("");
+
+                    // Orders tab
+                    addOrderButton.setText("");
+                    importOrderButton.setText("");
+                    orderExportButton.setText("");
                 } else {
-                    addProductButton.setText("➕ Adauga un produs");
-                    importProductsButton.setText("Importa produse \uD83D\uDCE5");
-                    addOrderButton.setText("➕ Adauga o comanda");
-                    excelExportButton.setText("Exporta realizari in excel");
+                    // Users tab
+                    addUserButton.setText("Adauga un utilizator");
+
+                    // Products tab
+                    addProductButton.setText("Adauga un produs");
+                    importProductsButton.setText("Importa produse");
+
+                    // Orders tab
+                    addOrderButton.setText("Adauga un produs");
+                    importOrderButton.setText("Importa comenzi");
+                    orderExportButton.setText("Exporta in excel");
                 }
             };
             stage.widthProperty().addListener(stageSizeListener);
@@ -112,43 +127,56 @@ public class ManagerView extends Parent implements Builder<Region> {
         VBox contentContainer = new VBox();
 
         contentContainer.getChildren().addAll(createProductsSectionHeader(), createProductsTable());
+        contentContainer.getStyleClass().add("sub-main-window-content-container");
         productsTab.setContent(contentContainer);
         productsTab.setClosable(false);
         return productsTab;
     }
 
     private Node createProductsSectionHeader() {
-        HBox sectionHeaderContainer = new HBox();
-        sectionHeaderContainer.setSpacing(10);
-        sectionHeaderContainer.setAlignment(Pos.CENTER);
+        Label sectionTitle = new Label("Produse");
+        sectionTitle.setMaxWidth(Double.MAX_VALUE);
+        sectionTitle.getStyleClass().add("sub-main-window-title");
+        HBox.setHgrow(sectionTitle, Priority.ALWAYS);
+        HBox headerSection = new HBox(sectionTitle);
+        headerSection.getStyleClass().add("sub-main-window-header");
 
-        Label productsSectionTitle = new Label("Produse");
-        productsSectionTitle.getStyleClass().add("tab-section-title");
-        productsSectionTitle.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(productsSectionTitle, Priority.ALWAYS);
+
+//        HBox sectionHeaderContainer = new HBox();
+//        sectionHeaderContainer.setSpacing(10);
+//        sectionHeaderContainer.setAlignment(Pos.CENTER);
+//
+//        Label productsSectionTitle = new Label("Produse");
+//        productsSectionTitle.getStyleClass().add("tab-section-title");
+//        productsSectionTitle.setMaxWidth(Double.MAX_VALUE);
+//        HBox.setHgrow(productsSectionTitle, Priority.ALWAYS);
 
         if(ConfigApp.getRole().canEditProducts()) {
             addProductButton = new Button();
             addProductButton.setOnAction(event -> new ProductController(stage));
+            addProductButton.setGraphic(new FontIcon("mdi2p-plus"));
+            addProductButton.getStyleClass().add("sub-main-window-button");
 
             importProductsButton = new Button();
             importProductsButton.setOnAction(event -> new ExcelImportController(stage));
+            importProductsButton.setGraphic(new FontIcon("mdi2a-application-import"));
             importProductsButton.setTooltip(new Tooltip("Importa produse dintr-un fisier excel."));
+            importProductsButton.getStyleClass().add("sub-main-window-button");
+
             if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                addProductButton.setText("➕");
-                importProductsButton.setText("\uD83D\uDCE5");
+                addProductButton.setText("");
+                importProductsButton.setText("");
             } else {
-                addProductButton.setText("➕ Adauga un produs");
-                importProductsButton.setText("Importa produse \uD83D\uDCE5");
+                addProductButton.setText("Adauga un produs");
+                importProductsButton.setText("Importa produse");
             }
-            addProductButton.getStyleClass().add("ghost-button");
-            importProductsButton.getStyleClass().add("ghost-button");
+
 
         }
 
-        sectionHeaderContainer.getChildren().addAll(productsSectionTitle, addProductButton, importProductsButton);
-        sectionHeaderContainer.getStyleClass().add("tab-section-header");
-        return sectionHeaderContainer;
+        headerSection.getChildren().addAll(addProductButton, importProductsButton);
+//        headerSection.getStyleClass().add("tab-section-header");
+        return headerSection;
     }
 
     private TableView<Product> createProductsTable() {
@@ -231,77 +259,56 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTab.setClosable(false);
 
         VBox contentContainer = new VBox();
-        
+
         contentContainer.getChildren().addAll(createOrdersSectionHeader(), createOrdersTable());
+        contentContainer.getStyleClass().add("sub-main-window-content-container");
         ordersTab.setContent(contentContainer);
 
         return ordersTab;
     }
 
     private Node createOrdersSectionHeader() {
-        HBox sectionHeaderContainer = new HBox();
-        sectionHeaderContainer.setSpacing(10);
-        sectionHeaderContainer.setAlignment(Pos.CENTER);
-
-        Label ordersSectionTitle = new Label("Comenzi");
-        ordersSectionTitle.getStyleClass().add("tab-section-title");
-        ordersSectionTitle.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(ordersSectionTitle, Priority.ALWAYS);
-
-        sectionHeaderContainer.getChildren().addAll(ordersSectionTitle);
-
-//        addProductButton = new Button();
-//        addProductButton.setOnAction(event -> new ProductController(stage));
-//
-//        importProductsButton = new Button();
-//        importProductsButton.setOnAction(event -> new ExcelImportController(stage));
-//        importProductsButton.setTooltip(new Tooltip("Importa produse dintr-un fisier excel."));
-//        if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-//            addProductButton.setText("➕");
-//            importProductsButton.setText("\uD83D\uDCE5");
-//        } else {
-//            addProductButton.setText("➕ Adauga un produs");
-//            importProductsButton.setText("Importa produse \uD83D\uDCE5");
-//        }
-//        addProductButton.getStyleClass().add("ghost-button");
-//        importProductsButton.getStyleClass().add("ghost-button");
+        Label sectionTitle = new Label("Comenzi");
+        sectionTitle.setMaxWidth(Double.MAX_VALUE);
+        sectionTitle.getStyleClass().add("sub-main-window-title");
+        HBox.setHgrow(sectionTitle, Priority.ALWAYS);
+        HBox headerSection = new HBox(sectionTitle);
+        headerSection.getStyleClass().add("sub-main-window-header");
 
         if(ConfigApp.getRole().canEditOrders()) {
             closedOrdersCheckbox.setSelected(true);
             closedOrdersCheckbox.setOnAction(event -> reloadOrders.accept(closedOrdersCheckbox.isSelected()));
 
             addOrderButton = new Button();
-            addOrderButton.setOnAction(event -> {
-                new OrderController(stage, WINDOW_TYPE.ADD);
-            });
-            orderExportButton = new Button("Exporta");
-            FontIcon fontIcon = new FontIcon("mdi2f-file-export-outline");
-            orderExportButton.setGraphic(fontIcon);
-            orderExportButton.getStyleClass().add("ghost-button");
-            orderExportButton.setOnAction(event -> new OrderExportController(stage));
+            addOrderButton.setOnAction(event -> new OrderController(stage, WINDOW_TYPE.ADD));
+            addOrderButton.setGraphic(new FontIcon("mdi2p-plus"));
+            addOrderButton.getStyleClass().add("sub-main-window-button");
 
-            importOrderButton = new Button("Importa comenzi");
+            orderExportButton = new Button();
+            orderExportButton.setOnAction(event -> new OrderExportController(stage));
+            orderExportButton.setGraphic(new FontIcon("mdi2f-file-export-outline"));
+            orderExportButton.getStyleClass().add("sub-main-window-button");
+
+            importOrderButton = new Button();
             importOrderButton.setOnAction(event -> new OrderImportController(stage));
             importOrderButton.setGraphic(new FontIcon("mdi2a-application-import"));
-            importOrderButton.getStyleClass().add("ghost-button");
-
-            excelExportButton = new Button();
-            excelExportButton.setOnAction(event -> new ExcelExportController(stage));
-
+            importOrderButton.getStyleClass().add("sub-main-window-button");
 
             if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                addOrderButton.setText("➕");
+                addOrderButton.setText("");
+                importOrderButton.setText("");
+                orderExportButton.setText("");
             } else {
-                addOrderButton.setText("➕ Adauga o comanda");
-                excelExportButton.setGraphic(new FontIcon("mdi2m-microsoft-excel"));
+                addOrderButton.setText("Adauga un produs");
+                importOrderButton.setText("Importa comenzi");
+                orderExportButton.setText("Exporta in excel");
             }
-            addOrderButton.getStyleClass().add("ghost-button");
+            addOrderButton.getStyleClass().add("sub-main-window-button");
 
-            sectionHeaderContainer.getChildren().addAll(closedOrdersCheckbox, addOrderButton, importOrderButton, orderExportButton);
+            headerSection.getChildren().addAll(closedOrdersCheckbox, addOrderButton, importOrderButton, orderExportButton);
         }
 
-        sectionHeaderContainer.getStyleClass().add("tab-section-header");
-        return sectionHeaderContainer;
+        return headerSection;
     }
 
     private TableView<Order> createOrdersTable() {
@@ -956,22 +963,37 @@ public class ManagerView extends Parent implements Builder<Region> {
     //region Users Tab
     private Tab createUsersTab() {
         Label sectionTitle = new Label("Utilizatori");
-        sectionTitle.getStyleClass().add("tab-section-title");
         sectionTitle.setMaxWidth(Double.MAX_VALUE);
+        sectionTitle.getStyleClass().add("sub-main-window-title");
         HBox.setHgrow(sectionTitle, Priority.ALWAYS);
         HBox headerSection = new HBox(sectionTitle);
+        headerSection.getStyleClass().add("sub-main-window-header");
+//
+//        Label sectionTitle = new Label("Utilizatori");
+//        sectionTitle.getStyleClass().add("tab-section-title");
+//        sectionTitle.setMaxWidth(Double.MAX_VALUE);
+//        HBox.setHgrow(sectionTitle, Priority.ALWAYS);
+//        HBox headerSection = new HBox(sectionTitle);
 
         if(ConfigApp.getRole().canEditUsers()) {
-            Button addButton = new Button("Adauga un utilizator");
-            addButton.getStyleClass().add("ghost-button");
-            addButton.setOnAction(event -> new UserController(stage));
-            addButton.setGraphic(new FontIcon("mdi2p-plus"));
-            headerSection.getChildren().add(addButton);
+            addUserButton = new Button();
+            addUserButton.setOnAction(event -> new UserController(stage));
+            addUserButton.setGraphic(new FontIcon("mdi2p-plus"));
+            addUserButton.getStyleClass().add("sub-main-window-button");
+
+            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
+                addUserButton.setText("");
+            } else {
+                addUserButton.setText("Adauga un utilizator");
+            }
+
+            headerSection.getChildren().add(addUserButton);
         }
 
-        headerSection.getStyleClass().add("tab-section-header");
+//        headerSection.getStyleClass().add("tab-section-header");
 
         VBox content = new VBox(headerSection, createUsersTable());
+        content.getStyleClass().add("sub-main-window-content-container");
 
         Tab tab = new Tab("Utilizatori");
         tab.setClosable(false);
