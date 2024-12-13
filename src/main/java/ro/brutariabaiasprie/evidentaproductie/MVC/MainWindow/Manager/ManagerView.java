@@ -397,6 +397,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                             int currentIndex = indexProperty().getValue() < 0 ? 0 : indexProperty().getValue();
                             Order order = param.getTableView().getItems().get(currentIndex);
 
+                            // When the value for a batch is defined
                             if(order.getProduct().getBatchValue() > 0) {
                                 double quantity = order.getQuantity();
                                 double completed = order.getCompleted();
@@ -405,12 +406,20 @@ public class ManagerView extends Parent implements Builder<Region> {
                                 double completedBatches = Math.ceil(completed / batchValue);
                                 double totalBatches = Math.ceil(quantity / batchValue);
 
+                                // When the order is incomplete
                                 if(completed < quantity) {
+                                    // When there are no completed batches
                                     if(completedBatches == 0) {
                                         percentage = completed / batchValue;
                                     }
+                                    // When there are completed batches
                                     else {
                                         percentage = (completed - (completedBatches - 1) * batchValue ) / batchValue;
+                                        // If the current batch is completed and it is not the last batch move to the next one
+                                        if (percentage == 1 && completedBatches < totalBatches) {
+                                            completedBatches += 1;
+                                            percentage = 0;
+                                        }
                                     }
                                 } else {
                                     percentage = 1 + (completed - quantity) / batchValue;
