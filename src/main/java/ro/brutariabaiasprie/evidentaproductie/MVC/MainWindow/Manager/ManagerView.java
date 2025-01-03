@@ -29,11 +29,8 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ProductGroup.Prod
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Record.RecordController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.User.UserController;
 
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.function.Consumer;
 
 public class ManagerView extends Parent implements Builder<Region> {
@@ -41,13 +38,6 @@ public class ManagerView extends Parent implements Builder<Region> {
     private final ManagerModel model;
     private final Consumer<Order> productionShortcutHandler;
     private final Consumer<Boolean> reloadOrders;
-    // Products tab
-    private Button addProductButton;
-    private Button importProductsButton;
-//    // Orders tab
-    private Button importOrderButton;
-    private Button orderExportButton;
-    private Button excelExportButton;
     private CheckBox closedOrdersCheckbox = new CheckBox("Afiseaza comenzi inchise");
 
     public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders) {
@@ -63,32 +53,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         root.setFillWidth(true);
         root.getChildren().add(createTabs());
 
-        createStageResizeListeners();
         return root;
-    }
-
-    private void createStageResizeListeners() {
-        ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
-            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                // Products tab
-                addProductButton.setText("");
-                importProductsButton.setText("");
-
-                importOrderButton.setText("");
-                orderExportButton.setText("");
-
-            } else {
-                // Products tab
-                addProductButton.setText("Adauga produs");
-                importProductsButton.setText("Importa produse");
-
-                importOrderButton.setText("Importa comenzi");
-                orderExportButton.setText("Exporta in excel");
-
-            }
-        };
-        stage.widthProperty().addListener(stageSizeListener);
-        stage.heightProperty().addListener(stageSizeListener);
     }
 
     private Node createTabs() {
@@ -142,30 +107,28 @@ public class ManagerView extends Parent implements Builder<Region> {
 //        HBox.setHgrow(productsSectionTitle, Priority.ALWAYS);
 
         if(ConfigApp.getRole().canEditProducts()) {
-            addProductButton = new Button();
+            Button addProductButton = new Button();
+            addProductButton.textProperty().bind(Bindings.createStringBinding(
+                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Adauga produs";},
+                    stage.widthProperty())
+            );
             addProductButton.setOnAction(event -> new ProductController(stage));
             addProductButton.setGraphic(new FontIcon("mdi2p-plus"));
             addProductButton.getStyleClass().add("sub-main-window-button");
 
-            importProductsButton = new Button();
+            Button importProductsButton = new Button();
+            importProductsButton.textProperty().bind(Bindings.createStringBinding(
+                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Importa produse";},
+                    stage.widthProperty())
+            );
             importProductsButton.setOnAction(event -> new ExcelImportController(stage));
             importProductsButton.setGraphic(new FontIcon("mdi2a-application-import"));
             importProductsButton.setTooltip(new Tooltip("Importa produse dintr-un fisier excel."));
             importProductsButton.getStyleClass().add("sub-main-window-button");
 
-            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                addProductButton.setText("");
-                importProductsButton.setText("");
-            } else {
-                addProductButton.setText("Adauga produs");
-                importProductsButton.setText("Importa produse");
-            }
-
+            headerSection.getChildren().addAll(addProductButton, importProductsButton);
 
         }
-
-        headerSection.getChildren().addAll(addProductButton, importProductsButton);
-//        headerSection.getStyleClass().add("tab-section-header");
         return headerSection;
     }
 
@@ -285,23 +248,24 @@ public class ManagerView extends Parent implements Builder<Region> {
             addOrderButton.setGraphic(new FontIcon("mdi2p-plus"));
             addOrderButton.getStyleClass().add("sub-main-window-button");
 
-            orderExportButton = new Button();
+            Button orderExportButton = new Button();
+            orderExportButton.textProperty().bind(Bindings.createStringBinding(
+                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Exporta in excel";},
+                    stage.widthProperty())
+            );
             orderExportButton.setOnAction(event -> new OrderExportController(stage));
             orderExportButton.setGraphic(new FontIcon("mdi2f-file-export-outline"));
             orderExportButton.getStyleClass().add("sub-main-window-button");
 
-            importOrderButton = new Button();
+            Button importOrderButton = new Button();
+            importOrderButton.textProperty().bind(Bindings.createStringBinding(
+                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Importa comenzi";},
+                    stage.widthProperty())
+            );
             importOrderButton.setOnAction(event -> new OrderImportController(stage));
             importOrderButton.setGraphic(new FontIcon("mdi2a-application-import"));
             importOrderButton.getStyleClass().add("sub-main-window-button");
 
-            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                importOrderButton.setText("");
-                orderExportButton.setText("");
-            } else {
-                importOrderButton.setText("Importa comenzi");
-                orderExportButton.setText("Exporta in excel");
-            }
             addOrderButton.getStyleClass().add("sub-main-window-button");
 
             headerSection.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton);
