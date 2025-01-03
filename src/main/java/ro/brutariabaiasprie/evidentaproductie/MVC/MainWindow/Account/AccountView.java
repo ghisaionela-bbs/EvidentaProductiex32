@@ -2,6 +2,7 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -33,17 +34,17 @@ public class AccountView extends Parent implements Builder<Region> {
 
     @Override
     public Region build() {
-        Label usernameLabel = new Label("Utilizator:");
-        Label usernameValueLabel = new Label(ConfigApp.getUser().getUsername());
-        Label roleLabel = new Label("Rol:");
-        Label roleValueLabel = new Label(ConfigApp.getRole().getName());
+        Label usernameLabel = new Label("Utilizator: " + ConfigApp.getUser().getUsername());
+//        Label usernameValueLabel = new Label(ConfigApp.getUser().getUsername());
+        Label roleLabel = new Label("Rol: " + ConfigApp.getRole().getName());
+//        Label roleValueLabel = new Label(ConfigApp.getRole().getName());
         Button disconnectButton = createDisconnectButton();
 
-        VBox infoContainer = new VBox(usernameLabel, usernameValueLabel, roleLabel, roleValueLabel);
-        infoContainer.setAlignment(Pos.CENTER);
+//        VBox infoContainer = new VBox(usernameLabel, usernameValueLabel, roleLabel, roleValueLabel);
+        VBox infoContainer = new VBox(usernameLabel, roleLabel);
 
         root = new VBox(infoContainer, disconnectButton);
-        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(16));
         return root;
     }
 

@@ -113,6 +113,14 @@ public class OrderImportView extends Parent implements Builder<Region> {
     }
 
     private void showConfigurationOptions() {
+        //  Title
+        Label titleLabel  = new Label("Import excel comenzi");
+        titleLabel.getStyleClass().add("title");
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(titleLabel, Priority.ALWAYS);
+        HBox titleContainer = new HBox(titleLabel);
+        titleContainer.setAlignment(Pos.CENTER_LEFT);
+
         TextFlow info = new TextFlow(new Text("Configurati coloanele si randul de la care se va incepe citirea fisierului excel\n(fara cap de tabel):"));
 
         GridPane gridPane = new GridPane();
@@ -151,33 +159,37 @@ public class OrderImportView extends Parent implements Builder<Region> {
         startingRowSpinner = new Spinner<>(1,1000,1);
         startingRowSpinner.getValueFactory().setValue(1);
 
-        gridPane.add(fileNameTextField, 0, 0, 2, 1);
-        gridPane.add(browseFileButton, 2, 0);
+        gridPane.add(titleContainer, 0, 0, 2, 1);
+        gridPane.add(info, 0, 1, 3, 1);
 
-        gridPane.add(new Label("Numar sheet: "), 0, 1);
-        gridPane.add(sheetSpinner, 1, 1);
+        gridPane.add(fileNameTextField, 0, 2, 2, 1);
+        gridPane.add(browseFileButton, 2, 2);
 
-        gridPane.add(productNameLabel, 0, 2);
-        gridPane.add(productNameColumnSpinner, 1, 2);
+        gridPane.add(new Label("Numar sheet: "), 0, 3);
+        gridPane.add(sheetSpinner, 1, 3);
 
-        gridPane.add(unitMeasurementLabel, 0, 3);
-        gridPane.add(quantityColumnSpinner, 1, 3);
+        gridPane.add(productNameLabel, 0, 4);
+        gridPane.add(productNameColumnSpinner, 1, 4);
 
-        gridPane.add(new Label("Coloana data:"), 0, 4);
-        gridPane.add(dateColumnSpinner, 1, 4);
+        gridPane.add(unitMeasurementLabel, 0, 5);
+        gridPane.add(quantityColumnSpinner, 1, 5);
 
-        gridPane.add(new Label("Coloana ora:"), 0, 5);
-        gridPane.add(timeColumnSpinner, 1, 5);
+        gridPane.add(new Label("Coloana data:"), 0, 6);
+        gridPane.add(dateColumnSpinner, 1, 6);
 
-        gridPane.add(startingRowLabel, 0, 6, 1, 2);
-        gridPane.add(startingRowSpinner, 1, 6);
+        gridPane.add(new Label("Coloana ora:"), 0, 7);
+        gridPane.add(timeColumnSpinner, 1, 7);
+
+        gridPane.add(startingRowLabel, 0, 8, 1, 2);
+        gridPane.add(startingRowSpinner, 1, 8);
 
         gridPane.getStyleClass().add("grid-form");
 
         VBox.setVgrow(gridPane, Priority.ALWAYS);
 
-        root.setCenter(new VBox(info, gridPane));
+        root.setCenter(gridPane);
         root.setBottom(createWindowActionButtons());
+
     }
 
 

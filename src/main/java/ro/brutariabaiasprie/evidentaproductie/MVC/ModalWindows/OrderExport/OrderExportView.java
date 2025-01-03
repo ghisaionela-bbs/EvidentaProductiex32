@@ -31,7 +31,7 @@ public class OrderExportView extends Parent implements Builder<Region> {
     public Region build() {
         BorderPane root = new BorderPane();
 
-        Label titleLabel  = new Label("Export excel");
+        Label titleLabel  = new Label("Export excel comenzi si realizari");
         titleLabel.getStyleClass().add("title");
         titleLabel.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(titleLabel, Priority.ALWAYS);
