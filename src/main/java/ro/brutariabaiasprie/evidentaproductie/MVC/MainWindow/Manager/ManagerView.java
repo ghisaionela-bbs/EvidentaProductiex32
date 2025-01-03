@@ -1,5 +1,6 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -28,8 +29,11 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ProductGroup.Prod
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Record.RecordController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.User.UserController;
 
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.function.Consumer;
 
 public class ManagerView extends Parent implements Builder<Region> {
@@ -40,14 +44,11 @@ public class ManagerView extends Parent implements Builder<Region> {
     // Products tab
     private Button addProductButton;
     private Button importProductsButton;
-    // Orders tab
-    private Button addOrderButton;
+//    // Orders tab
     private Button importOrderButton;
     private Button orderExportButton;
     private Button excelExportButton;
     private CheckBox closedOrdersCheckbox = new CheckBox("Afiseaza comenzi inchise");
-    // Users tab
-    private Button addUserButton;
 
     public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders) {
         this.model = model;
@@ -67,38 +68,27 @@ public class ManagerView extends Parent implements Builder<Region> {
     }
 
     private void createStageResizeListeners() {
-        if(model.getCONNECTED_USER().getRoleId() == 1 || model.getCONNECTED_USER().getRoleId() == 2) {
-            ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
-                if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                    // Users tab
-                    addUserButton.setText("");
+        ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
+            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
+                // Products tab
+                addProductButton.setText("");
+                importProductsButton.setText("");
 
-                    // Products tab
-                    addProductButton.setText("");
-                    importProductsButton.setText("");
+                importOrderButton.setText("");
+                orderExportButton.setText("");
 
-                    // Orders tab
-                    addOrderButton.setText("");
-                    importOrderButton.setText("");
-                    orderExportButton.setText("");
-                } else {
-                    // Users tab
-                    addUserButton.setText("Adauga un utilizator");
+            } else {
+                // Products tab
+                addProductButton.setText("Adauga produs");
+                importProductsButton.setText("Importa produse");
 
-                    // Products tab
-                    addProductButton.setText("Adauga un produs");
-                    importProductsButton.setText("Importa produse");
+                importOrderButton.setText("Importa comenzi");
+                orderExportButton.setText("Exporta in excel");
 
-                    // Orders tab
-                    addOrderButton.setText("Adauga un produs");
-                    importOrderButton.setText("Importa comenzi");
-                    orderExportButton.setText("Exporta in excel");
-                }
-            };
-            stage.widthProperty().addListener(stageSizeListener);
-            stage.heightProperty().addListener(stageSizeListener);
-        }
-
+            }
+        };
+        stage.widthProperty().addListener(stageSizeListener);
+        stage.heightProperty().addListener(stageSizeListener);
     }
 
     private Node createTabs() {
@@ -167,7 +157,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                 addProductButton.setText("");
                 importProductsButton.setText("");
             } else {
-                addProductButton.setText("Adauga un produs");
+                addProductButton.setText("Adauga produs");
                 importProductsButton.setText("Importa produse");
             }
 
@@ -268,18 +258,29 @@ public class ManagerView extends Parent implements Builder<Region> {
     }
 
     private Node createOrdersSectionHeader() {
+        VBox header = new VBox();
+
         Label sectionTitle = new Label("Comenzi");
         sectionTitle.setMaxWidth(Double.MAX_VALUE);
         sectionTitle.getStyleClass().add("sub-main-window-title");
         HBox.setHgrow(sectionTitle, Priority.ALWAYS);
         HBox headerSection = new HBox(sectionTitle);
-        headerSection.getStyleClass().add("sub-main-window-header");
+        headerSection.getStyleClass().add("hbox-container");
+
+        header.getChildren().add(headerSection);
+        header.getStyleClass().add("sub-main-window-header");
 
         if(ConfigApp.getRole().canEditOrders()) {
             closedOrdersCheckbox.setSelected(true);
             closedOrdersCheckbox.setOnAction(event -> reloadOrders.accept(closedOrdersCheckbox.isSelected()));
 
-            addOrderButton = new Button();
+            header.getChildren().add(closedOrdersCheckbox);
+
+            Button addOrderButton = new Button();
+            addOrderButton.textProperty().bind(Bindings.createStringBinding(
+                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Adauga comanda";},
+                    stage.widthProperty())
+            );
             addOrderButton.setOnAction(event -> new OrderController(stage, WINDOW_TYPE.ADD));
             addOrderButton.setGraphic(new FontIcon("mdi2p-plus"));
             addOrderButton.getStyleClass().add("sub-main-window-button");
@@ -295,20 +296,18 @@ public class ManagerView extends Parent implements Builder<Region> {
             importOrderButton.getStyleClass().add("sub-main-window-button");
 
             if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                addOrderButton.setText("");
                 importOrderButton.setText("");
                 orderExportButton.setText("");
             } else {
-                addOrderButton.setText("Adauga un produs");
                 importOrderButton.setText("Importa comenzi");
                 orderExportButton.setText("Exporta in excel");
             }
             addOrderButton.getStyleClass().add("sub-main-window-button");
 
-            headerSection.getChildren().addAll(closedOrdersCheckbox, addOrderButton, importOrderButton, orderExportButton);
+            headerSection.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton);
         }
 
-        return headerSection;
+        return header;
     }
 
     private TableView<Order> createOrdersTable() {
@@ -316,28 +315,33 @@ public class ManagerView extends Parent implements Builder<Region> {
         ordersTableView.setPlaceholder(new Label("Nu exista comenzi."));
         VBox.setVgrow(ordersTableView, Priority.ALWAYS);
 
-        TableColumn<Order, Boolean> isClosedColumn = new TableColumn<>();
-        isClosedColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().isClosed()));
-        isClosedColumn.setCellFactory(column -> new TableCell<>() {
-            final FontIcon fontIcon = new FontIcon("mdi2l-lock");
-            @Override
-            protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(null);
-                    if(item) {
-                        setGraphic(fontIcon);
-                        setStyle("-fx-alignment: CENTER;");
-                    } else {
+        if(ConfigApp.getRole().canEditOrders()) {
+            TableColumn<Order, Boolean> isClosedColumn = new TableColumn<>();
+            isClosedColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().isClosed()));
+            isClosedColumn.setCellFactory(column -> new TableCell<>() {
+                final FontIcon fontIcon = new FontIcon("mdi2l-lock");
+                @Override
+                protected void updateItem(Boolean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
                         setGraphic(null);
+                    } else {
+                        setText(null);
+                        if(item) {
+                            setGraphic(fontIcon);
+                            setStyle("-fx-alignment: CENTER;");
+                        } else {
+                            setGraphic(null);
+                        }
                     }
                 }
-            }
-        });
-        ordersTableView.getColumns().add(isClosedColumn);
+            });
+            ordersTableView.getColumns().add(isClosedColumn);
+            isClosedColumn.prefWidthProperty().set(64);
+        }
+
+
 
         TableColumn<Order, Integer> orderCounterColumn = new TableColumn<>("Nr");
         orderCounterColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getCounter()));
@@ -610,10 +614,13 @@ public class ManagerView extends Parent implements Builder<Region> {
             return row;
         });
 
-        isClosedColumn.prefWidthProperty().set(64);
         orderCounterColumn.prefWidthProperty().set(64);
         dateTimeColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
-        productNameColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.5).subtract(192));
+        if(ConfigApp.getRole().canEditOrders()) {
+            productNameColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.5).subtract(192));
+        } else {
+            productNameColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.5).subtract(128));
+        }
         quantityColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
         completedColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
         remainderColumn.prefWidthProperty().bind(ordersTableView.widthProperty().multiply(0.125));
@@ -743,11 +750,11 @@ public class ManagerView extends Parent implements Builder<Region> {
         sectionTitle.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(sectionTitle, Priority.ALWAYS);
 
-        Button addButton = new Button("Adauga o grupa");
+        Button addButton = new Button("Adauga grupa");
         addButton.getStyleClass().add("ghost-button");
         addButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.ADD));
 
-        Button addProductGroupButton = new Button("Adauga o grupa de produs");
+        Button addProductGroupButton = new Button("Adauga grupa de produs");
         addProductGroupButton.getStyleClass().add("ghost-button");
         addProductGroupButton.setOnAction(event -> new ProductGroupController(stage));
 
@@ -770,7 +777,12 @@ public class ManagerView extends Parent implements Builder<Region> {
         HBox headerSection = new HBox(sectionTitle);
 
         if(ConfigApp.getRole().canEditGroups()) {
-            Button addGroupButton = new Button("Adaugare grupa");
+            Button addGroupButton = new Button();
+            addGroupButton.textProperty().bind(Bindings.createStringBinding(
+                () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Adauga grupa";},
+                stage.widthProperty())
+            );
+
             addGroupButton.setGraphic(new FontIcon("mdi2p-plus"));
             addGroupButton.getStyleClass().add("sub-main-window-button");
             addGroupButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.ADD));
@@ -797,7 +809,7 @@ public class ManagerView extends Parent implements Builder<Region> {
         listView.setFocusTraversable(false);
         listView.getStyleClass().add("group-listview");
         listView.setCellFactory(param -> new ListCell<>() {
-            final Button addSubGroupButton = new Button("Adaugare subgrupa");
+            final Button addSubGroupButton = new Button();
             final FontIcon plusIcon = new FontIcon("mdi2p-plus");
             final Button editButton = new Button();
             final FontIcon editIcon = new FontIcon("mdi2s-square-edit-outline");
@@ -813,7 +825,6 @@ public class ManagerView extends Parent implements Builder<Region> {
                     if(item.getParentGroupId() == 0) {
                         final Label groupLabel = new Label(item.getName());
 
-
                         final Label spacer = new Label();
                         spacer.setMaxWidth(Double.MAX_VALUE);
                         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -827,6 +838,12 @@ public class ManagerView extends Parent implements Builder<Region> {
                             addSubGroupButton.setGraphic(plusIcon);
                             addSubGroupButton.getStyleClass().add("sub-main-window-button");
                             addSubGroupButton.setOnAction(event -> new GroupController(stage, WINDOW_TYPE.ADD, new Group(0, "", item.getId())));
+
+                            addSubGroupButton.textProperty().bind(Bindings.createStringBinding(
+                                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Adauga subgrupa";},
+                                    stage.widthProperty())
+                            );
+
                             titleContainer = new HBox(groupLabel, editButton, spacer, addSubGroupButton);
                         } else {
                             titleContainer = new HBox(groupLabel, spacer);
@@ -976,16 +993,15 @@ public class ManagerView extends Parent implements Builder<Region> {
 //        HBox headerSection = new HBox(sectionTitle);
 
         if(ConfigApp.getRole().canEditUsers()) {
-            addUserButton = new Button();
+            Button addUserButton = new Button();
+            addUserButton.textProperty().bind(Bindings.createStringBinding(
+                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Adauga utilizator";},
+                    stage.widthProperty())
+            );
+
             addUserButton.setOnAction(event -> new UserController(stage));
             addUserButton.setGraphic(new FontIcon("mdi2p-plus"));
             addUserButton.getStyleClass().add("sub-main-window-button");
-
-            if(stage.getWidth() < Globals.MINIMIZE_WIDTH) {
-                addUserButton.setText("");
-            } else {
-                addUserButton.setText("Adauga un utilizator");
-            }
 
             headerSection.getChildren().add(addUserButton);
         }

@@ -507,6 +507,9 @@
     -fx-alignment: CENTER-LEFT;
     -fx-spacing: 8px;
 }
+.main-window .sub-main-window-header > .hbox-container {
+    -fx-spacing: 8px;
+}
 .main-window .sub-main-window-title {
     -fx-font-size: 1.5em;
 }
