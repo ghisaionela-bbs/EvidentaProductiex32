@@ -127,7 +127,7 @@ public class OrderImportView extends Parent implements Builder<Region> {
         gridPane.setAlignment(Pos.TOP_LEFT);
 
         Label productNameLabel = new Label("Coloana denumire:");
-        Label unitMeasurementLabel = new Label("Coloana um:");
+        Label unitMeasurementLabel = new Label("Coloana cantitate:");
 
         fileNameTextField = new TextField();
         fileNameTextField.setPromptText("Cauta fisierul");

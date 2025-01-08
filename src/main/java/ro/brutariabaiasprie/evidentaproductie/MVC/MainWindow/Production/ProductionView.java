@@ -80,21 +80,21 @@ public class ProductionView extends Parent implements Builder<Region> {
         Button btnProductChoice = createBtnProductChoice();
         quantityTextField = createQuantityField();
         quantityTextField.setMaxWidth(Double.MAX_VALUE);
-        Label unitMeasurementLabel = new Label();
-        unitMeasurementLabel.textProperty().bind(Bindings.createStringBinding(() ->
-        {
-            String text = "";
-            if(model.getSelectedProduct() != null) {
-                text = model.getSelectedProduct().getUnitMeasurement();
-            }
-            return text;
-        }, model.selectedProductProperty()));
-        HBox.setHgrow(quantityTextField, Priority.ALWAYS);
-        unitMeasurementLabel.getStyleClass().add("unit-measurement-indicator");
-        unitMeasurementLabel.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(unitMeasurementLabel, Priority.ALWAYS);
+//        Label unitMeasurementLabel = new Label();
+//        unitMeasurementLabel.textProperty().bind(Bindings.createStringBinding(() ->
+//        {
+//            String text = "";
+//            if(model.getSelectedProduct() != null) {
+//                text = model.getSelectedProduct().getUnitMeasurement();
+//            }
+//            return text;
+//        }, model.selectedProductProperty()));
+//        HBox.setHgrow(quantityTextField, Priority.ALWAYS);
+//        unitMeasurementLabel.getStyleClass().add("unit-measurement-indicator");
+//        unitMeasurementLabel.setMaxWidth(Double.MAX_VALUE);
+//        HBox.setHgrow(unitMeasurementLabel, Priority.ALWAYS);
 
-        quantityInputContainer = new HBox(quantityTextField, unitMeasurementLabel);
+        quantityInputContainer = new HBox(quantityTextField);
         quantityInputContainer.setAlignment(Pos.CENTER);
         quantityInputContainer.setSpacing(8);
         quantityInputContainer.getStyleClass().add("production-quantity-input");
@@ -111,7 +111,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         productsListView = createProductListView();
         productsListView.maxWidthProperty().bind(stage.widthProperty().divide(3));
 
-        Label titleLabel = new Label("Inregistrari introduse");
+        Label titleLabel = new Label("Realizari");
         titleLabel.getStyleClass().add("records-title");
         titleLabel.setMaxWidth(Double.MAX_VALUE);
 
@@ -162,11 +162,11 @@ public class ProductionView extends Parent implements Builder<Region> {
                     orderLabel.getStyleClass().remove("warning");
                     Order order = model.getAssociatedOrder();
                     if(order.getRemainder() > 0) {
-                        return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted()) +
-                                "\nNecesar: " + order.getRemainder();
+                        return "Necesar: " + order.getRemainder() +
+                                "\nAsociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
                     } else {
-                        return "Asociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted()) +
-                                "\nComanda completa";
+                        return "\nComanda completa" +
+                                "\nAsociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
                     }
 
 

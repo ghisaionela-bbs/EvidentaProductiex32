@@ -14,9 +14,8 @@
   <component name="ChangeListManager">
     <list default="true" id="837d3ee9-ac9b-4d92-975d-3cc0e66fbe14" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Data/ConfigApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/Data/ConfigApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/Production/ProductionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/Production/ProductionView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/OrderImport/OrderImportView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/ModalWindows/OrderImport/OrderImportView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
