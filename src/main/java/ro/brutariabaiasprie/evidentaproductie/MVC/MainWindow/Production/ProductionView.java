@@ -112,18 +112,22 @@ public class ProductionView extends Parent implements Builder<Region> {
         productsListView.maxWidthProperty().bind(stage.widthProperty().divide(3));
 
         Label titleLabel = new Label("Inregistrari introduse");
+        titleLabel.getStyleClass().add("records-title");
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+
         TableView<Record> tableView = createRecordTableView();
         tableView.setMaxSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
         VBox.setVgrow(tableView, Priority.ALWAYS);
 
         VBox records = new VBox(titleLabel, tableView);
-        records.setAlignment(Pos.CENTER);
+        records.setSpacing(8);
         HBox.setHgrow(records, Priority.ALWAYS);
 
 //        TabPane root = new TabPane(createOrdersTab(), createRecordsTab());
         root = new HBox();
         root.getChildren().addAll(leftSection, records);
         root.setSpacing(8);
+        root.getStyleClass().add("production-window");
         return root;
     }
 

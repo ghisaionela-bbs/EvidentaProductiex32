@@ -1,6 +1,6 @@
 /*ROOT*/
 .root {
-    -fx-font-size: 2em;
+    -fx-font-size: 1.8em;
     COLOR_BRAND_BROWN: #4F2C1D;
     COLOR_BRAND_BROWN_90: rgba(68, 44, 29, 0.9);
     COLOR_BRAND_BROWN_80: rgba(68, 44, 29, 0.8);
@@ -403,6 +403,17 @@
     -fx-padding: 0.5em;
 }*/
 /* CONTENT -> PRODUCTION VIEW */
+.production-window {
+    -fx-padding: 1em;
+}
+.production-window .records-title {
+    -fx-background-color: COLOR_WHITE;
+    -fx-background-radius: 0.2em;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 1, 0.1, 1, 1);
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-spacing: 8px;
+    -fx-font-size: 1.5em;
+}
 .main-window .main-window-content .production-input-section .production-product-selection-button{
     -fx-background-color: COLOR_WHITE;
     -fx-background-radius: 0.2em;
@@ -496,7 +507,7 @@
     -fx-alignment: TOP-CENTER;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.1, 0.2, 0.2);
     -fx-padding: 1em;
-    -fx-spacing: 1em;
+    -fx-spacing: 0.5em;
 }
 
 .main-window .sub-main-window-header {
@@ -611,17 +622,26 @@
 }
 /* CONTENT -> MANAGER VIEW -> TABLE VIEW */
 .main-table-view {
-    -fx-background-color: TRANSPARENT;
+    -fx-background-color: COLOR_WHITE;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 1, 0.1, 1, 1);
+    -fx-padding: 0.2em;
+    -fx-background-radius: 0.2em;
 }
 .main-table-view .column-header {
     -fx-background-color: TRANSPARENT;
 }
 .main-table-view .column-header-background {
-    -fx-background-color: derive(COLOR_WHITE, -10%);
+    -fx-background-color: COLOR_WHITE;
     -fx-text-fill: COLOR_BRAND_BROWN;
+    -fx-border-color: COLOR_BRAND_BROWN;
+    -fx-border-width: 0 0 0.2em 0;
 }
 .main-table-view .column-header-background .filler {
     -fx-background-color: TRANSPARENT;
+}
+.main-table-view .table-row-cell {
+    -fx-border-color: COLOR_BRAND_BROWN;
+    -fx-border-width: 0 0 0.2 0;
 }
 .main-table-view .table-row-cell:filled:focused:selected .text {
     -fx-fill: -fx-selection-bar-text;

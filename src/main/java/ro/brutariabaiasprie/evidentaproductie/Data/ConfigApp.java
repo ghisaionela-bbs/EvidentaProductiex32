@@ -81,9 +81,6 @@ public class ConfigApp {
 
     private static void init_default_config() {
         String appDirPath = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\EvidentaProductie";
-        setConfig(CONFIG_KEY.DBURL.name(), "jdbc:sqlserver://192.168.3.145;databaseName=DB_EVIDENTA_PRODUCTIE;encrypt=false;");
-        setConfig(CONFIG_KEY.DBUSER.name(), "sa");
-        setConfig(CONFIG_KEY.DBPASS.name(), "sqlserverstatia51");
         setConfig(CONFIG_KEY.ERRLOG_PATH.name(), appDirPath + "\\ErrorLog.txt");
         setConfig(CONFIG_KEY.EXCEL_EXPORT_PATH.name(), appDirPath + "\\Rapoarte excel");
         setConfig(CONFIG_KEY.APPDIR.name(), appDirPath);
