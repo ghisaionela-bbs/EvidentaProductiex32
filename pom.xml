@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ro.brutariabaiasprie</groupId>
-  <artifactId>EvidentaProductiex32</artifactId>
+  <artifactId>EvidentaProductie</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>EvidentaProductiex32</name>
 
@@ -57,7 +57,7 @@
       <artifactId>bootstrapfx-core</artifactId>
       <version>0.4.0</version>
     </dependency>
-<dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>${junit.version}</version>
@@ -99,12 +99,24 @@
       <artifactId>log4j-api</artifactId>
       <version>2.20.0</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
+      <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+      <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+          <version>2.17.2</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
       <version>10.2.0.jre17</version>
     </dependency>
+      <!-- https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-materialdesign2-pack -->
+      <dependency>
+          <groupId>org.kordamp.ikonli</groupId>
+          <artifactId>ikonli-materialdesign2-pack</artifactId>
+          <version>12.3.1</version>
+      </dependency><!-- https://mvnrepository.com/artifact/org.comtel2000/fx-onscreen-keyboard-swing -->
   </dependencies>
 
   <build>
@@ -127,7 +139,7 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>ro.brutariabaiasprie.evidentaproductiex32/ro.brutariabaiasprie.evidentaproductiex32.HelloApplication</mainClass>
+              <mainClass>ro.brutariabaiasprie.evidentaproductiex32/ro.brutariabaiasprie.evidentaproductie.HelloApplication</mainClass>
               <launcher>app</launcher>
               <jlinkZipName>app</jlinkZipName>
               <jlinkImageName>app</jlinkImageName>
