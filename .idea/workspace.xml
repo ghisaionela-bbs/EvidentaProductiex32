@@ -14,9 +14,6 @@
   <component name="ChangeListManager">
     <list default="true" id="837d3ee9-ac9b-4d92-975d-3cc0e66fbe14" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/Manager/ManagerView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/Manager/ManagerView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/Production/ProductionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductie/MVC/MainWindow/Production/ProductionView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductie/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,7 +108,7 @@
       <recent name="ro.brutariabaiasprie.evidentaproductie.MVC" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainWrapper">
+  <component name="RunManager" selected="JAR Application.EvidentaProductie.jar">
     <configuration name="DashboardController" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Dashboard.DashboardController" />
       <module name="EvidentaProductie" />
@@ -168,8 +165,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.MainWrapper" />
         <item itemvalue="JAR Application.EvidentaProductie.jar" />
+        <item itemvalue="Application.MainWrapper" />
         <item itemvalue="Application.EvidentaProductie" />
         <item itemvalue="Application.DashboardController" />
         <item itemvalue="JAR Application.EvidentaProductiex32.jar" />
