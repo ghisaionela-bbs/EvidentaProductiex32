@@ -1,19 +1,31 @@
-module ro.brutariabaiasprie.evidentaproductiex32 {
-    requires javafx.controls;
+module ro.brutariabaiasprie.evidentaproductie {
     requires javafx.fxml;
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.core;
     requires org.kordamp.bootstrapfx.core;
-    requires java.sql;
     requires org.apache.poi.ooxml;
-    requires java.desktop;
     requires jxl;
+    requires com.fasterxml.jackson.databind;
+    requires org.dhatim.fastexcel.reader;
+    requires org.apache.logging.log4j;
+    requires java.sql;
+    requires jdk.compiler;
+    requires org.dhatim.fastexcel;
+    requires java.desktop;
+    requires commons.math3;
 
-    opens ro.brutariabaiasprie.evidentaproductiex32 to javafx.fxml;
-    exports ro.brutariabaiasprie.evidentaproductiex32;
-    exports ro.brutariabaiasprie.evidentaproductiex32.DTO;
-    opens ro.brutariabaiasprie.evidentaproductiex32.DTO to javafx.fxml;
+    opens ro.brutariabaiasprie.evidentaproductie to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie;
+    exports ro.brutariabaiasprie.evidentaproductie.DTO;
+    opens ro.brutariabaiasprie.evidentaproductie.DTO to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie.Data;
+    opens ro.brutariabaiasprie.evidentaproductie.Data to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie.MVC;
+    opens ro.brutariabaiasprie.evidentaproductie.MVC to javafx.fxml;
+    exports ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account;
+    opens ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account to javafx.fxml;
 }

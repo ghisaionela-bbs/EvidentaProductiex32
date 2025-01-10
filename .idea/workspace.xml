@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_TEST_SOURCES" value="false" />
+  </component>
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="EvidentaProductiex32:jar" />
+      <artifact name="EvidentaProductie:jar" />
     </artifacts-to-build>
   </component>
   <component name="AutoImportSettings">
@@ -10,23 +13,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="837d3ee9-ac9b-4d92-975d-3cc0e66fbe14" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/stylesheet.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/EvidentaProductiex32.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/EvidentaProductiex32.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/AddProductRecordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/AddProductRecordController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/DatabaseConnectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/DatabaseConnectionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/EvidentaProductie.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/EvidentaProductie.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/ProductListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ro/brutariabaiasprie/evidentaproductiex32/ProductListController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/add-product-record-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/add-product-record-view.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/product-list-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ro/brutariabaiasprie/evidentaproductiex32/product-list-view.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Exception" />
+        <option value="Enum" />
+        <option value="Kotlin Class" />
+        <option value="Class" />
+        <option value="FxmlFile" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JvmLoggingSettingsStorage">
+    <option name="loggerId" value="Slf4j" />
   </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
@@ -34,6 +44,9 @@
         <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
       </MavenGeneralSettings>
     </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
@@ -46,35 +59,62 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Application.DashboardController.executor&quot;: &quot;Run&quot;,
+    &quot;Application.EvidentaProductie.executor&quot;: &quot;Run&quot;,
     &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
     &quot;Application.MainWrapper.executor&quot;: &quot;Run&quot;,
+    &quot;Application.test.executor&quot;: &quot;Run&quot;,
     &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;JAR Application.EvidentaProductie.jar.executor&quot;: &quot;Run&quot;,
     &quot;JAR Application.EvidentaProductiex32.jar.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.EvidentaProductie [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.EvidentaProductie [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.EvidentaProductie [org.apache.maven.plugins:maven-clean-plugin:2.5:clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.EvidentaProductie [org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.EvidentaProductie [org.apache.maven.plugins:maven-install-plugin:2.4:help].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.EvidentaProductie [org.apache.maven.plugins:maven-install-plugin:2.4:install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.EvidentaProductie [validate].executor&quot;: &quot;Run&quot;,
     &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
     &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
     &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;NEW__ORDERS&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/computer/.m2/repository/org/kordamp/ikonli/ikonli-materialdesign2-pack/12.3.1/ikonli-materialdesign2-pack-12.3.1.jar&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.112488925&quot;
+    &quot;project.structure.side.proportion&quot;: &quot;0.15192926&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductie\src\main\resources" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductie\src\main\resources" />
+      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductie\src\main\resources\project" />
+      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductie\src\main\resources\AppIcon" />
+      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductie\src\main\resources\ro\brutariabaiasprie\evidentaproductie" />
       <recent name="C:\Users\computer\IdeaProjects\EvidentaProductiex32\src\main\resources\ro\brutariabaiasprie\evidentaproductiex32" />
-      <recent name="C:\Users\computer\IdeaProjects\EvidentaProductiex32\src" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="ro.brutariabaiasprie.evidentaproductie" />
+      <recent name="ro.brutariabaiasprie.evidentaproductie.MVC" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainWrapper">
-    <configuration name="MainWrapper" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="ro.brutariabaiasprie.evidentaproductiex32.MainWrapper" />
-      <module name="EvidentaProductiex32" />
+  <component name="RunManager" selected="JAR Application.EvidentaProductie.jar">
+    <configuration name="DashboardController" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Dashboard.DashboardController" />
+      <module name="EvidentaProductie" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="ro.brutariabaiasprie.evidentaproductiex32.*" />
+          <option name="PATTERN" value="ro.brutariabaiasprie.evidentaproductie.MVC.MainWindowContent.Dashboard.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -82,13 +122,53 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="EvidentaProductie" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="ro.brutariabaiasprie.evidentaproductie.EvidentaProductie" />
+      <module name="EvidentaProductie" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ro.brutariabaiasprie.evidentaproductie.MVC.Account.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainWrapper" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="ro.brutariabaiasprie.evidentaproductie.MainWrapper" />
+      <module name="EvidentaProductie" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ro.brutariabaiasprie.evidentaproductie.DatabaseConnectionController" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EvidentaProductie.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/out/artifacts/EvidentaProductie_jar/EvidentaProductie.jar" />
+      <method v="2" />
+    </configuration>
     <configuration name="EvidentaProductiex32.jar" type="JarApplication" temporary="true">
       <option name="JAR_PATH" value="$PROJECT_DIR$/out/artifacts/EvidentaProductiex32_jar/EvidentaProductiex32.jar" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Application.DashboardController" />
+      <item itemvalue="Application.EvidentaProductie" />
+      <item itemvalue="Application.MainWrapper" />
+      <item itemvalue="JAR Application.EvidentaProductie.jar" />
+      <item itemvalue="JAR Application.EvidentaProductiex32.jar" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JAR Application.EvidentaProductie.jar" />
         <item itemvalue="Application.MainWrapper" />
+        <item itemvalue="Application.EvidentaProductie" />
+        <item itemvalue="Application.DashboardController" />
         <item itemvalue="JAR Application.EvidentaProductiex32.jar" />
       </list>
     </recent_temporary>
@@ -103,5 +183,32 @@
       <updated>1728885586482</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="ro.brutariabaiasprie.evidentaproductie.MVC.DBConn.DBConnModel" memberName="presentationModel" />
+      </pinned-members>
+    </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="cell.getCellStyle().getDataFormat()" language="JAVA" />
+        <watch expression="ConfigApp.getUser().getGroupId()" language="JAVA" />
+        <watch expression="ConfigApp.getUser().getSubgroupId()" language="JAVA" />
+        <watch expression="products.get(i).getName()" language="JAVA" />
+        <watch expression="cell.getStringCellValue()" language="JAVA" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
