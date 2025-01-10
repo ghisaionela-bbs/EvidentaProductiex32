@@ -414,15 +414,22 @@
     -fx-spacing: 8px;
     -fx-font-size: 1.5em;
 }
+
+.main-window .main-window-content .production-input-section {
+    -fx-spacing: 8px;
+}
+
 .main-window .main-window-content .production-input-section .production-product-selection-button{
     -fx-background-color: COLOR_WHITE;
     -fx-background-radius: 0.2em;
     -fx-font-color: COLOR_BRAND_BROWN;
     -fx-border-color: COLOR_BRAND_BROWN;
     -fx-border-radius: 0.2em;
-    -fx-border-width: 0.1em;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.1, 0.2, 0.2);
+    /*-fx-border-width: 0.1em;*/
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.5, 0.0, 0.0);
+    /*-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.5, 0.0, 0.0);*/
 }
 .main-window .main-window-content .production-product-selection-button .label{
     -fx-text-fill: COLOR_BRAND_BROWN;
@@ -432,7 +439,14 @@
 }
 .main-window .main-window-content .production-product-selection-button .product-name {
     -fx-font-weight: BOLD;
+    -fx-text-alignment: CENTER;
+    -fx-text-fill: COLOR_WHITE;
 }
+.main-window .main-window-content .production-product-selection-button .ikonli-font-icon {
+    -fx-icon-color: COLOR_WHITE;
+    -fx-icon-size: 32px;
+}
+
 /* CONTENT -> MANAGER VIEW -> TAB*/
 .tab-header-area .tab-header-background {
     -fx-background-color: derive(COLOR_BRAND_BROWN, 90%);
@@ -703,6 +717,10 @@
 .numpad .button .ikonli-font-icon {
      -fx-icon-color: COLOR_DARK_BROWN_80;
      -fx-icon-size: 1em;
+ }
+
+ .button .ikonli-font-icon {
+    -fx-background-color: COLOR_WHITE;
  }
 
 .numpad .button:hover {

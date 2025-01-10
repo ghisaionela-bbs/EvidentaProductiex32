@@ -734,7 +734,7 @@ public class ManagerView extends Parent implements Builder<Region> {
     }
 
     private Tab createGroupsTab2() {
-        Label sectionTitle = new Label("Grupe si subgrupe");
+        Label sectionTitle = new Label("Grupe");
         sectionTitle.setMaxWidth(Double.MAX_VALUE);
         sectionTitle.getStyleClass().add("sub-main-window-title");
         HBox.setHgrow(sectionTitle, Priority.ALWAYS);

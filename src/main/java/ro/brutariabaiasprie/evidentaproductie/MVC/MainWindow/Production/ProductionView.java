@@ -78,6 +78,7 @@ public class ProductionView extends Parent implements Builder<Region> {
     @Override
     public Region build() {
         Button btnProductChoice = createBtnProductChoice();
+        btnProductChoice.getStyleClass().add("production-product-selection");
         quantityTextField = createQuantityField();
         quantityTextField.setMaxWidth(Double.MAX_VALUE);
 //        Label unitMeasurementLabel = new Label();
@@ -111,6 +112,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         productsListView = createProductListView();
         productsListView.maxWidthProperty().bind(stage.widthProperty().divide(3));
 
+
+
         Label titleLabel = new Label("Realizari");
         titleLabel.getStyleClass().add("records-title");
         titleLabel.setMaxWidth(Double.MAX_VALUE);
@@ -142,7 +145,7 @@ public class ProductionView extends Parent implements Builder<Region> {
         selectedProductNameLabel.getStyleClass().add("product-name");
         selectedProductNameLabel.textProperty().bind(Bindings.createStringBinding(() ->
         {
-            String text = "Nici un produs selectat";
+            String text = "!!! Selectati produsul !!!";
             if(model.getSelectedProduct() != null) {
                 text = model.getSelectedProduct().getName();
             }
@@ -150,40 +153,57 @@ public class ProductionView extends Parent implements Builder<Region> {
         }, model.selectedProductProperty()));
 
         selectedProductNameLabel.setWrapText(true);
+        selectedProductNameLabel.setMaxWidth(Double.MAX_VALUE);
+        selectedProductNameLabel.setAlignment(Pos.CENTER);
+
+        FontIcon downArrowIcon = new FontIcon("mdi2a-arrow-down-drop-circle");
+        FontIcon upArrowIcon = new FontIcon("mdi2a-arrow-up-drop-circle");
+        upArrowIcon.setVisible(false);
+        StackPane iconPane = new StackPane(downArrowIcon, upArrowIcon);
+        StackPane.setAlignment(selectedProductNameLabel, Pos.CENTER);
+        StackPane.setAlignment(downArrowIcon, Pos.CENTER_RIGHT);
+        StackPane.setAlignment(upArrowIcon, Pos.CENTER_RIGHT);
+        StackPane productNameStackPane = new StackPane(downArrowIcon, upArrowIcon, selectedProductNameLabel);
+//        HBox.setHgrow(selectedProductNameLabel, Priority.ALWAYS);
+//        HBox productNameSection = new HBox(selectedProductNameLabel, iconPane);
+//        productNameSection.setSpacing(8);
+//        productNameSection.setStyle("-fx-background-color: COLOR_BRAND_BROWN;" +
+//                "-fx-padding: 1em;");
+        productNameStackPane.setStyle("-fx-background-color: COLOR_BRAND_BROWN;" +
+                "-fx-padding: 1em;");
+//        VBox.setVgrow(productNameStackPane, Priority.ALWAYS);
 
         orderLabel = new Label();
-        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm ");
         orderLabel.textProperty().bind(Bindings.createStringBinding(() ->
-                {
-                    if(model.getAssociatedOrder() == null) {
-                        orderLabel.getStyleClass().add("warning");
-                        return "!!! Nici o comanda asociata !!!";
-                    }
-                    orderLabel.getStyleClass().remove("warning");
-                    Order order = model.getAssociatedOrder();
-                    if(order.getRemainder() > 0) {
-                        return "Necesar: " + order.getRemainder() +
-                                "\nAsociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
-                    } else {
-                        return "\nComanda completa" +
-                                "\nAsociat la comanda: " + order.getId() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
-                    }
-
-
-                },
-                model.associatedOrderProperty()
+            {
+                if(model.getAssociatedOrder() == null) {
+                    orderLabel.getStyleClass().add("warning");
+                    return "!!! Asociati comanda !!!";
+                }
+                orderLabel.getStyleClass().remove("warning");
+                Order order = model.getAssociatedOrder();
+                if(order.getRemainder() > 0) {
+                    return "Necesar: " + order.getRemainder() +
+                            "\nComanda: " + order.getCounter() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
+                } else {
+                    return "Comanda completa" +
+                            "\nComanda: " + order.getCounter() + " din " + dateTimeFormatter.format(order.getDateTimeInserted());
+                }
+            },
+            model.associatedOrderProperty()
         ));
         orderLabel.wrapTextProperty().set(true);
         orderLabel.getStyleClass().add("select-product-button-order-info");
 
-        infoContainer.getChildren().addAll(selectedProductNameLabel, orderLabel);
-        infoContainer.setAlignment(Pos.CENTER);
+        infoContainer.getChildren().addAll(productNameStackPane, orderLabel);
+        infoContainer.setAlignment(Pos.TOP_CENTER);
 
         arrowIcon = new Label("▼");
         arrowIcon.setAlignment(Pos.CENTER_RIGHT);
 
         StackPane stackPane = new StackPane();
-        stackPane.getChildren().addAll(infoContainer, arrowIcon);
+        stackPane.getChildren().addAll(infoContainer);
         StackPane.setAlignment(arrowIcon, Pos.CENTER_RIGHT);
 
         Button btnProductChoice = new Button();
@@ -198,12 +218,16 @@ public class ProductionView extends Parent implements Builder<Region> {
                     leftSection.setDisable(false);
                     leftSection.getChildren().addAll(quantityInputContainer, numpad);
                     leftSection.getChildren().remove(productsListView);
-                    arrowIcon.setText("▼");
+                    upArrowIcon.setVisible(false);
+                    downArrowIcon.setVisible(true);
+//                    arrowIcon.setText("▼");
                 } else {
                     leftSection.setDisable(false);
                     leftSection.getChildren().removeAll(quantityInputContainer, numpad);
                     leftSection.getChildren().add(productsListView);
-                    arrowIcon.setText("▲");
+//                    arrowIcon.setText("▲");
+                    upArrowIcon.setVisible(true);
+                    downArrowIcon.setVisible(false);
                 }
 
             });
