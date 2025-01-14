@@ -194,8 +194,10 @@ public class ProductionView extends Parent implements Builder<Region> {
             model.associatedOrderProperty()
         ));
         orderLabel.wrapTextProperty().set(true);
-        orderLabel.getStyleClass().add("select-product-button-order-info");
+        orderLabel.setMinHeight(100);
 
+        orderLabel.getStyleClass().add("select-product-button-order-info");
+        VBox.setVgrow(orderLabel, Priority.ALWAYS);
         infoContainer.getChildren().addAll(productNameStackPane, orderLabel);
         infoContainer.setAlignment(Pos.TOP_CENTER);
 

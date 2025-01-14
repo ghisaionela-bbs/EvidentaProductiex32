@@ -30,6 +30,7 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Record.RecordCont
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.User.UserController;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.function.Consumer;
 
@@ -351,6 +352,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         TableColumn<Order, String> productNameColumn = new TableColumn<>("Produs");
         productNameColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getName()));
+        DecimalFormat df = new DecimalFormat("#.##");
         productNameColumn.setCellFactory(new Callback<TableColumn<Order, String>, TableCell<Order, String>>() {
             @Override
             public TableCell<Order, String> call(TableColumn<Order, String> param) {
@@ -402,7 +404,7 @@ public class ManagerView extends Parent implements Builder<Region> {
 
                                 batchNumber.setText("Sarja: " + (int)completedBatches + "/" + (int)totalBatches);
                                 ColoredProgressBar progressBar = new ColoredProgressBar(percentage);
-                                percentageLabel.setText(percentage * 100.0 + "%");
+                                percentageLabel.setText(df.format(percentage * 100.0) + "%");
                                 HBox progressContainer = new HBox(batchNumber, progressBar, percentageLabel);
                                 VBox container = new VBox(txtName, progressContainer);
                                 progressContainer.setSpacing(8);

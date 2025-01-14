@@ -7,12 +7,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Builder;
+import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
@@ -34,17 +32,29 @@ public class AccountView extends Parent implements Builder<Region> {
 
     @Override
     public Region build() {
+        VBox userInfoContainer = new VBox();
+
+        Label userInfoTitle = new Label("Informatii cont");
+        HBox.setHgrow(userInfoTitle, Priority.ALWAYS);
+        userInfoTitle.setMaxWidth(Double.MAX_VALUE);
+        userInfoTitle.getStyleClass().add("sub-main-window-title");
+
         Label usernameLabel = new Label("Utilizator: " + ConfigApp.getUser().getUsername());
-//        Label usernameValueLabel = new Label(ConfigApp.getUser().getUsername());
         Label roleLabel = new Label("Rol: " + ConfigApp.getRole().getName());
-//        Label roleValueLabel = new Label(ConfigApp.getRole().getName());
         Button disconnectButton = createDisconnectButton();
+        disconnectButton.setGraphic(new FontIcon("mdi2p-power"));
+        disconnectButton.getStyleClass().add("sub-main-window-button");
+        disconnectButton.getStyleClass().add("disconnect");
+        HBox userInfoHeader = new HBox(userInfoTitle, disconnectButton);
+        userInfoHeader.getStyleClass().add("sub-main-window-header");
 
-//        VBox infoContainer = new VBox(usernameLabel, usernameValueLabel, roleLabel, roleValueLabel);
         VBox infoContainer = new VBox(usernameLabel, roleLabel);
+        infoContainer.getStyleClass().add("sub-main-window-header");
+        userInfoContainer.getChildren().addAll(userInfoHeader, infoContainer);
+        userInfoContainer.setSpacing(8);
+        userInfoContainer.getStyleClass().add("sub-main-window-content-container");
 
-        root = new VBox(infoContainer, disconnectButton);
-        root.setPadding(new Insets(16));
+        root = new VBox(userInfoContainer);
         return root;
     }
 

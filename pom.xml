@@ -111,12 +111,12 @@
       <artifactId>mssql-jdbc</artifactId>
       <version>10.2.0.jre17</version>
     </dependency>
-      <!-- https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-materialdesign2-pack -->
-      <dependency>
-          <groupId>org.kordamp.ikonli</groupId>
-          <artifactId>ikonli-materialdesign2-pack</artifactId>
-          <version>12.3.1</version>
-      </dependency><!-- https://mvnrepository.com/artifact/org.comtel2000/fx-onscreen-keyboard-swing -->
+    <!-- https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-materialdesign2-pack -->
+    <dependency>
+      <groupId>org.kordamp.ikonli</groupId>
+      <artifactId>ikonli-materialdesign2-pack</artifactId>
+      <version>12.3.1</version>
+    </dependency><!-- https://mvnrepository.com/artifact/org.comtel2000/fx-onscreen-keyboard-swing -->
   </dependencies>
 
   <build>
@@ -139,9 +139,9 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>ro.brutariabaiasprie.evidentaproductiex32/ro.brutariabaiasprie.evidentaproductie.HelloApplication</mainClass>
-              <launcher>app</launcher>
-              <jlinkZipName>app</jlinkZipName>
+              <mainClass>ro.brutariabaiasprie.evidentaproductie.MainWrapper</mainClass>
+              <launcher>EvidentaProductie</launcher>
+              <jlinkZipName>EvidentaProductie</jlinkZipName>
               <jlinkImageName>app</jlinkImageName>
               <noManPages>true</noManPages>
               <stripDebug>true</stripDebug>

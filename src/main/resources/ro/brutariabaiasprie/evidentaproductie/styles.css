@@ -519,7 +519,7 @@
 /* CONTENT -> MANAGER VIEW -> TAB CONTENT*/
 .main-window .sub-main-window-content-container {
     -fx-alignment: TOP-CENTER;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.1, 0.2, 0.2);
+    /*-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0.1, 0.2, 0.2);*/
     -fx-padding: 1em;
     -fx-spacing: 0.5em;
 }
@@ -557,6 +557,24 @@
 .main-window .sub-main-window-button:hover .ikonli-font-icon {
     -fx-icon-color: COLOR_WHITE;
 }
+
+.main-window .sub-main-window-button.disconnect {
+    -fx-text-fill: RED;
+    -fx-border-color: RED;
+}
+.main-window .sub-main-window-button.disconnect:hover {
+    -fx-background-color: RED;
+    -fx-text-fill: COLOR_WHITE;
+    -fx-cursor: hand;
+}
+.main-window .sub-main-window-button.disconnect .ikonli-font-icon {
+    -fx-icon-color: RED;
+    -fx-icon-size: 32px;
+}
+.main-window .sub-main-window-button.disconnect:hover .ikonli-font-icon {
+    -fx-icon-color: COLOR_WHITE;
+}
+
 .main-window .sub-main-view-list-header {
     -fx-background-color: COLOR_WHITE;
     -fx-background-radius: 0.2em;
