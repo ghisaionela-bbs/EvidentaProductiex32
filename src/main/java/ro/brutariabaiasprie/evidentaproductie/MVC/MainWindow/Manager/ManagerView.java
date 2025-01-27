@@ -371,51 +371,85 @@ public class ManagerView extends Parent implements Builder<Region> {
                             txtName.getStyleClass().add("text");
                             txtName.wrappingWidthProperty().bind(widthProperty());
 
-                            int currentIndex = indexProperty().getValue() < 0 ? 0 : indexProperty().getValue();
+                            int currentIndex = indexProperty().getValue() < 0 ? 1 : indexProperty().getValue();
                             Order order = param.getTableView().getItems().get(currentIndex);
+                            double percentage = order.getCompleted() / order.getQuantity();
 
-                            // When the value for a batch is defined
-                            if(order.getProduct().getBatchValue() > 0) {
+                            // If the batch value of the order is defined show the [number of batches completed] / [number of total batches]
+                            if (order.getProduct().getBatchValue() > 0) {
                                 double quantity = order.getQuantity();
                                 double completed = order.getCompleted();
                                 double batchValue = order.getProduct().getBatchValue();
-                                double percentage = 0.0;
-                                double completedBatches = Math.ceil(completed / batchValue);
-                                double totalBatches = Math.ceil(quantity / batchValue);
+                                double totalBatches = 0;
+                                double completedBatches = 0;
 
-                                // When the order is incomplete
-                                if(completed < quantity) {
-                                    // When there are no completed batches
-                                    if(completedBatches == 0) {
-                                        percentage = completed / batchValue;
-                                    }
-                                    // When there are completed batches
-                                    else {
-                                        percentage = (completed - (completedBatches - 1) * batchValue ) / batchValue;
-                                        // If the current batch is completed and it is not the last batch move to the next one
-                                        if (percentage == 1 && completedBatches < totalBatches) {
-                                            completedBatches += 1;
-                                            percentage = 0;
-                                        }
-                                    }
+                                totalBatches = Math.ceil(quantity / batchValue);
+
+                                // When the quantity completed is less than one batch
+                                if (completed == quantity) {
+                                    completedBatches = totalBatches;
+                                }
+                                else if (completed < quantity) {
+                                    completedBatches = Math.floor(completed / batchValue);
                                 } else {
-                                    percentage = 1 + (completed - quantity) / batchValue;
+                                    completedBatches = Math.floor(completed / batchValue) + 1;
                                 }
 
                                 batchNumber.setText("Sarja: " + (int)completedBatches + "/" + (int)totalBatches);
-                                ColoredProgressBar progressBar = new ColoredProgressBar(percentage);
-                                percentageLabel.setText(df.format(percentage * 100.0) + "%");
-                                HBox progressContainer = new HBox(batchNumber, progressBar, percentageLabel);
-                                VBox container = new VBox(txtName, progressContainer);
-                                progressContainer.setSpacing(8);
-                                setGraphic(container);
+                            } else {
+                                batchNumber.setText("");
                             }
 
-                            else {
-                                setGraphic(txtName);
-                                setText(null);
-                                setStyle(null);
-                            }
+                            ColoredProgressBar progressBar = new ColoredProgressBar(percentage);
+                            percentageLabel.setText(df.format(percentage * 100.0) + "%");
+                            HBox progressContainer = new HBox(batchNumber, progressBar, percentageLabel);
+                            VBox container = new VBox(txtName, progressContainer);
+                            progressContainer.setSpacing(8);
+                            setGraphic(container);
+
+
+//                            // When the value for a batch is defined
+//                            if(order.getProduct().getBatchValue() > 0) {
+//                                double quantity = order.getQuantity();
+//                                double completed = order.getCompleted();
+//                                double batchValue = order.getProduct().getBatchValue();
+//                                double percentage = 0.0;
+//                                double completedBatches = Math.ceil(completed / batchValue);
+//                                double totalBatches = Math.ceil(quantity / batchValue);
+//
+//                                // When the order is incomplete
+//                                if(completed < quantity) {
+//                                    // When there are no completed batches
+//                                    if(completedBatches == 0) {
+//                                        percentage = completed / batchValue;
+//                                    }
+//                                    // When there are completed batches
+//                                    else {
+//                                        percentage = (completed - (completedBatches - 1) * batchValue ) / batchValue;
+//                                        // If the current batch is completed and it is not the last batch move to the next one
+//                                        if (percentage == 1 && completedBatches < totalBatches) {
+//                                            completedBatches += 1;
+//                                            percentage = 0;
+//                                        }
+//                                    }
+//                                } else {
+//                                    percentage = 1 + (completed - quantity) / batchValue;
+//                                }
+
+
+//                                ColoredProgressBar progressBar = new ColoredProgressBar(percentage);
+//                                percentageLabel.setText(df.format(percentage * 100.0) + "%");
+//                                HBox progressContainer = new HBox(batchNumber, progressBar, percentageLabel);
+//                                VBox container = new VBox(txtName, progressContainer);
+//                                progressContainer.setSpacing(8);
+//                                setGraphic(container);
+//                            }
+
+//                            else {
+//                                setGraphic(txtName);
+//                                setText(null);
+//                                setStyle(null);
+//                            }
                         }
                     }
                 };
