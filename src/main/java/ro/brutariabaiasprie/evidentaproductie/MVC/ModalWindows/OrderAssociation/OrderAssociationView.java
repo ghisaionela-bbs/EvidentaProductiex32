@@ -111,7 +111,7 @@ public class OrderAssociationView extends Parent implements Builder<Region> {
         ordersTableView.getColumns().add(orderCounterColumn);
 
         TableColumn<Order, Timestamp> dateTimeColumn = new TableColumn<>("Plasata la");
-        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateTimeInserted()));
+        dateTimeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDateScheduled()));
         ordersTableView.getColumns().add(dateTimeColumn);
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         dateTimeColumn.setCellFactory(column -> new TableCell<>() {

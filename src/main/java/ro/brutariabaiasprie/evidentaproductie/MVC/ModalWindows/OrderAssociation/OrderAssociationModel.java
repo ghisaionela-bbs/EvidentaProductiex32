@@ -70,6 +70,7 @@ public class OrderAssociationModel {
                     "c.ID_UTILIZATOR_I, " +
                     "c.datasiora_m, " +
                     "c.ID_UTILIZATOR_M, " +
+                    "c.data_programata, " +
                     "c.inchisa  " +
                     "FROM COMENZI c LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
@@ -90,6 +91,7 @@ public class OrderAssociationModel {
                     "c.ID_UTILIZATOR_I, " +
                     "c.datasiora_m, " +
                     "c.ID_UTILIZATOR_M, " +
+                    "c.data_programata, " +
                     "c.inchisa " +
                     "ORDER BY c.datasiora_i ASC ";
 
@@ -129,6 +131,7 @@ public class OrderAssociationModel {
         order.setRemainder(resultSet.getDouble("rest"));
         order.setDateTimeInserted(resultSet.getTimestamp("datasiora_i"));
         order.setUserIdInserted(resultSet.getInt("ID_UTILIZATOR_I"));
+        order.setDateScheduled(resultSet.getTimestamp("data_programata"));
         order.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
         order.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
         order.setClosed(resultSet.getBoolean("inchisa"));

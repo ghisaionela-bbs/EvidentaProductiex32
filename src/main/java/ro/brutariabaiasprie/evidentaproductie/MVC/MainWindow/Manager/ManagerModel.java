@@ -2,6 +2,7 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.controlsfx.control.CheckComboBox;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
@@ -13,6 +14,7 @@ import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class ManagerModel {
     private final User CONNECTED_USER;
@@ -22,8 +24,13 @@ public class ManagerModel {
     private final ObservableList<Record> records = FXCollections.observableArrayList();
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<Group> groups2 = FXCollections.observableArrayList();
-
-    private boolean showClosedOrdersFilter = true;
+    private int orderStatusFilter = -1;
+//    private Group orderGroupFilter = null;
+//    private Group orderSubgroupFilter = null;
+    private final ObservableList<Group> groupFilterList = FXCollections.observableArrayList();
+    private ArrayList<Group> orderGroupFilter = new ArrayList<>();
+    private ArrayList<Group> orderSubgroupFilter = new ArrayList<>();
+    private final ObservableList<Group> subgroupFilterList = FXCollections.observableArrayList();
 
     public ManagerModel() {
         CONNECTED_USER = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
@@ -57,12 +64,22 @@ public class ManagerModel {
         return users;
     }
 
-    public boolean isShowClosedOrdersFilter() {
-        return showClosedOrdersFilter;
+    public ObservableList<Group> getGroupFilterList() { return groupFilterList; }
+
+    public ObservableList<Group> getSubgroupFilterList() {
+        return subgroupFilterList;
     }
 
-    public void setShowClosedOrdersFilter(boolean showClosedOrdersFilter) {
-        this.showClosedOrdersFilter = showClosedOrdersFilter;
+    public void setOrderStatusFilter(int orderStatusFilter) {
+        this.orderStatusFilter = orderStatusFilter;
+    }
+
+    public void setOrderGroupFilter(ArrayList<Group> orderGroupFilter) {
+        this.orderGroupFilter = orderGroupFilter;
+    }
+
+    public void setOrderSubgroupFilter(ArrayList<Group> orderSubgroupFilter) {
+        this.orderSubgroupFilter = orderSubgroupFilter;
     }
 
     public void loadProducts() {
@@ -75,9 +92,12 @@ public class ManagerModel {
                     "p.um, " +
                     "p.ID_GRUPA, " +
                     "p.ID_SUBGRUPA_PRODUSE, " +
-                    "gp.denumire AS denumire_grupa " +
+                    "gp.denumire AS denumire_grupa, " +
+                    "subg.denumire AS denumire_subgrupa, " +
+                    "subg.ID_GRUPA_PARINTE AS subg_id_parinte " +
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
+                    "LEFT JOIN GRUPE_PRODUSE subg ON p.ID_SUBGRUPA_PRODUSE = subg.ID " +
                     "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
@@ -90,15 +110,24 @@ public class ManagerModel {
                     group = new Group(groupId,
                             resultSet.getString("denumire_grupa"));
                 }
+                int subgroupId = resultSet.getInt("subg_id_parinte");
+                Group subgroup = new Group();
+                if(!resultSet.wasNull()) {
+                    subgroup = new Group(
+                            subgroupId,
+                            resultSet.getString("denumire_subgrupa"),
+                            resultSet.getInt("subg_id_parinte"));
+                }
                 Product product = new Product(
                         resultSet.getInt("ID"),
                         resultSet.getString("denumire"),
                         resultSet.getDouble("sarja"),
                         resultSet.getString("um"),
                         group,
+                        subgroup,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 );
-                product.setGroup(group);
+//                product.setGroup(group);
                 products.add(product);
             }
         } catch (Exception e) {
@@ -186,9 +215,32 @@ public class ManagerModel {
                     whereCond += " AND 1=0 ";
             }
 
-            if(!showClosedOrdersFilter) {
-                whereCond += " AND c.inchisa != ? ";
+            switch (orderStatusFilter) {
+                case -1:
+                    break;
+                case 0:
+                    whereCond += " AND c.inchisa = 0 ";
+                    break;
+                case 1:
+                    whereCond += " AND c.inchisa = 1 ";
+                    break;
             }
+
+            whereCond += " AND ( 1=0 ";
+            for (int i = 0; i < orderGroupFilter.size(); i++) {
+                if(orderGroupFilter.get(i) != null) {
+                    whereCond += " OR gp.ID = ? ";
+                }
+            }
+            whereCond += " ) ";
+
+            whereCond += " AND ( 1=0 ";
+            for (int i = 0; i < orderSubgroupFilter.size(); i++) {
+                if(orderSubgroupFilter.get(i) != null) {
+                    whereCond += " OR subg.ID = ? ";
+                }
+            }
+            whereCond += " ) ";
 
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT c.ID, " +
@@ -253,8 +305,18 @@ public class ManagerModel {
                     break;
             }
 
-            if(!showClosedOrdersFilter) {
-                statement.setBoolean(paramCount, true);
+            for (int i = 0; i < orderGroupFilter.size(); i++) {
+                if(orderGroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, orderGroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+
+            for (int i = 0; i < orderSubgroupFilter.size(); i++) {
+                if(orderSubgroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, orderSubgroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
             }
 
             ResultSet resultSet = statement.executeQuery();
@@ -292,6 +354,66 @@ public class ManagerModel {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void loadGroupFilterList() {
+        try {
+            groupFilterList.clear();
+            groupFilterList.add(null);
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE ID_GRUPA_PARINTE IS NULL";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                groupFilterList.add(new Group(
+                    resultSet.getInt("ID"),
+                    resultSet.getString("denumire")
+                ));
+            }
+        } catch (SQLException e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+
+
+    public void loadSubgroupFilterList() {
+        subgroupFilterList.clear();
+        subgroupFilterList.add(null);
+        if (orderGroupFilter.isEmpty()) {
+            return;
+        }
+
+        String whereCond = " 1=0 ";
+        for (int i = 0; i < orderGroupFilter.size(); i++) {
+            if(orderGroupFilter.get(i) != null) {
+                whereCond += " OR ID_GRUPA_PARINTE = ? ";
+            }
+        }
+
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE " + whereCond;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramCount = 1;
+            for (int i = 0; i < orderGroupFilter.size(); i++) {
+                if (orderGroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, orderGroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                subgroupFilterList.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire"),
+                        resultSet.getInt("ID_GRUPA_PARINTE")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
         }
     }
 

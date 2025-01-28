@@ -3,6 +3,8 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,6 +15,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.IndexedCheckModel;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import ro.brutariabaiasprie.evidentaproductie.Data.*;
@@ -39,13 +44,19 @@ public class ManagerView extends Parent implements Builder<Region> {
     private final ManagerModel model;
     private final Consumer<Order> productionShortcutHandler;
     private final Consumer<Boolean> reloadOrders;
-    private CheckBox closedOrdersCheckbox = new CheckBox("Afiseaza comenzi inchise");
+    private final Runnable filterOrders;
+    private CheckComboBox<Group> groupComboBox;
+    private CheckComboBox<Group> subgroupComboBox;
+    private ToggleGroup orderStatusToggleGroup = new ToggleGroup();
+    private Runnable updateFilters;
 
-    public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders) {
+    public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders, Runnable filterOrders, Runnable updateFilters) {
         this.model = model;
         this.stage = stage;
         this.productionShortcutHandler = productionShortcutHandler;
         this.reloadOrders = reloadOrders;
+        this.filterOrders = filterOrders;
+        this.updateFilters = updateFilters;
     }
 
     @Override
@@ -97,16 +108,6 @@ public class ManagerView extends Parent implements Builder<Region> {
         HBox headerSection = new HBox(sectionTitle);
         headerSection.getStyleClass().add("sub-main-window-header");
 
-
-//        HBox sectionHeaderContainer = new HBox();
-//        sectionHeaderContainer.setSpacing(10);
-//        sectionHeaderContainer.setAlignment(Pos.CENTER);
-//
-//        Label productsSectionTitle = new Label("Produse");
-//        productsSectionTitle.getStyleClass().add("tab-section-title");
-//        productsSectionTitle.setMaxWidth(Double.MAX_VALUE);
-//        HBox.setHgrow(productsSectionTitle, Priority.ALWAYS);
-
         if(ConfigApp.getRole().canEditProducts()) {
             Button addProductButton = new Button();
             addProductButton.textProperty().bind(Bindings.createStringBinding(
@@ -156,6 +157,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             }
         });
         productsTableView.getColumns().add(productNameColumn);
+        productNameColumn.prefWidthProperty().bind(productsTableView.widthProperty().multiply(0.5).subtract(72));
+
 
         TableColumn<Product, String> groupColumn = new TableColumn<>("Grupa");
         groupColumn.setCellValueFactory(cellData -> {
@@ -165,6 +168,40 @@ public class ManagerView extends Parent implements Builder<Region> {
             return new SimpleObjectProperty<>(cellData.getValue().getGroup().getName());
         });
         productsTableView.getColumns().add(groupColumn);
+        groupColumn.prefWidthProperty().bind(productsTableView.widthProperty().multiply(0.15));
+
+
+        TableColumn<Product, String> subgroupColumn = new TableColumn<>("Subgrupa");
+        subgroupColumn.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getGroup() == null) {
+                return null;
+            }
+            return new SimpleObjectProperty<>(cellData.getValue().getSubgroup().getName());
+        });
+        productsTableView.getColumns().add(subgroupColumn);
+        subgroupColumn.prefWidthProperty().bind(productsTableView.widthProperty().multiply(0.15));
+
+
+        TableColumn<Product, Double> batchColumn = new TableColumn<>("Sarja");
+        batchColumn.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getGroup() == null) {
+                return null;
+            }
+            return new SimpleObjectProperty<>(cellData.getValue().getBatchValue());
+        });
+        productsTableView.getColumns().add(batchColumn);
+        batchColumn.prefWidthProperty().bind(productsTableView.widthProperty().multiply(0.1));
+
+
+        TableColumn<Product, String> umColumn = new TableColumn<>("UM");
+        umColumn.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getGroup() == null) {
+                return null;
+            }
+            return new SimpleObjectProperty<>(cellData.getValue().getUnitMeasurement());
+        });
+        productsTableView.getColumns().add(umColumn);
+        umColumn.prefWidthProperty().bind(productsTableView.widthProperty().multiply(0.1));
 
         if(ConfigApp.getRole().canEditProducts()) {
             TableColumn<Product, Integer> editBtnColumn = new TableColumn<>();
@@ -194,10 +231,10 @@ public class ManagerView extends Parent implements Builder<Region> {
                 }
             });
             productsTableView.getColumns().add(editBtnColumn);
+            editBtnColumn.prefWidthProperty().set(64);
         }
 
-
-        productsTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+//        productsTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 
         productsTableView.setPlaceholder(new Label("Nu exista produse."));
         VBox.setVgrow(productsTableView, Priority.ALWAYS);
@@ -235,10 +272,124 @@ public class ManagerView extends Parent implements Builder<Region> {
         header.getStyleClass().add("sub-main-window-header");
 
         if(ConfigApp.getRole().canEditOrders()) {
-            closedOrdersCheckbox.setSelected(true);
-            closedOrdersCheckbox.setOnAction(event -> reloadOrders.accept(closedOrdersCheckbox.isSelected()));
+            RadioButton orderStatusAll = new RadioButton("Toate");
+            orderStatusAll.setUserData(-1);
+            orderStatusAll.setToggleGroup(orderStatusToggleGroup);
+            orderStatusAll.setSelected(true);
+            RadioButton orderStatusOpen = new RadioButton("Deschise");
+            orderStatusOpen.setUserData(0);
+            orderStatusOpen.setToggleGroup(orderStatusToggleGroup);
+            RadioButton orderStatusClosed = new RadioButton("Inchise");
+            orderStatusClosed.setUserData(1);
+            orderStatusClosed.setToggleGroup(orderStatusToggleGroup);
+            HBox orderStatusFilterContainer = new HBox(orderStatusAll, orderStatusOpen, orderStatusClosed);
+            orderStatusFilterContainer.setSpacing(16);
+            orderStatusToggleGroup.selectedToggleProperty().addListener((observableValue, oldValue, newValue) -> filterOrders.run());
 
-            header.getChildren().add(closedOrdersCheckbox);
+            //Group filter
+            Label groupLabel = new Label("Grupa:");
+            groupLabel.setMaxWidth(Double.MAX_VALUE);
+            groupComboBox = new CheckComboBox<>(model.getGroupFilterList());
+            groupComboBox.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(Group group) {
+                    if (group == null) {
+                        return "Toate";
+                    }
+                    return group.getName();
+                }
+
+                @Override
+                public Group fromString(String s) {
+                    return null;
+                }
+            });
+            groupComboBox.setMaxWidth(200);
+            groupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+                private boolean changing = false;
+                @Override
+                public void onChanged(Change<? extends Integer> change) {
+                    groupComboBox.setTitle("");
+                    if (!changing) {
+                        change.next();
+                        if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                            changing = true;
+                            groupComboBox.getCheckModel().clearChecks();
+                            changing = false;
+                        } else if (change.wasAdded() && change.getList().contains(0)) {
+                            changing = true;
+                            groupComboBox.getCheckModel().checkAll();
+                            changing = false;
+                        } else if (change.getList().size() < groupComboBox.getItems().size()) {
+                            changing = true;
+                            groupComboBox.getCheckModel().clearCheck(0);
+                            changing = false;
+                        }
+                        updateFilters.run();
+                        filterOrders.run();
+                    }
+                }
+            });
+            HBox groupFilter = new HBox(groupLabel, groupComboBox);
+            groupFilter.setSpacing(8);
+            groupFilter.setAlignment(Pos.CENTER_LEFT);
+            groupFilter.getStyleClass().add("section");
+            groupFilter.getStyleClass().add("vbox-layout");
+
+            // Subgroup filter
+            Label subgroupLabel = new Label("Subgrupa:");
+            subgroupLabel.setMaxWidth(Double.MAX_VALUE);
+            subgroupComboBox = new CheckComboBox<>(model.getSubgroupFilterList());
+            subgroupComboBox.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(Group group) {
+                    if (group == null) {
+                        return "Toate";
+                    }
+                    return group.getName();
+                }
+
+                @Override
+                public Group fromString(String s) {
+                    return null;
+                }
+            });
+            subgroupComboBox.setMaxWidth(200);
+            subgroupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+                private boolean changing = false;
+                @Override
+                public void onChanged(Change<? extends Integer> change) {
+                    subgroupComboBox.setTitle("");
+                    if (!changing) {
+                        change.next();
+                        if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                            changing = true;
+                            subgroupComboBox.getCheckModel().clearChecks();
+                            changing = false;
+                        } else if (change.wasAdded() && change.getList().contains(0)) {
+                            changing = true;
+                            subgroupComboBox.getCheckModel().checkAll();
+                            changing = false;
+                        } else if (change.getList().size() < subgroupComboBox.getItems().size()) {
+                            changing = true;
+                            subgroupComboBox.getCheckModel().clearCheck(0);
+                            changing = false;
+                        }
+
+                        filterOrders.run();
+                    }
+                }
+            });
+            HBox subgroupFilter = new HBox(subgroupLabel, subgroupComboBox);
+            subgroupFilter.setSpacing(8);
+            subgroupFilter.setAlignment(Pos.CENTER_LEFT);
+            subgroupFilter.getStyleClass().add("section");
+            subgroupFilter.getStyleClass().add("vbox-layout");
+
+            HBox groupAndSubgroupFilterContainer = new HBox(groupFilter, subgroupFilter);
+            groupAndSubgroupFilterContainer.setSpacing(16);
+
+            header.getChildren().addAll(orderStatusFilterContainer, groupAndSubgroupFilterContainer);
 
             Button addOrderButton = new Button();
             addOrderButton.textProperty().bind(Bindings.createStringBinding(
@@ -303,9 +454,8 @@ public class ManagerView extends Parent implements Builder<Region> {
                 }
             });
             ordersTableView.getColumns().add(isClosedColumn);
-            isClosedColumn.prefWidthProperty().set(64);
+            isClosedColumn.prefWidthProperty().set(32);
         }
-
 
 
         TableColumn<Order, Integer> orderCounterColumn = new TableColumn<>("Nr");
@@ -406,50 +556,6 @@ public class ManagerView extends Parent implements Builder<Region> {
                             VBox container = new VBox(txtName, progressContainer);
                             progressContainer.setSpacing(8);
                             setGraphic(container);
-
-
-//                            // When the value for a batch is defined
-//                            if(order.getProduct().getBatchValue() > 0) {
-//                                double quantity = order.getQuantity();
-//                                double completed = order.getCompleted();
-//                                double batchValue = order.getProduct().getBatchValue();
-//                                double percentage = 0.0;
-//                                double completedBatches = Math.ceil(completed / batchValue);
-//                                double totalBatches = Math.ceil(quantity / batchValue);
-//
-//                                // When the order is incomplete
-//                                if(completed < quantity) {
-//                                    // When there are no completed batches
-//                                    if(completedBatches == 0) {
-//                                        percentage = completed / batchValue;
-//                                    }
-//                                    // When there are completed batches
-//                                    else {
-//                                        percentage = (completed - (completedBatches - 1) * batchValue ) / batchValue;
-//                                        // If the current batch is completed and it is not the last batch move to the next one
-//                                        if (percentage == 1 && completedBatches < totalBatches) {
-//                                            completedBatches += 1;
-//                                            percentage = 0;
-//                                        }
-//                                    }
-//                                } else {
-//                                    percentage = 1 + (completed - quantity) / batchValue;
-//                                }
-
-
-//                                ColoredProgressBar progressBar = new ColoredProgressBar(percentage);
-//                                percentageLabel.setText(df.format(percentage * 100.0) + "%");
-//                                HBox progressContainer = new HBox(batchNumber, progressBar, percentageLabel);
-//                                VBox container = new VBox(txtName, progressContainer);
-//                                progressContainer.setSpacing(8);
-//                                setGraphic(container);
-//                            }
-
-//                            else {
-//                                setGraphic(txtName);
-//                                setText(null);
-//                                setStyle(null);
-//                            }
                         }
                     }
                 };
@@ -1073,6 +1179,28 @@ public class ManagerView extends Parent implements Builder<Region> {
         VBox.setVgrow(tableView, Priority.ALWAYS);
         return tableView;
     }
+
+    public int getOrderStatusFilter() {
+        return (int) orderStatusToggleGroup.getSelectedToggle().getUserData();
+    }
+
+    public void setGroupFilter() {
+        groupComboBox.getCheckModel().check(0);
+    }
+
+    public void setSubgroupFilter() {
+        subgroupComboBox.getCheckModel().check(0);
+    }
+
+    public CheckComboBox<Group> getOrderGroupFilter() {
+        return groupComboBox;
+    }
+
+    public CheckComboBox<Group> getOrderSubgroupFilter() {
+        return subgroupComboBox;
+    }
+
+
 
     //endregion
 }

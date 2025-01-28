@@ -8,6 +8,7 @@ public class Product {
     private double batchValue;
     private String unitMeasurement;
     private Group group;
+    private Group subgroup;
     private int subgroupId;
 
     public Product() {
@@ -25,6 +26,16 @@ public class Product {
         this.batchValue = batchValue;
         this.unitMeasurement = unitMeasurement;
         this.group = group;
+        this.subgroupId = subgroupId;
+    }
+
+    public Product(int id, String name, double batchValue, String unitMeasurement, Group group, Group subgroup, int subgroupId) {
+        this.id = id;
+        this.name = name;
+        this.batchValue = batchValue;
+        this.unitMeasurement = unitMeasurement;
+        this.group = group;
+        this.subgroup = subgroup;
         this.subgroupId = subgroupId;
     }
 
@@ -66,6 +77,14 @@ public class Product {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public Group getSubgroup() {
+        return subgroup;
+    }
+
+    public void setSubgroup(Group subgroup) {
+        this.subgroup = subgroup;
     }
 
     public int getSubgroupId() {
