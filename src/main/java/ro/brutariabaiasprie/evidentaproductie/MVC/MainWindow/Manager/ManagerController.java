@@ -41,8 +41,14 @@ public class ManagerController implements SceneController {
                     model.loadOrders();
 //                    model.loadRecords();
                     model.loadUsers();
-//                    model.loadGroupFilterList();
-//                    model.loadSubgroupFilterList();
+                    if(key.equals("GRUPE_PRODUSE")) {
+                        model.loadGroupFilterList();
+                        view.setGroupFilter();
+                        model.loadSubgroupFilterList();
+                        view.setSubgroupFilter();
+                        filterOrders();
+                    }
+
                 });
 
             }

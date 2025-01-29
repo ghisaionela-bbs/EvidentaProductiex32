@@ -4,10 +4,12 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -16,12 +18,15 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.CheckComboBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.DTO.ProductionProductDTO;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
@@ -43,6 +48,8 @@ public class ProductionView extends Parent implements Builder<Region> {
     private final BiConsumer<Runnable, Double> productRecordAddActionHandler;
     private final Consumer<Product> searchOrderForProductHandler;
     private final BiConsumer<Product, Order> setSelectedProductHandler;
+    private final Runnable filterOrders;
+    private final Runnable updateFilters;
 
     private final ProductionModel model;
     private final Stage stage;
@@ -56,6 +63,8 @@ public class ProductionView extends Parent implements Builder<Region> {
     private Label arrowIcon;
     private Label orderLabel;
     private HBox quantityInputContainer;
+    private CheckComboBox<Group> groupComboBox;
+    private CheckComboBox<Group> subgroupComboBox;
 
     public Stage getStage() {
         return stage;
@@ -65,7 +74,8 @@ public class ProductionView extends Parent implements Builder<Region> {
                           Consumer<Runnable> productSelectionActionHandler,
                           BiConsumer<Runnable, Double>  productRecordAddActionHandler,
                           Consumer<Product> searchOrderForProductHandler,
-                          BiConsumer<Product, Order> setSelectedProductHandler) {
+                          BiConsumer<Product, Order> setSelectedProductHandler,
+                          Runnable filterOrders, Runnable updateFilters) {
         this.productSelectionActionHandler = productSelectionActionHandler;
         this.productRecordAddActionHandler = productRecordAddActionHandler;
         this.model = model;
@@ -73,6 +83,8 @@ public class ProductionView extends Parent implements Builder<Region> {
         this.searchOrderForProductHandler = searchOrderForProductHandler;
         this.setSelectedProductHandler = setSelectedProductHandler;
         this.user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+        this.filterOrders = filterOrders;
+        this.updateFilters = updateFilters;
     }
 
     @Override
@@ -122,7 +134,10 @@ public class ProductionView extends Parent implements Builder<Region> {
         tableView.setMaxSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
         VBox.setVgrow(tableView, Priority.ALWAYS);
 
-        VBox records = new VBox(titleLabel, tableView);
+        VBox header = new VBox(titleLabel, createFilters());
+        header.getStyleClass().add("sub-main-window-header");
+        VBox records = new VBox(header, tableView);
+
         records.setSpacing(8);
         HBox.setHgrow(records, Priority.ALWAYS);
 
@@ -132,6 +147,112 @@ public class ProductionView extends Parent implements Builder<Region> {
         root.setSpacing(8);
         root.getStyleClass().add("production-window");
         return root;
+    }
+
+    public Node createFilters() {
+        //Group filter
+        Label groupLabel = new Label("Grupa:");
+        groupLabel.setMaxWidth(Double.MAX_VALUE);
+        groupComboBox = new CheckComboBox<>(model.getGroupFilterList());
+        groupComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if (group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+        groupComboBox.setMaxWidth(200);
+        groupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            private boolean changing = false;
+            @Override
+            public void onChanged(Change<? extends Integer> change) {
+                groupComboBox.setTitle("");
+                if (!changing) {
+                    change.next();
+                    if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                        changing = true;
+                        groupComboBox.getCheckModel().clearChecks();
+                        changing = false;
+                    } else if (change.wasAdded() && change.getList().contains(0)) {
+                        changing = true;
+                        groupComboBox.getCheckModel().checkAll();
+                        changing = false;
+                    } else if (change.getList().size() < groupComboBox.getItems().size()) {
+                        changing = true;
+                        groupComboBox.getCheckModel().clearCheck(0);
+                        changing = false;
+                    }
+                    updateFilters.run();
+                    filterOrders.run();
+                }
+            }
+        });
+        HBox groupFilter = new HBox(groupLabel, groupComboBox);
+        groupFilter.setSpacing(8);
+        groupFilter.setAlignment(Pos.CENTER_LEFT);
+        groupFilter.getStyleClass().add("section");
+        groupFilter.getStyleClass().add("vbox-layout");
+
+        // Subgroup filter
+        Label subgroupLabel = new Label("Subgrupa:");
+        subgroupLabel.setMaxWidth(Double.MAX_VALUE);
+        subgroupComboBox = new CheckComboBox<>(model.getSubgroupFilterList());
+        subgroupComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if (group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+        subgroupComboBox.setMaxWidth(200);
+        subgroupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            private boolean changing = false;
+            @Override
+            public void onChanged(Change<? extends Integer> change) {
+                subgroupComboBox.setTitle("");
+                if (!changing) {
+                    change.next();
+                    if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                        changing = true;
+                        subgroupComboBox.getCheckModel().clearChecks();
+                        changing = false;
+                    } else if (change.wasAdded() && change.getList().contains(0)) {
+                        changing = true;
+                        subgroupComboBox.getCheckModel().checkAll();
+                        changing = false;
+                    } else if (change.getList().size() < subgroupComboBox.getItems().size()) {
+                        changing = true;
+                        subgroupComboBox.getCheckModel().clearCheck(0);
+                        changing = false;
+                    }
+
+                    filterOrders.run();
+                }
+            }
+        });
+        HBox subgroupFilter = new HBox(subgroupLabel, subgroupComboBox);
+        subgroupFilter.setSpacing(8);
+        subgroupFilter.setAlignment(Pos.CENTER_LEFT);
+        subgroupFilter.getStyleClass().add("section");
+        subgroupFilter.getStyleClass().add("vbox-layout");
+
+        HBox container = new HBox(groupFilter, subgroupFilter);
+        container.setSpacing(16);
+        return container;
     }
 
     public Region getRoot() {
@@ -648,6 +769,22 @@ public class ProductionView extends Parent implements Builder<Region> {
             leftSection.getChildren().remove(productsListView);
             setSelectedProductHandler.accept(product, orderAssociationController.getOrder());
         }
+    }
+
+    public void setGroupFilter() {
+        groupComboBox.getCheckModel().check(0);
+    }
+
+    public void setSubgroupFilter() {
+        subgroupComboBox.getCheckModel().check(0);
+    }
+
+    public CheckComboBox<Group> getOrderGroupFilter() {
+        return groupComboBox;
+    }
+
+    public CheckComboBox<Group> getOrderSubgroupFilter() {
+        return subgroupComboBox;
     }
 
 }

@@ -17,6 +17,7 @@ import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Record;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ProductionModel {
@@ -25,6 +26,11 @@ public class ProductionModel {
     private final ObservableList<OrderResultsDTO> orderSearchResults;
     private final ObjectProperty<Product> selectedProduct = new SimpleObjectProperty<>();
     private final ObjectProperty<Order> associatedOrder = new SimpleObjectProperty<>();
+
+    private ArrayList<Group> orderGroupFilter = new ArrayList<>();
+    private final ObservableList<Group> groupFilterList = FXCollections.observableArrayList();
+    private ArrayList<Group> orderSubgroupFilter = new ArrayList<>();
+    private final ObservableList<Group> subgroupFilterList = FXCollections.observableArrayList();
 
     public ProductionModel() {
         this.products = FXCollections.observableArrayList();
@@ -63,24 +69,54 @@ public class ProductionModel {
         this.selectedProduct.set(selectedProduct);
     }
 
+    public void setOrderGroupFilter(ArrayList<Group> orderGroupFilter) {
+        this.orderGroupFilter = orderGroupFilter;
+    }
+
+    public void setOrderSubgroupFilter(ArrayList<Group> orderSubgroupFilter) {
+        this.orderSubgroupFilter = orderSubgroupFilter;
+    }
+
+    public ObservableList<Group> getGroupFilterList() { return groupFilterList; }
+
+    public ObservableList<Group> getSubgroupFilterList() {
+        return subgroupFilterList;
+    }
+
     public void loadRecords() {
         try {
             Connection connection = DBConnectionService.getConnection();
 
-            String whereCond = "";
+            String whereCond = "WHERE 1=1 ";
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:
                 case DIRECTOR:
                     break;
                 case MANAGER:
-                    whereCond += "WHERE g.ID = ? ";
+                    whereCond += " AND g.ID = ? ";
                     break;
                 case OPERATOR:
-                    whereCond += "WHERE r.ID_UTILIZATOR_I = ? ";
+                    whereCond += " AND r.ID_UTILIZATOR_I = ? ";
                     break;
                 case UNAUTHORIZED:
-                    whereCond += "WHERE 1=0 ";
+                    whereCond += " AND 1=0 ";
             }
+
+            whereCond += " AND ( 1=0 ";
+            for (int i = 0; i < orderGroupFilter.size(); i++) {
+                if(orderGroupFilter.get(i) != null) {
+                    whereCond += " OR g.ID = ? ";
+                }
+            }
+            whereCond += " ) ";
+
+            whereCond += " AND ( 1=0 ";
+            for (int i = 0; i < orderSubgroupFilter.size(); i++) {
+                if(orderSubgroupFilter.get(i) != null) {
+                    whereCond += " OR subg.ID = ? ";
+                }
+            }
+            whereCond += " ) ";
 
             String sql = " SELECT TOP 100 " +
                     "r.ID, " +
@@ -105,18 +141,35 @@ public class ProductionModel {
                     "ORDER BY r.datasiora_i DESC ";
 
             PreparedStatement statement = connection.prepareStatement(sql);
+            int paramCount = 1;
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:
                 case DIRECTOR:
                     break;
                 case MANAGER:
-                    statement.setInt(1, ConfigApp.getUser().getGroupId());
+                    statement.setInt(paramCount, ConfigApp.getUser().getGroupId());
+                    paramCount += 1;
                     break;
                 case OPERATOR:
                     statement.setInt(1, ConfigApp.getUser().getId());
+                    paramCount += 1;
                     break;
                 case UNAUTHORIZED:
                     break;
+            }
+
+            for (int i = 0; i < orderGroupFilter.size(); i++) {
+                if(orderGroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, orderGroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+
+            for (int i = 0; i < orderSubgroupFilter.size(); i++) {
+                if(orderSubgroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, orderSubgroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
             }
 
             ResultSet resultSet = statement.executeQuery();
@@ -431,6 +484,64 @@ public class ProductionModel {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void loadGroupFilterList() {
+        try {
+            groupFilterList.clear();
+            groupFilterList.add(null);
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE ID_GRUPA_PARINTE IS NULL";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                groupFilterList.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire")
+                ));
+            }
+        } catch (SQLException e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    public void loadSubgroupFilterList() {
+        subgroupFilterList.clear();
+        subgroupFilterList.add(null);
+        if (orderGroupFilter.isEmpty()) {
+            return;
+        }
+
+        String whereCond = " 1=0 ";
+        for (int i = 0; i < orderGroupFilter.size(); i++) {
+            if(orderGroupFilter.get(i) != null) {
+                whereCond += " OR ID_GRUPA_PARINTE = ? ";
+            }
+        }
+
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE " + whereCond;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramCount = 1;
+            for (int i = 0; i < orderGroupFilter.size(); i++) {
+                if (orderGroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, orderGroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                subgroupFilterList.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire"),
+                        resultSet.getInt("ID_GRUPA_PARINTE")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
         }
     }
 }

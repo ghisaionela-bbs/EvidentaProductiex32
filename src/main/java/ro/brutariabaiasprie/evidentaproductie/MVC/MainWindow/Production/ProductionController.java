@@ -9,6 +9,7 @@ import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Product;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
@@ -16,18 +17,30 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderAssociation.
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
+import java.util.ArrayList;
+
 public class ProductionController implements SceneController {
     private final ProductionView view;
     private final ProductionModel model = new ProductionModel();
 
     public ProductionController(Stage owner) {
-        model.loadRecords();
+//        model.loadRecords();
         this.view = new ProductionView(model, owner,
                 this::loadProducts,
                 this::addProductRecordToDB,
                 this::searchOrderForProduct,
-                this::setSelectedProduct);
+                this::setSelectedProduct,
+                this::filterOrders,
+                this::updateFilters);
         User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
+//        Platform.runLater(() -> {
+//            System.out.println("will set filters");
+//            model.loadGroupFilterList();
+//            view.setGroupFilter();
+//            model.loadSubgroupFilterList();
+//            view.setSubgroupFilter();
+//            model.loadRecords();
+//        });
 
         DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, ModifiedTableData>) change -> {
             Platform.runLater(model::loadAssociatedOrder);
@@ -115,6 +128,16 @@ public class ProductionController implements SceneController {
         });
     }
 
+    public void loadFilters() {
+        Platform.runLater(() -> {
+            model.loadGroupFilterList();
+            view.setGroupFilter();
+            model.loadSubgroupFilterList();
+            view.setSubgroupFilter();
+            model.loadRecords();
+        });
+    }
+
     @Override
     public Region getView() {
         if(view.getRoot() != null) {
@@ -186,5 +209,28 @@ public class ProductionController implements SceneController {
     public void setOrder(Order order) {
         model.setAssociatedOrder(order);
         model.setSelectedProduct(order.getProduct());
+    }
+
+    private void updateFilters() {
+        ArrayList<Group> checked_groups = new ArrayList<>();
+        for(int i : view.getOrderGroupFilter().getCheckModel().getCheckedIndices()) {
+            if (i != -1) {
+                checked_groups.add(view.getOrderGroupFilter().getCheckModel().getItem(i));
+            }
+        }
+        model.setOrderGroupFilter(checked_groups);
+        model.loadSubgroupFilterList();
+        view.setSubgroupFilter();
+    }
+
+    private void filterOrders() {
+        ArrayList<Group> checked_subgroups = new ArrayList<>();
+        for(int i : view.getOrderSubgroupFilter().getCheckModel().getCheckedIndices()) {
+            if (i != -1) {
+                checked_subgroups.add(view.getOrderSubgroupFilter().getCheckModel().getItem(i));
+            }
+        }
+        model.setOrderSubgroupFilter(checked_subgroups);
+        Platform.runLater(model::loadRecords);
     }
 }

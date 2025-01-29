@@ -69,6 +69,9 @@ public class MainWindowController implements SceneController {
                 }
         }
         view.setCenter(Objects.requireNonNull(controller).getView());
+        if(sceneType == SceneType.PRODUCTION) {
+            productionController.loadFilters();
+        }
     }
 
     private void productionShortcutHandler(Order order) {
