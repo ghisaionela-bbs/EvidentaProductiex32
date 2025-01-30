@@ -54,7 +54,7 @@ public class UserRole {
                         "Poate interveni cand apar erori de operare a programului.";
                 break;
             case MANAGER:
-                name = "Tehnic";
+                name = "Sef schimb";
                 viewProductionTab = true;
                 editRecords = true;
                 viewAdminTab = true;

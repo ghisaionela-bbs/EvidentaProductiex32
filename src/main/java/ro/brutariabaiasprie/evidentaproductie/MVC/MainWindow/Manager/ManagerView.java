@@ -223,7 +223,6 @@ public class ManagerView extends Parent implements Builder<Region> {
 
         header.getChildren().addAll(groupAndSubgroupFilterContainer);
 
-        if(ConfigApp.getRole().canEditProducts()) {
             Button addProductButton = new Button();
             addProductButton.textProperty().bind(Bindings.createStringBinding(
                     () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Adauga produs";},
@@ -245,7 +244,19 @@ public class ManagerView extends Parent implements Builder<Region> {
 
             headerSection.getChildren().addAll(addProductButton, importProductsButton);
 
+
+        switch (ConfigApp.getRole().getAccessLevel()) {
+            case ADMINISTRATOR, DIRECTOR, MANAGER:
+                break;
+            case OPERATOR:
+                groupFilter.setDisable(true);
+//                groupFilter.setVisible(false);
+            case UNAUTHORIZED:
+                groupAndSubgroupFilterContainer.setDisable(true);
+//                groupAndSubgroupFilterContainer.setVisible(false);
+                break;
         }
+
         return header;
     }
 
@@ -386,11 +397,10 @@ public class ManagerView extends Parent implements Builder<Region> {
         header.getChildren().add(headerSection);
         header.getStyleClass().add("sub-main-window-header");
 
-        if(ConfigApp.getRole().canEditOrders()) {
+
             RadioButton orderStatusAll = new RadioButton("Toate");
             orderStatusAll.setUserData(-1);
             orderStatusAll.setToggleGroup(orderStatusToggleGroup);
-            orderStatusAll.setSelected(true);
             RadioButton orderStatusOpen = new RadioButton("Deschise");
             orderStatusOpen.setUserData(0);
             orderStatusOpen.setToggleGroup(orderStatusToggleGroup);
@@ -536,6 +546,23 @@ public class ManagerView extends Parent implements Builder<Region> {
             addOrderButton.getStyleClass().add("sub-main-window-button");
 
             headerSection.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton);
+
+        switch (ConfigApp.getRole().getAccessLevel()) {
+            case ADMINISTRATOR, DIRECTOR, MANAGER:
+                orderStatusAll.setSelected(true);
+                break;
+            case OPERATOR:
+                groupFilter.setDisable(true);
+                orderStatusOpen.setSelected(true);
+                orderStatusFilterContainer.setDisable(true);
+//                groupFilter.setVisible(false);
+                break;
+            case UNAUTHORIZED:
+                orderStatusFilterContainer.setDisable(true);
+                groupAndSubgroupFilterContainer.setDisable(true);
+//                orderStatusFilterContainer.setVisible(false);
+//                groupAndSubgroupFilterContainer.setVisible(false);
+                break;
         }
 
         return header;
