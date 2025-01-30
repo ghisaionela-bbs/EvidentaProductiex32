@@ -38,7 +38,7 @@ public class RecordController extends ModalWindow {
         this.model.loadProducts();
         this.model.loadOrders();
         this.view = new RecordView(this.model, stage, type, this::onWindowAction, this::editOrder);
-        this.view.setOrderId(record.getOrderId());
+        this.view.setOrderCounter(record.getOrderCounter());
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
 
@@ -67,11 +67,11 @@ public class RecordController extends ModalWindow {
             Order order = orderAssociationController.getOrder();
             if(order == null) {
                 model.getRecord().setOrderId(0);
+                view.setOrderCounter(0);
             } else {
                 model.getRecord().setOrderId(order.getId());
+                view.setOrderCounter(order.getCounter());
             }
-            view.setOrderId(model.getRecord().getOrderId());
-
         }
     }
 

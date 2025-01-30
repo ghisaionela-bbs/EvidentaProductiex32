@@ -131,7 +131,8 @@ public class ProductionModel {
                     "r.datasiora_i, " +
                     "r.ID_UTILIZATOR_I, " +
                     "r.datasiora_m, " +
-                    "r.ID_UTILIZATOR_M " +
+                    "r.ID_UTILIZATOR_M, " +
+                    "c.contor " +
                     "FROM REALIZARI r " +
                     "LEFT JOIN COMENZI c ON c.ID = r.ID_COMANDA " +
                     "LEFT JOIN PRODUSE p ON p.ID = r.ID_PRODUS " +
@@ -196,6 +197,7 @@ public class ProductionModel {
                 record.setDateTimeModified(resultSet.getTimestamp("datasiora_m"));
                 record.setUserIdModified(resultSet.getInt("ID_UTILIZATOR_M"));
                 record.setOrderId(resultSet.getInt("ID_COMANDA"));
+                record.setOrderCounter(resultSet.getInt("contor"));
                 records.add(record);
             }
 

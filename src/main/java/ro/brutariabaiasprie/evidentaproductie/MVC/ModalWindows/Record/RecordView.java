@@ -4,7 +4,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -128,7 +127,7 @@ public class RecordView extends Parent implements Builder<Region> {
                 if(model.getRecord().getOrderId() == 0) {
                     orderLabel.setText("Comanda: fara comanda");
                 } else {
-                    orderLabel.setText("Comanda: " + model.getRecord().getOrderId());
+                    orderLabel.setText("Comanda: " + model.getRecord().getOrderCounter());
                 }
                 quantityTextField.setText(String.valueOf(model.getRecord().getQuantity()));
                 productComboBox.getSelectionModel().select(model.getRecord().getProduct());
@@ -209,11 +208,11 @@ public class RecordView extends Parent implements Builder<Region> {
         return quantityTextField.getText();
     }
 
-    public void setOrderId(int orderId) {
-        if(orderId == 0) {
+    public void setOrderCounter(int orderCounter) {
+        if(orderCounter == 0) {
             orderLabel.setText("Comanda: fara comanda");
         } else {
-            orderLabel.setText("Comanda: " + orderId);
+            orderLabel.setText("Comanda: " + orderCounter);
         }
     }
 }

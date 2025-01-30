@@ -11,6 +11,7 @@ public class Record {
     private Timestamp dateTimeModified;
     private int userIdModified;
     private int orderId;
+    private int orderCounter;
 
     public int getId() {
         return id;
@@ -74,5 +75,13 @@ public class Record {
 
     public void setOrderId(int orderId) {
         this.orderId = orderId;
+    }
+
+    public int getOrderCounter() {
+        return orderCounter;
+    }
+
+    public void setOrderCounter(int orderCounter) {
+        this.orderCounter = orderCounter;
     }
 }
