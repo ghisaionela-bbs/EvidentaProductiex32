@@ -252,6 +252,19 @@ public class ProductionView extends Parent implements Builder<Region> {
 
         HBox container = new HBox(groupFilter, subgroupFilter);
         container.setSpacing(16);
+
+        switch (ConfigApp.getRole().getAccessLevel()) {
+            case ADMINISTRATOR, DIRECTOR, MANAGER:
+                break;
+            case OPERATOR:
+                groupFilter.setDisable(true);
+                break;
+            case UNAUTHORIZED:
+                groupFilter.setDisable(true);
+                subgroupFilter.setDisable(true);
+                break;
+        }
+
         return container;
     }
 

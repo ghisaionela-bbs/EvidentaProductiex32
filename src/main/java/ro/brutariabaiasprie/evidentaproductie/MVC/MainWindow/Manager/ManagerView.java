@@ -250,6 +250,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                 break;
             case OPERATOR:
                 groupFilter.setDisable(true);
+                break;
 //                groupFilter.setVisible(false);
             case UNAUTHORIZED:
                 groupAndSubgroupFilterContainer.setDisable(true);

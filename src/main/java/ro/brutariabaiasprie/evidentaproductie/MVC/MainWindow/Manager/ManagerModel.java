@@ -488,9 +488,9 @@ public class ManagerModel {
 
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT * FROM GRUPE_PRODUSE " + whereCond + " AND ID_GRUPA_PARINTE IS NULL";
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             int paramCount = 1;
-            PreparedStatement statement = connection.prepareStatement(sql);
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:
                     break;
@@ -524,7 +524,6 @@ public class ManagerModel {
         }
 
         String whereCond = " 1=1 ";
-
         switch (ConfigApp.getRole().getAccessLevel()) {
             case ADMINISTRATOR, MANAGER:
                 break;

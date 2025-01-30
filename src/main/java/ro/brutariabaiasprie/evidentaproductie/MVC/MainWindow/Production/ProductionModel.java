@@ -491,9 +491,35 @@ public class ProductionModel {
         try {
             groupFilterList.clear();
             groupFilterList.add(null);
+
+            String whereCond = " WHERE 1=1 ";
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR :
+                    break;
+                case MANAGER, OPERATOR:
+                    whereCond += " AND ID = ? ";
+                    break;
+                case UNAUTHORIZED:
+                    whereCond += " AND 1=0 ";
+                    break;
+            }
+
             Connection connection = DBConnectionService.getConnection();
-            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE ID_GRUPA_PARINTE IS NULL";
+            String sql = "SELECT * FROM GRUPE_PRODUSE " + whereCond + " AND ID_GRUPA_PARINTE IS NULL";
             PreparedStatement statement = connection.prepareStatement(sql);
+
+            int paramCount = 1;
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                    break;
+                case MANAGER, OPERATOR:
+                    statement.setInt(paramCount, ConfigApp.getUser().getGroupId());
+                    paramCount += 1;
+                    break;
+                case UNAUTHORIZED:
+                    break;
+            }
+
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 groupFilterList.add(new Group(
@@ -513,18 +539,43 @@ public class ProductionModel {
             return;
         }
 
-        String whereCond = " 1=0 ";
+        String whereCond = " 1=1 ";
+        switch (ConfigApp.getRole().getAccessLevel()) {
+            case ADMINISTRATOR, MANAGER:
+                break;
+            case OPERATOR:
+                whereCond += " AND ID = ? ";
+                break;
+            case UNAUTHORIZED:
+                whereCond += " AND 1=0 ";
+                break;
+        }
+
+        whereCond += " AND ( 1=0 ";
         for (int i = 0; i < orderGroupFilter.size(); i++) {
             if(orderGroupFilter.get(i) != null) {
                 whereCond += " OR ID_GRUPA_PARINTE = ? ";
             }
         }
+        whereCond += " ) ";
 
         try {
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT * FROM GRUPE_PRODUSE WHERE " + whereCond;
             PreparedStatement statement = connection.prepareStatement(sql);
             int paramCount = 1;
+
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR, MANAGER:
+                    break;
+                case OPERATOR:
+                    statement.setInt(paramCount, ConfigApp.getUser().getSubgroupId());
+                    paramCount += 1;
+                    break;
+                case UNAUTHORIZED:
+                    break;
+            }
+
             for (int i = 0; i < orderGroupFilter.size(); i++) {
                 if (orderGroupFilter.get(i) != null) {
                     statement.setInt(paramCount, orderGroupFilter.get(i).getId());
