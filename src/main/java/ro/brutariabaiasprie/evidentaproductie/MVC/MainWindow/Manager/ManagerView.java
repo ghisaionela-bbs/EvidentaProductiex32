@@ -796,7 +796,9 @@ public class ManagerView extends Parent implements Builder<Region> {
         if(ConfigApp.getRole().canEditOrders()) {
             actionBtnColumn.setCellFactory(column -> new TableCell<>() {
                 final Button actionButton = new Button();
+                final Button shortcutButton = new Button();
                 final FontIcon fontIcon = new FontIcon("mdi2s-square-edit-outline");
+                final FontIcon shortcutIcon = new FontIcon("mdi2a-arrow-right-drop-circle");
                 @Override
                 protected void updateItem(Integer item, boolean empty) {
                     super.updateItem(item, empty);
@@ -805,18 +807,42 @@ public class ManagerView extends Parent implements Builder<Region> {
                         setGraphic(null);
                     } else {
                         setText(null);
+//                        if(getTableRow() == null) {
+//                            setGraphic(null);
+//                            return;
+//                        }
+//                        if(getTableRow().getItem() == null) {
+//                            setGraphic(null);
+//                            return;
+//                        }
+//                        if(getTableRow().getItem().isClosed()) {
+//                            setGraphic(null);
+//                            return;
+//                        }
+
+                        VBox content = new VBox();
+                        content.setSpacing(8);
 
                         actionButton.getStyleClass().add("filled-button");
                         actionButton.setGraphic(fontIcon);
                         actionButton.setOnAction(event -> new OrderController(stage, WINDOW_TYPE.EDIT, getTableRow().getItem()));
-                        setGraphic(actionButton);
+//                        setGraphic(actionButton);
                         setStyle("-fx-alignment: TOP-RIGHT;");
+
+                        shortcutButton.getStyleClass().add("filled-button");
+                        shortcutButton.setGraphic(shortcutIcon);
+                        shortcutButton.setOnAction(event -> productionShortcutHandler.accept(getTableRow().getItem()));
+//                        setGraphic(shortcutButton);
+                        setStyle("-fx-alignment: TOP-RIGHT;");
+
+                        content.getChildren().addAll(actionButton, shortcutButton);
+                        setGraphic(content);
                     }
                 }
             });
         } else {
             actionBtnColumn.setCellFactory(column -> new TableCell<>() {
-                final Button actionButton = new Button();
+                final Button shortcutButton = new Button();
                 final FontIcon fontIcon = new FontIcon("mdi2a-arrow-right-drop-circle");
                 @Override
                 protected void updateItem(Integer item, boolean empty) {
@@ -839,10 +865,10 @@ public class ManagerView extends Parent implements Builder<Region> {
                             return;
                         }
 
-                        actionButton.getStyleClass().add("filled-button");
-                        actionButton.setGraphic(fontIcon);
-                        actionButton.setOnAction(event -> productionShortcutHandler.accept(getTableRow().getItem()));
-                        setGraphic(actionButton);
+                        shortcutButton.getStyleClass().add("filled-button");
+                        shortcutButton.setGraphic(fontIcon);
+                        shortcutButton.setOnAction(event -> productionShortcutHandler.accept(getTableRow().getItem()));
+                        setGraphic(shortcutButton);
                         setStyle("-fx-alignment: TOP-RIGHT;");
                     }
                 }

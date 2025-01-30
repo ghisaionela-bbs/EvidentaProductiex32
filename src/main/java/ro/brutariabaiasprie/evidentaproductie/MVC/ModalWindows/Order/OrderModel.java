@@ -151,23 +151,43 @@ public class OrderModel {
                     "inchisa = ? " +
                     "WHERE ID = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, order.getProduct().getId());
-            statement.setTimestamp(2, order.getDateScheduled());
-            statement.setDouble(3, order.getQuantity());
-            statement.setTimestamp(4, order.getDateTimeInserted());
-            statement.setInt(5, order.getUserIdInserted());
-            if(order.getDateTimeModified() == null) {
-                statement.setNull(6, Types.TIMESTAMP);
-            } else {
-                statement.setTimestamp(6, order.getDateTimeModified());
-            }
-            if(order.getUserIdModified() == 0) {
-                statement.setNull(7, Types.INTEGER);
-            } else {
-                statement.setInt(7, order.getUserIdModified());
-            }
-            statement.setBoolean(8, order.isClosed());
-            statement.setInt(9, order.getId());
+
+            Calendar calendar = Calendar.getInstance();
+            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+
+            int paramCount = 1;
+            statement.setInt(paramCount, order.getProduct().getId());
+            paramCount += 1;
+            statement.setTimestamp(paramCount, order.getDateScheduled());
+            paramCount += 1;
+            statement.setDouble(paramCount, order.getQuantity());
+            paramCount += 1;
+            statement.setTimestamp(paramCount, order.getDateTimeInserted());
+            paramCount += 1;
+            statement.setInt(paramCount, order.getUserIdInserted());
+            paramCount += 1;
+            statement.setTimestamp(paramCount, timestamp);
+            paramCount += 1;
+//            if(order.getDateTimeModified() == null) {
+//                statement.setNull(paramCount, Types.TIMESTAMP);
+//                paramCount += 1;
+//            } else {
+//            statement.setTimestamp(paramCount, order.getDateTimeModified());
+//            paramCount += 1;
+//            }
+            statement.setInt(paramCount, ConfigApp.getUser().getId());
+            paramCount += 1;
+//            if(order.getUserIdModified() == 0) {
+//                statement.setNull(paramCount, Types.INTEGER);
+//                paramCount += 1;
+//            } else {
+//                statement.setInt(paramCount, order.getUserIdModified());
+//                paramCount += 1;
+//            }
+            statement.setBoolean(paramCount, order.isClosed());
+            paramCount += 1;
+            statement.setInt(paramCount, order.getId());
+            paramCount += 1;
             statement.executeUpdate();
 
             if(withDissociation) {
