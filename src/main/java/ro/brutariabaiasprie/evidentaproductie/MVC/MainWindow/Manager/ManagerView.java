@@ -2,8 +2,6 @@ package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Manager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,7 +15,6 @@ import javafx.util.Builder;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.CheckComboBox;
-import org.controlsfx.control.IndexedCheckModel;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import ro.brutariabaiasprie.evidentaproductie.Data.*;
@@ -45,18 +42,26 @@ public class ManagerView extends Parent implements Builder<Region> {
     private final Consumer<Order> productionShortcutHandler;
     private final Consumer<Boolean> reloadOrders;
     private final Runnable filterOrders;
-    private CheckComboBox<Group> groupComboBox;
-    private CheckComboBox<Group> subgroupComboBox;
-    private ToggleGroup orderStatusToggleGroup = new ToggleGroup();
-    private Runnable updateFilters;
+    private final Runnable updateFilters;
+    private final Runnable filterProducts;
+    private final Runnable updateProductsFilters;
 
-    public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders, Runnable filterOrders, Runnable updateFilters) {
+    private CheckComboBox<Group> orderGroupComboBox;
+    private CheckComboBox<Group> orderSubgroupComboBox;
+    private ToggleGroup orderStatusToggleGroup = new ToggleGroup();
+
+    private CheckComboBox<Group> productGroupComboBox;
+    private CheckComboBox<Group> productSubgroupComboBox;
+
+    public ManagerView(ManagerModel model, Stage stage, Consumer<Order> productionShortcutHandler, Consumer<Boolean> reloadOrders, Runnable filterOrders, Runnable updateFilters, Runnable filterProducts, Runnable updateProductsFilters) {
         this.model = model;
         this.stage = stage;
         this.productionShortcutHandler = productionShortcutHandler;
         this.reloadOrders = reloadOrders;
         this.filterOrders = filterOrders;
         this.updateFilters = updateFilters;
+        this.filterProducts = filterProducts;
+        this.updateProductsFilters = updateProductsFilters;
     }
 
     @Override
@@ -101,12 +106,122 @@ public class ManagerView extends Parent implements Builder<Region> {
     }
 
     private Node createProductsSectionHeader() {
+        VBox header = new VBox();
+
         Label sectionTitle = new Label("Produse");
         sectionTitle.setMaxWidth(Double.MAX_VALUE);
         sectionTitle.getStyleClass().add("sub-main-window-title");
         HBox.setHgrow(sectionTitle, Priority.ALWAYS);
         HBox headerSection = new HBox(sectionTitle);
-        headerSection.getStyleClass().add("sub-main-window-header");
+        headerSection.getStyleClass().add("hbox-container");
+
+        header.getChildren().add(headerSection);
+        header.getStyleClass().add("sub-main-window-header");
+
+        //Group filter
+        Label groupLabel = new Label("Grupa:");
+        groupLabel.setMaxWidth(Double.MAX_VALUE);
+        productGroupComboBox = new CheckComboBox<>(model.getProductGroupFilterList());
+        productGroupComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if (group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+        productGroupComboBox.setMaxWidth(200);
+        productGroupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            private boolean changing = false;
+            @Override
+            public void onChanged(Change<? extends Integer> change) {
+                productGroupComboBox.setTitle("");
+                if (!changing) {
+                    change.next();
+                    if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                        changing = true;
+                        productGroupComboBox.getCheckModel().clearChecks();
+                        changing = false;
+                    } else if (change.wasAdded() && change.getList().contains(0)) {
+                        changing = true;
+                        productGroupComboBox.getCheckModel().checkAll();
+                        changing = false;
+                    } else if (change.getList().size() < productGroupComboBox.getItems().size()) {
+                        changing = true;
+                        productGroupComboBox.getCheckModel().clearCheck(0);
+                        changing = false;
+                    }
+                    updateProductsFilters.run();
+                    filterProducts.run();
+                }
+            }
+        });
+        HBox groupFilter = new HBox(groupLabel, productGroupComboBox);
+        groupFilter.setSpacing(8);
+        groupFilter.setAlignment(Pos.CENTER_LEFT);
+        groupFilter.getStyleClass().add("section");
+        groupFilter.getStyleClass().add("vbox-layout");
+
+        // Subgroup filter
+        Label subgroupLabel = new Label("Subgrupa:");
+        subgroupLabel.setMaxWidth(Double.MAX_VALUE);
+        productSubgroupComboBox = new CheckComboBox<>(model.getProductSubgroupFilterList());
+        productSubgroupComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if (group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+        productSubgroupComboBox.setMaxWidth(200);
+        productSubgroupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            private boolean changing = false;
+            @Override
+            public void onChanged(Change<? extends Integer> change) {
+                productSubgroupComboBox.setTitle("");
+                if (!changing) {
+                    change.next();
+                    if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                        changing = true;
+                        productSubgroupComboBox.getCheckModel().clearChecks();
+                        changing = false;
+                    } else if (change.wasAdded() && change.getList().contains(0)) {
+                        changing = true;
+                        productSubgroupComboBox.getCheckModel().checkAll();
+                        changing = false;
+                    } else if (change.getList().size() < productSubgroupComboBox.getItems().size()) {
+                        changing = true;
+                        productSubgroupComboBox.getCheckModel().clearCheck(0);
+                        changing = false;
+                    }
+
+                    filterProducts.run();
+                }
+            }
+        });
+        HBox subgroupFilter = new HBox(subgroupLabel, productSubgroupComboBox);
+        subgroupFilter.setSpacing(8);
+        subgroupFilter.setAlignment(Pos.CENTER_LEFT);
+        subgroupFilter.getStyleClass().add("section");
+        subgroupFilter.getStyleClass().add("vbox-layout");
+
+        HBox groupAndSubgroupFilterContainer = new HBox(groupFilter, subgroupFilter);
+        groupAndSubgroupFilterContainer.setSpacing(16);
+
+        header.getChildren().addAll(groupAndSubgroupFilterContainer);
 
         if(ConfigApp.getRole().canEditProducts()) {
             Button addProductButton = new Button();
@@ -131,7 +246,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             headerSection.getChildren().addAll(addProductButton, importProductsButton);
 
         }
-        return headerSection;
+        return header;
     }
 
     private TableView<Product> createProductsTable() {
@@ -289,8 +404,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             //Group filter
             Label groupLabel = new Label("Grupa:");
             groupLabel.setMaxWidth(Double.MAX_VALUE);
-            groupComboBox = new CheckComboBox<>(model.getGroupFilterList());
-            groupComboBox.setConverter(new StringConverter<>() {
+            orderGroupComboBox = new CheckComboBox<>(model.getGroupFilterList());
+            orderGroupComboBox.setConverter(new StringConverter<>() {
                 @Override
                 public String toString(Group group) {
                     if (group == null) {
@@ -304,25 +419,25 @@ public class ManagerView extends Parent implements Builder<Region> {
                     return null;
                 }
             });
-            groupComboBox.setMaxWidth(200);
-            groupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            orderGroupComboBox.setMaxWidth(200);
+            orderGroupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
                 private boolean changing = false;
                 @Override
                 public void onChanged(Change<? extends Integer> change) {
-                    groupComboBox.setTitle("");
+                    orderGroupComboBox.setTitle("");
                     if (!changing) {
                         change.next();
                         if (change.wasRemoved() && change.getRemoved().contains(0)) {
                             changing = true;
-                            groupComboBox.getCheckModel().clearChecks();
+                            orderGroupComboBox.getCheckModel().clearChecks();
                             changing = false;
                         } else if (change.wasAdded() && change.getList().contains(0)) {
                             changing = true;
-                            groupComboBox.getCheckModel().checkAll();
+                            orderGroupComboBox.getCheckModel().checkAll();
                             changing = false;
-                        } else if (change.getList().size() < groupComboBox.getItems().size()) {
+                        } else if (change.getList().size() < orderGroupComboBox.getItems().size()) {
                             changing = true;
-                            groupComboBox.getCheckModel().clearCheck(0);
+                            orderGroupComboBox.getCheckModel().clearCheck(0);
                             changing = false;
                         }
                         updateFilters.run();
@@ -330,7 +445,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                     }
                 }
             });
-            HBox groupFilter = new HBox(groupLabel, groupComboBox);
+            HBox groupFilter = new HBox(groupLabel, orderGroupComboBox);
             groupFilter.setSpacing(8);
             groupFilter.setAlignment(Pos.CENTER_LEFT);
             groupFilter.getStyleClass().add("section");
@@ -339,8 +454,8 @@ public class ManagerView extends Parent implements Builder<Region> {
             // Subgroup filter
             Label subgroupLabel = new Label("Subgrupa:");
             subgroupLabel.setMaxWidth(Double.MAX_VALUE);
-            subgroupComboBox = new CheckComboBox<>(model.getSubgroupFilterList());
-            subgroupComboBox.setConverter(new StringConverter<>() {
+            orderSubgroupComboBox = new CheckComboBox<>(model.getSubgroupFilterList());
+            orderSubgroupComboBox.setConverter(new StringConverter<>() {
                 @Override
                 public String toString(Group group) {
                     if (group == null) {
@@ -354,25 +469,25 @@ public class ManagerView extends Parent implements Builder<Region> {
                     return null;
                 }
             });
-            subgroupComboBox.setMaxWidth(200);
-            subgroupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            orderSubgroupComboBox.setMaxWidth(200);
+            orderSubgroupComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
                 private boolean changing = false;
                 @Override
                 public void onChanged(Change<? extends Integer> change) {
-                    subgroupComboBox.setTitle("");
+                    orderSubgroupComboBox.setTitle("");
                     if (!changing) {
                         change.next();
                         if (change.wasRemoved() && change.getRemoved().contains(0)) {
                             changing = true;
-                            subgroupComboBox.getCheckModel().clearChecks();
+                            orderSubgroupComboBox.getCheckModel().clearChecks();
                             changing = false;
                         } else if (change.wasAdded() && change.getList().contains(0)) {
                             changing = true;
-                            subgroupComboBox.getCheckModel().checkAll();
+                            orderSubgroupComboBox.getCheckModel().checkAll();
                             changing = false;
-                        } else if (change.getList().size() < subgroupComboBox.getItems().size()) {
+                        } else if (change.getList().size() < orderSubgroupComboBox.getItems().size()) {
                             changing = true;
-                            subgroupComboBox.getCheckModel().clearCheck(0);
+                            orderSubgroupComboBox.getCheckModel().clearCheck(0);
                             changing = false;
                         }
 
@@ -380,7 +495,7 @@ public class ManagerView extends Parent implements Builder<Region> {
                     }
                 }
             });
-            HBox subgroupFilter = new HBox(subgroupLabel, subgroupComboBox);
+            HBox subgroupFilter = new HBox(subgroupLabel, orderSubgroupComboBox);
             subgroupFilter.setSpacing(8);
             subgroupFilter.setAlignment(Pos.CENTER_LEFT);
             subgroupFilter.getStyleClass().add("section");
@@ -906,10 +1021,6 @@ public class ManagerView extends Parent implements Builder<Region> {
         return tab;
     }
 
-//    private Node createGroupCard() {
-//
-//    }
-
     private ListView<Group> createGroupsList() {
         ListView<Group> listView = new ListView<>();
         listView.setFocusTraversable(false);
@@ -1185,21 +1296,36 @@ public class ManagerView extends Parent implements Builder<Region> {
     }
 
     public void setGroupFilter() {
-        groupComboBox.getCheckModel().check(0);
+        orderGroupComboBox.getCheckModel().check(0);
     }
 
     public void setSubgroupFilter() {
-        subgroupComboBox.getCheckModel().check(0);
+        orderSubgroupComboBox.getCheckModel().check(0);
     }
 
     public CheckComboBox<Group> getOrderGroupFilter() {
-        return groupComboBox;
+        return orderGroupComboBox;
     }
 
     public CheckComboBox<Group> getOrderSubgroupFilter() {
-        return subgroupComboBox;
+        return orderSubgroupComboBox;
     }
 
+    public void setProductGroupFilter() {
+        productGroupComboBox.getCheckModel().check(0);
+    }
+
+    public void setProductSubgroupFilter() {
+        productSubgroupComboBox.getCheckModel().check(0);
+    }
+
+    public CheckComboBox<Group> getProductGroupFilter() {
+        return productGroupComboBox;
+    }
+
+    public CheckComboBox<Group> getProductSubgroupFilter() {
+        return productSubgroupComboBox;
+    }
 
 
     //endregion

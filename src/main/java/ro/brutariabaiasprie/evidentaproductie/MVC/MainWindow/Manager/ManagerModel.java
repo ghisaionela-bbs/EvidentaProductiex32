@@ -32,6 +32,11 @@ public class ManagerModel {
     private ArrayList<Group> orderSubgroupFilter = new ArrayList<>();
     private final ObservableList<Group> subgroupFilterList = FXCollections.observableArrayList();
 
+    private final ObservableList<Group> productGroupFilterList = FXCollections.observableArrayList();
+    private ArrayList<Group> productGroupFilter = new ArrayList<>();
+    private final ObservableList<Group> productSubgroupFilterList = FXCollections.observableArrayList();
+    private ArrayList<Group> productSubgroupFilter = new ArrayList<>();
+
     public ManagerModel() {
         CONNECTED_USER = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
     }
@@ -82,8 +87,42 @@ public class ManagerModel {
         this.orderSubgroupFilter = orderSubgroupFilter;
     }
 
+    public void setProductGroupFilter(ArrayList<Group> productGroupFilter) {
+        this.productGroupFilter = productGroupFilter;
+    }
+
+    public void setProductSubgroupFilter(ArrayList<Group> productSubgroupFilter) {
+        this.productSubgroupFilter = productSubgroupFilter;
+    }
+
+    public ObservableList<Group> getProductGroupFilterList() {
+        return productGroupFilterList;
+    }
+
+    public ObservableList<Group> getProductSubgroupFilterList() {
+        return productSubgroupFilterList;
+    }
+
     public void loadProducts() {
         try {
+
+            String whereCond = "WHERE 1=1 ";
+            whereCond += " AND ( 1=0 ";
+            for (int i = 0; i < productGroupFilter.size(); i++) {
+                if(productGroupFilter.get(i) != null) {
+                    whereCond += " OR gp.ID = ? ";
+                }
+            }
+            whereCond += " ) ";
+
+            whereCond += " AND ( 1=0 ";
+            for (int i = 0; i < productSubgroupFilter.size(); i++) {
+                if(productSubgroupFilter.get(i) != null) {
+                    whereCond += " OR subg.ID = ? ";
+                }
+            }
+            whereCond += " ) ";
+
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT " +
                     "p.ID, " +
@@ -98,10 +137,24 @@ public class ManagerModel {
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     "LEFT JOIN GRUPE_PRODUSE subg ON p.ID_SUBGRUPA_PRODUSE = subg.ID " +
+                    whereCond +
                     "ORDER BY p.um, p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet resultSet = statement.executeQuery();
+            int paramCount = 1;
+            for (int i = 0; i < productGroupFilter.size(); i++) {
+                if(productGroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, productGroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+            for (int i = 0; i < productSubgroupFilter.size(); i++) {
+                if(productSubgroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, productSubgroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
+            }
 
+            ResultSet resultSet = statement.executeQuery();
             products.clear();
             while(resultSet.next()) {
                 Group group = null;
@@ -132,6 +185,64 @@ public class ManagerModel {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void loadProductGroupFilterList() {
+        try {
+            productGroupFilterList.clear();
+            productGroupFilterList.add(null);
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE ID_GRUPA_PARINTE IS NULL";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                productGroupFilterList.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire")
+                ));
+            }
+        } catch (SQLException e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    public void loadProductSubgroupFilterList() {
+        productSubgroupFilterList.clear();
+        productSubgroupFilterList.add(null);
+        if (productGroupFilter.isEmpty()) {
+            return;
+        }
+
+        String whereCond = " 1=0 ";
+        for (int i = 0; i < productGroupFilter.size(); i++) {
+            if(productGroupFilter.get(i) != null) {
+                whereCond += " OR ID_GRUPA_PARINTE = ? ";
+            }
+        }
+
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE " + whereCond;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramCount = 1;
+            for (int i = 0; i < productGroupFilter.size(); i++) {
+                if (productGroupFilter.get(i) != null) {
+                    statement.setInt(paramCount, productGroupFilter.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                productSubgroupFilterList.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire"),
+                        resultSet.getInt("ID_GRUPA_PARINTE")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
         }
     }
 
@@ -200,7 +311,7 @@ public class ManagerModel {
 
     public void loadOrders() {
         try {
-            String whereCond = "";
+            String whereCond = " WHERE 1=1 ";
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:
                 case DIRECTOR:
@@ -266,7 +377,7 @@ public class ManagerModel {
                     "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
                     "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
-                    "WHERE 1=1 " + whereCond +
+                    whereCond +
                     "GROUP BY c.ID, " +
                     "c.contor, " +
                     "c.data_programata, " +
@@ -510,4 +621,6 @@ public class ManagerModel {
             throw new RuntimeException(e);
         }
     }
+
+
 }

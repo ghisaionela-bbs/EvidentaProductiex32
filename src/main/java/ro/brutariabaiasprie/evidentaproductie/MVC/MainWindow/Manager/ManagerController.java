@@ -20,17 +20,24 @@ public class ManagerController implements SceneController {
 
     public ManagerController(Stage parentStage, Consumer<Order> productionShortcutHandler) {
         this.PARENT_STAGE = parentStage;
-        this.view = new ManagerView(this.model, parentStage, productionShortcutHandler, this::reloadOrders, this::filterOrders, this::updateFilters);
+        this.view = new ManagerView(this.model, parentStage, productionShortcutHandler,
+                this::reloadOrders, this::filterOrders, this::updateOrdersFilters,
+                this::filterProducts, this::updateProductsFilter);
         Platform.runLater(() -> {
             model.loadProducts();
             model.loadOrders();
             model.loadGroups2();
 //            model.loadRecords();
             model.loadUsers();
+            // Filters
             model.loadGroupFilterList();
             view.setGroupFilter();
             model.loadSubgroupFilterList();
             view.setSubgroupFilter();
+            model.loadProductGroupFilterList();
+            view.setProductGroupFilter();
+            model.loadProductSubgroupFilterList();
+            view.setProductSubgroupFilter();
         });
         DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, ModifiedTableData>) change -> {
             if (change.wasAdded()) {
@@ -47,6 +54,11 @@ public class ManagerController implements SceneController {
                         model.loadSubgroupFilterList();
                         view.setSubgroupFilter();
                         filterOrders();
+                        model.loadProductGroupFilterList();
+                        view.setProductGroupFilter();
+                        model.loadProductSubgroupFilterList();
+                        view.setProductSubgroupFilter();
+                        filterProducts();
                     }
 
                 });
@@ -55,7 +67,30 @@ public class ManagerController implements SceneController {
         });
     }
 
-    private void updateFilters() {
+    private void updateProductsFilter() {
+        ArrayList<Group> checked_groups = new ArrayList<>();
+        for(int i : view.getProductGroupFilter().getCheckModel().getCheckedIndices()) {
+            if (i != -1) {
+                checked_groups.add(view.getProductGroupFilter().getCheckModel().getItem(i));
+            }
+        }
+        model.setProductGroupFilter(checked_groups);
+        model.loadProductSubgroupFilterList();
+        view.setProductSubgroupFilter();
+    }
+
+    private void filterProducts() {
+        ArrayList<Group> checked_subgroups = new ArrayList<>();
+        for(int i : view.getProductSubgroupFilter().getCheckModel().getCheckedIndices()) {
+            if (i != -1) {
+                checked_subgroups.add(view.getProductSubgroupFilter().getCheckModel().getItem(i));
+            }
+        }
+        model.setProductSubgroupFilter(checked_subgroups);
+        Platform.runLater(model::loadProducts);
+    }
+
+    private void updateOrdersFilters() {
         ArrayList<Group> checked_groups = new ArrayList<>();
         for(int i : view.getOrderGroupFilter().getCheckModel().getCheckedIndices()) {
             if (i != -1) {
