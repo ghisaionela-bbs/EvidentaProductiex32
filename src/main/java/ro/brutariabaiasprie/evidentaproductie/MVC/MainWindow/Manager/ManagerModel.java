@@ -109,17 +109,43 @@ public class ManagerModel {
 
             String whereCond = "WHERE 1=1 ";
             whereCond += " AND ( 1=0 ";
+            boolean all_group_results = false;
             for (int i = 0; i < productGroupFilter.size(); i++) {
                 if(productGroupFilter.get(i) != null) {
-                    whereCond += " OR gp.ID = ? ";
+                    if (productGroupFilter.get(i).getId() != -1) {
+                        whereCond += " OR gp.ID = ? ";
+                    } else {
+                        whereCond += " OR gp.ID IS NULL ";
+                    }
+                } else {
+                    all_group_results = true;
+                }
+            }
+            if (all_group_results) {
+                if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                        ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+                    whereCond += " OR 1=1 ";
                 }
             }
             whereCond += " ) ";
 
             whereCond += " AND ( 1=0 ";
+            boolean all_subgroup_results = false;
             for (int i = 0; i < productSubgroupFilter.size(); i++) {
                 if(productSubgroupFilter.get(i) != null) {
-                    whereCond += " OR subg.ID = ? ";
+                    if (productSubgroupFilter.get(i).getId() != -1) {
+                        whereCond += " OR subg.ID = ? ";
+                    } else {
+                        whereCond += " OR subg.ID IS NULL ";
+                    }
+                } else {
+                    all_subgroup_results = true;
+                }
+            }
+            if (all_subgroup_results) {
+                if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                        ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+                    whereCond += " OR 1=1 ";
                 }
             }
             whereCond += " ) ";
@@ -139,19 +165,23 @@ public class ManagerModel {
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     "LEFT JOIN GRUPE_PRODUSE subg ON p.ID_SUBGRUPA_PRODUSE = subg.ID " +
                     whereCond +
-                    "ORDER BY p.denumire ASC, p.um ";
+                    "ORDER BY p.denumire ASC, gp.denumire ASC, subg.denumire ASC, p.um ";
             PreparedStatement statement = connection.prepareStatement(sql);
             int paramCount = 1;
             for (int i = 0; i < productGroupFilter.size(); i++) {
                 if(productGroupFilter.get(i) != null) {
-                    statement.setInt(paramCount, productGroupFilter.get(i).getId());
-                    paramCount += 1;
+                    if(productGroupFilter.get(i).getId() != -1) {
+                        statement.setInt(paramCount, productGroupFilter.get(i).getId());
+                        paramCount += 1;
+                    }
                 }
             }
             for (int i = 0; i < productSubgroupFilter.size(); i++) {
                 if(productSubgroupFilter.get(i) != null) {
-                    statement.setInt(paramCount, productSubgroupFilter.get(i).getId());
-                    paramCount += 1;
+                    if(productSubgroupFilter.get(i).getId() != -1) {
+                        statement.setInt(paramCount, productSubgroupFilter.get(i).getId());
+                        paramCount += 1;
+                    }
                 }
             }
 
@@ -193,6 +223,11 @@ public class ManagerModel {
         try {
             productGroupFilterList.clear();
             productGroupFilterList.add(null);
+            if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+                Group noGroupOption = new Group(-1, "Fara grupa");
+                productGroupFilterList.add(noGroupOption);
+            }
             Connection connection = DBConnectionService.getConnection();
             String sql = "SELECT * FROM GRUPE_PRODUSE WHERE ID_GRUPA_PARINTE IS NULL";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -211,6 +246,11 @@ public class ManagerModel {
     public void loadProductSubgroupFilterList() {
         productSubgroupFilterList.clear();
         productSubgroupFilterList.add(null);
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+            Group noSubgroupOption = new Group(-1, "Fara subgrupa");
+            productSubgroupFilterList.add(noSubgroupOption);
+        }
         if (productGroupFilter.isEmpty()) {
             return;
         }
@@ -339,17 +379,52 @@ public class ManagerModel {
             }
 
             whereCond += " AND ( 1=0 ";
-            for (int i = 0; i < orderGroupFilter.size(); i++) {
-                if(orderGroupFilter.get(i) != null) {
-                    whereCond += " OR gp.ID = ? ";
+            if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                    ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+                for (int i = 0; i < orderGroupFilter.size(); i++) {
+                    if(orderGroupFilter.get(i) != null) {
+                        if (orderGroupFilter.get(i).getId() != -1) {
+                            whereCond += " OR gp.ID = ? ";
+                        } else {
+                            whereCond += " OR gp.ID IS NULL ";
+                        }
+                    } else {
+                        whereCond += " OR 1=1 ";
+
+                    }
+                }
+            } else {
+                for (int i = 0; i < orderGroupFilter.size(); i++) {
+                    if(orderGroupFilter.get(i) != null) {
+                        if (orderGroupFilter.get(i).getId() != -1) {
+                            whereCond += " OR gp.ID = ? ";
+                        }
+                    }
                 }
             }
             whereCond += " ) ";
 
             whereCond += " AND ( 1=0 ";
-            for (int i = 0; i < orderSubgroupFilter.size(); i++) {
-                if(orderSubgroupFilter.get(i) != null) {
-                    whereCond += " OR subg.ID = ? ";
+            if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                    ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+                for (int i = 0; i < orderSubgroupFilter.size(); i++) {
+                    if(orderSubgroupFilter.get(i) != null) {
+                        if (orderSubgroupFilter.get(i).getId() != -1) {
+                            whereCond += " OR subg.ID = ? ";
+                        } else {
+                            whereCond += " OR subg.ID IS NULL ";
+                        }
+                    } else {
+                        whereCond += " OR 1=1 ";
+                    }
+                }
+            } else {
+                for (int i = 0; i < orderSubgroupFilter.size(); i++) {
+                    if(orderSubgroupFilter.get(i) != null) {
+                        if (orderSubgroupFilter.get(i).getId() != -1) {
+                            whereCond += " OR subg.ID = ? ";
+                        }
+                    }
                 }
             }
             whereCond += " ) ";
@@ -419,15 +494,19 @@ public class ManagerModel {
 
             for (int i = 0; i < orderGroupFilter.size(); i++) {
                 if(orderGroupFilter.get(i) != null) {
-                    statement.setInt(paramCount, orderGroupFilter.get(i).getId());
-                    paramCount += 1;
+                    if (orderGroupFilter.get(i).getId() != -1) {
+                        statement.setInt(paramCount, orderGroupFilter.get(i).getId());
+                        paramCount += 1;
+                    }
                 }
             }
 
             for (int i = 0; i < orderSubgroupFilter.size(); i++) {
                 if(orderSubgroupFilter.get(i) != null) {
-                    statement.setInt(paramCount, orderSubgroupFilter.get(i).getId());
-                    paramCount += 1;
+                    if (orderSubgroupFilter.get(i).getId() != -1) {
+                        statement.setInt(paramCount, orderSubgroupFilter.get(i).getId());
+                        paramCount += 1;
+                    }
                 }
             }
 
@@ -473,7 +552,11 @@ public class ManagerModel {
         try {
             groupFilterList.clear();
             groupFilterList.add(null);
-
+            if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                    ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+                Group noGroupOption = new Group(-1, "Fara grupa");
+                groupFilterList.add(noGroupOption);
+            }
             String whereCond = " WHERE 1=1 ";
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR :
@@ -514,11 +597,14 @@ public class ManagerModel {
         }
     }
 
-
-
     public void loadSubgroupFilterList() {
         subgroupFilterList.clear();
         subgroupFilterList.add(null);
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+            Group noGroupOption = new Group(-1, "Fara subgrupa");
+            subgroupFilterList.add(noGroupOption);
+        }
         if (orderGroupFilter.isEmpty()) {
             return;
         }

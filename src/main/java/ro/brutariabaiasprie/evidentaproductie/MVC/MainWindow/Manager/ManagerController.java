@@ -97,6 +97,7 @@ public class ManagerController implements SceneController {
                 checked_groups.add(view.getOrderGroupFilter().getCheckModel().getItem(i));
             }
         }
+
         model.setOrderGroupFilter(checked_groups);
         model.loadSubgroupFilterList();
         view.setSubgroupFilter();

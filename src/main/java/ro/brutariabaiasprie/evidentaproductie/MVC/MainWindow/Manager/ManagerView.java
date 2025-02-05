@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Builder;
@@ -575,29 +576,70 @@ public class ManagerView extends Parent implements Builder<Region> {
         VBox.setVgrow(ordersTableView, Priority.ALWAYS);
 
         if(ConfigApp.getRole().canEditOrders()) {
-            TableColumn<Order, Boolean> isClosedColumn = new TableColumn<>();
-            isClosedColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().isClosed()));
-            isClosedColumn.setCellFactory(column -> new TableCell<>() {
-                final FontIcon fontIcon = new FontIcon("mdi2l-lock");
+            TableColumn<Order, Integer> indicatorsColumn = new TableColumn<>();
+            indicatorsColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().getId()));
+            indicatorsColumn.setCellFactory(new Callback<TableColumn<Order, Integer>, TableCell<Order, Integer>>() {
                 @Override
-                protected void updateItem(Boolean item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty) {
-                        setText(null);
-                        setGraphic(null);
-                    } else {
-                        setText(null);
-                        if(item) {
-                            setGraphic(fontIcon);
-                            setStyle("-fx-alignment: CENTER;");
-                        } else {
-                            setGraphic(null);
+                public TableCell<Order, Integer> call(TableColumn<Order, Integer> param) {
+                    return new TableCell<>(){
+                        final FontIcon lockIcon = new FontIcon("mdi2l-lock");
+                        final FontIcon visibilityIcon = new FontIcon("mdi2e-eye-off");
+                        @Override
+                        protected void updateItem(Integer item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (item == null || empty) {
+                                setText(null);
+                                setGraphic(null);
+                                setStyle(null);
+                            } else {
+                                setText(null);
+
+                                int currentIndex = indexProperty().getValue() < 0 ? 1 : indexProperty().getValue();
+                                Order order = param.getTableView().getItems().get(currentIndex);
+                                VBox container = new VBox();
+                                container.setAlignment(Pos.CENTER);
+                                container.setMaxHeight(Double.MAX_VALUE);
+                                container.setSpacing(4);
+                                visibilityIcon.setIconColor(Color.RED);
+                                if(order.isClosed()) {
+                                    container.getChildren().add(lockIcon);
+                                }
+                                if(order.getProduct().getSubgroupId() <= 0) {
+                                    container.getChildren().add(visibilityIcon);
+                                }
+                                setGraphic(container);
+                            }
                         }
-                    }
+                    };
                 }
             });
-            ordersTableView.getColumns().add(isClosedColumn);
-            isClosedColumn.prefWidthProperty().set(32);
+            ordersTableView.getColumns().add(indicatorsColumn);
+            indicatorsColumn.prefWidthProperty().set(32);
+
+
+//            TableColumn<Order, Boolean> isClosedColumn = new TableColumn<>();
+//            isClosedColumn.setCellValueFactory(dataCell -> new SimpleObjectProperty<>(dataCell.getValue().isClosed()));
+//            isClosedColumn.setCellFactory(column -> new TableCell<>() {
+//                final FontIcon fontIcon = new FontIcon("mdi2l-lock");
+//                @Override
+//                protected void updateItem(Boolean item, boolean empty) {
+//                    super.updateItem(item, empty);
+//                    if (empty) {
+//                        setText(null);
+//                        setGraphic(null);
+//                    } else {
+//                        setText(null);
+//                        if(item) {
+//                            setGraphic(fontIcon);
+//                            setStyle("-fx-alignment: CENTER;");
+//                        } else {
+//                            setGraphic(null);
+//                        }
+//                    }
+//                }
+//            });
+//            ordersTableView.getColumns().add(isClosedColumn);
+//            isClosedColumn.prefWidthProperty().set(32);
         }
 
 
