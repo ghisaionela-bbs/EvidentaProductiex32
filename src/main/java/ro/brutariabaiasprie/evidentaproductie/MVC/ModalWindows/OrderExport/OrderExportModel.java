@@ -135,14 +135,18 @@ public class OrderExportModel {
                 "c.cantitate - SUM(COALESCE(r.cantitate, 0.00)) AS rest, " +
                 "c.datasiora_i, " +
                 "c.ID_UTILIZATOR_I, " +
+                "ui.nume_utilizator AS nume_utilizator_i, " +
                 "c.datasiora_m, " +
                 "c.ID_UTILIZATOR_M, " +
+                "um.nume_utilizator AS nume_utilizator_m, " +
                 "c.inchisa " +
                 "FROM COMENZI c " +
                 "LEFT JOIN PRODUSE p ON p.ID = c.ID_PRODUS " +
                 "LEFT JOIN REALIZARI r ON r.ID_COMANDA = c.ID " +
                 "LEFT JOIN GRUPE_PRODUSE gp ON gp.ID = p.ID_GRUPA " +
                 "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
+                "LEFT JOIN UTILIZATORI ui ON ui.ID = c.ID_UTILIZATOR_I " +
+                "LEFT JOIN UTILIZATORI um ON um.ID = c.ID_UTILIZATOR_M " +
                 "WHERE 1=1 " + whereCond +
                 "GROUP BY c.ID, " +
                 "c.data_programata, " +
@@ -157,7 +161,9 @@ public class OrderExportModel {
                 "c.ID_UTILIZATOR_I, " +
                 "c.datasiora_m, " +
                 "c.ID_UTILIZATOR_M, " +
-                "c.inchisa " +
+                "c.inchisa, " +
+                "ui.nume_utilizator, " +
+                "um.nume_utilizator " +
                 "ORDER BY c.data_programata ASC ";
 
         int curr_param = 1;
@@ -210,9 +216,28 @@ public class OrderExportModel {
             double quantity = resultSet.getDouble("cantitate");
             double completed = resultSet.getDouble("realizat");
             double remainder = resultSet.getDouble("rest");
+            String modified = "";
+            String username = "";
+            Timestamp dateAndTimeModified = null;
+            resultSet.getInt("ID_UTILIZATOR_M");
+            if (resultSet.wasNull()) {
+                username = resultSet.getString("nume_utilizator_i");
+                modified = "";
+            } else {
+                username = resultSet.getString("nume_utilizator_m");
+                modified = "DA";
+                dateAndTimeModified = resultSet.getTimestamp("datasiora_m");
+            }
             String formatedDate = dateFormatter.format(dateAndTime);
             String formatedTime = timeFormatter.format(dateAndTime);
-            recordData.add(new Object[]{id, formatedDate, formatedTime, product, quantity, completed, remainder});
+            String formatedModifiedDate = "";
+            String formatedModifiedTime = "";
+            if(dateAndTimeModified != null) {
+                formatedModifiedDate = dateFormatter.format(dateAndTimeModified);
+                formatedModifiedTime = timeFormatter.format(dateAndTimeModified);
+            }
+            recordData.add(new Object[]{id, formatedDate, formatedTime, product, quantity, completed, remainder,
+                    username, modified, formatedModifiedDate, formatedModifiedTime});
         }
         return recordData;
     }
@@ -235,9 +260,15 @@ public class OrderExportModel {
         String sql = "SELECT p.ID, " +
                 "p.denumire, " +
                 "r.cantitate, " +
-                "r.datasiora_i " +
+                "r.datasiora_i, " +
+                "r.ID_UTILIZATOR_M, " +
+                "r.datasiora_m, " +
+                "ui.nume_utilizator AS nume_utilizator_i, " +
+                "um.nume_utilizator AS nume_utilizator_m " +
                 "FROM REALIZARI AS r " +
                 "LEFT JOIN PRODUSE AS p ON r.ID_PRODUS = p.ID " +
+                "LEFT JOIN UTILIZATORI ui ON ui.ID = r.ID_UTILIZATOR_I " +
+                "LEFT JOIN UTILIZATORI um ON um.ID = r.ID_UTILIZATOR_M " +
                 "WHERE 1=1 " + whereCond +
                 "ORDER BY r.datasiora_i DESC";
 
@@ -271,9 +302,28 @@ public class OrderExportModel {
             String name = resultSet.getString("denumire");
             double quantity = resultSet.getDouble("cantitate");
             Timestamp dateAndTime = resultSet.getTimestamp("datasiora_i");
+            String modified = "";
+            String username = "";
+            Timestamp dateAndTimeModified = null;
+            resultSet.getInt("ID_UTILIZATOR_M");
+            if (resultSet.wasNull()) {
+                username = resultSet.getString("nume_utilizator_i");
+                modified = "";
+            } else {
+                username = resultSet.getString("nume_utilizator_m");
+                modified = "DA";
+                dateAndTimeModified = resultSet.getTimestamp("datasiora_m");
+            }
             String formatedDate = dateFormatter.format(dateAndTime);
             String formatedTime = timeFormatter.format(dateAndTime);
-            recordData.add(new Object[]{name, quantity, formatedDate, formatedTime});
+            String formatedModifiedDate = "";
+            String formatedModifiedTime = "";
+            if(dateAndTimeModified != null) {
+                formatedModifiedDate = dateFormatter.format(dateAndTimeModified);
+                formatedModifiedTime = timeFormatter.format(dateAndTimeModified);
+            }
+            recordData.add(new Object[]{name, quantity, formatedDate, formatedTime,
+                username, modified, formatedModifiedDate, formatedModifiedTime});
         }
         return recordData;
     }
@@ -308,9 +358,9 @@ public class OrderExportModel {
         Row headerRow = sheet.createRow(1);
         headerRow.createCell(0).setCellValue("Nr");
         headerRow.getCell(0).setCellStyle(headerStyle);
-        headerRow.createCell(1).setCellValue("Data");
+        headerRow.createCell(1).setCellValue("Data plasare");
         headerRow.getCell(1).setCellStyle(headerStyle);
-        headerRow.createCell(2).setCellValue("Ora");
+        headerRow.createCell(2).setCellValue("Ora plasare");
         headerRow.getCell(2).setCellStyle(headerStyle);
         headerRow.createCell(3).setCellValue("Produs");
         headerRow.getCell(3).setCellStyle(headerStyle);
@@ -320,6 +370,14 @@ public class OrderExportModel {
         headerRow.getCell(5).setCellStyle(headerStyle);
         headerRow.createCell(6).setCellValue("Rest");
         headerRow.getCell(6).setCellStyle(headerStyle);
+        headerRow.createCell(7).setCellValue("Utilizator");
+        headerRow.getCell(7).setCellStyle(headerStyle);
+        headerRow.createCell(8).setCellValue("Modificat");
+        headerRow.getCell(8).setCellStyle(headerStyle);
+        headerRow.createCell(9).setCellValue("Data modificare");
+        headerRow.getCell(9).setCellStyle(headerStyle);
+        headerRow.createCell(10).setCellValue("Ora modificare");
+        headerRow.getCell(10).setCellStyle(headerStyle);
         for (int i = 0; i < recordData.size(); i++) {
             Row row = sheet.createRow(i + 2); // Start from the second row
             row.createCell(0).setCellValue((int) recordData.get(i)[0]);
@@ -329,6 +387,10 @@ public class OrderExportModel {
             row.createCell(4).setCellValue((double) recordData.get(i)[4]);
             row.createCell(5).setCellValue((double) recordData.get(i)[5]);
             row.createCell(6).setCellValue((double) recordData.get(i)[6]);
+            row.createCell(7).setCellValue((String) recordData.get(i)[7]);
+            row.createCell(8).setCellValue((String) recordData.get(i)[8]);
+            row.createCell(9).setCellValue((String) recordData.get(i)[9]);
+            row.createCell(10).setCellValue((String) recordData.get(i)[10]);
         }
     }
 
@@ -366,16 +428,28 @@ public class OrderExportModel {
         headerRow.getCell(0).setCellStyle(style);
         headerRow.createCell(1).setCellValue("Cantitate");
         headerRow.getCell(1).setCellStyle(style);
-        headerRow.createCell(2).setCellValue("Data");
+        headerRow.createCell(2).setCellValue("Data introducere");
         headerRow.getCell(2).setCellStyle(style);
-        headerRow.createCell(3).setCellValue("Ora");
+        headerRow.createCell(3).setCellValue("Ora introducere");
         headerRow.getCell(3).setCellStyle(style);
+        headerRow.createCell(4).setCellValue("Utilizator");
+        headerRow.getCell(4).setCellStyle(style);
+        headerRow.createCell(5).setCellValue("Modificata");
+        headerRow.getCell(5).setCellStyle(style);
+        headerRow.createCell(6).setCellValue("Data modificare");
+        headerRow.getCell(6).setCellStyle(style);
+        headerRow.createCell(7).setCellValue("Ora modificare");
+        headerRow.getCell(7).setCellStyle(style);
         for (int i = 0; i < recordData.size(); i++) {
             Row row = sheet.createRow(i + 2); // Start from the second row
             row.createCell(0).setCellValue((String) recordData.get(i)[0]);
             row.createCell(1).setCellValue((double) recordData.get(i)[1]);
             row.createCell(2).setCellValue((String) recordData.get(i)[2]);
             row.createCell(3).setCellValue((String) recordData.get(i)[3]);
+            row.createCell(4).setCellValue((String) recordData.get(i)[4]);
+            row.createCell(5).setCellValue((String) recordData.get(i)[5]);
+            row.createCell(6).setCellValue((String) recordData.get(i)[6]);
+            row.createCell(7).setCellValue((String) recordData.get(i)[7]);
         }
     }
 }

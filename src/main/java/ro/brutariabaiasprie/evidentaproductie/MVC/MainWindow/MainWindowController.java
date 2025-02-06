@@ -1,10 +1,12 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow;
 
 import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
 import ro.brutariabaiasprie.evidentaproductie.Data.User;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Account.AccountController;
@@ -14,6 +16,7 @@ import ro.brutariabaiasprie.evidentaproductie.MVC.MainWindow.Production.Producti
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ConnectionWindows.UserConn.UserConnController;
+import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.util.Objects;
 import java.util.concurrent.Callable;

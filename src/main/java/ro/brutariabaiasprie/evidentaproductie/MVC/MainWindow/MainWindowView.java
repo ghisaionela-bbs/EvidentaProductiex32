@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Builder;
 import org.kordamp.ikonli.javafx.FontIcon;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.Globals;
 import ro.brutariabaiasprie.evidentaproductie.MVC.SceneType;
 
@@ -28,7 +29,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
     private final BorderPane root = new BorderPane();
     private VBox navigationMenu;
     private Button accountButton;
-    private Button managerButton;
+    public Button managerButton;
     private Button productionButton;
     private Button dashBoardButton;
 
@@ -46,7 +47,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
         navigationMenu = new VBox();
         dashBoardButton = createNavBarMenuButton("Tablou\nde bord", SceneType.DASHBOARD);
         dashBoardButton.setGraphic(new FontIcon("mdi2m-monitor-dashboard"));
-        accountButton = createNavBarMenuButton("\uD83D\uDC64\nCont", SceneType.ACCOUNT);
+        accountButton = createNavBarMenuButton("\uD83D\uDC64\n" + ConfigApp.getUser().getUsername(), SceneType.ACCOUNT);
         managerButton = createNavBarMenuButton("\uD83D\uDCCA\nAdministrare", SceneType.MANAGER);
         productionButton = createNavBarMenuButton("\uD83C\uDFED\nProductie", SceneType.PRODUCTION);
         if(PARENT_STAGE.getWidth() < Globals.MINIMIZE_WIDTH) {
@@ -55,7 +56,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
             productionButton.setText("\uD83C\uDFED");
             dashBoardButton.setText("");
         } else {
-            accountButton.setText("\uD83D\uDC64\nCont");
+            accountButton.setText("\uD83D\uDC64\n" + ConfigApp.getUser().getUsername());
             managerButton.setText("\uD83D\uDCCA\nAdministrare");
             productionButton.setText("\uD83C\uDFED\nProductie");
             dashBoardButton.setText("Tablou\nde bord");
@@ -81,7 +82,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
                 productionButton.setText("\uD83C\uDFED");
                 dashBoardButton.setText("");
             } else {
-                accountButton.setText("\uD83D\uDC64\nCont");
+                accountButton.setText("\uD83D\uDC64\n" + ConfigApp.getUser().getUsername());
                 managerButton.setText("\uD83D\uDCCA\nAdministrare");
                 productionButton.setText("\uD83C\uDFED\nProductie");
                 dashBoardButton.setText("Tablou\nde bord");
@@ -105,6 +106,10 @@ public class MainWindowView extends Parent implements Builder<Region> {
                 actionHandler.accept(sceneType);
             }
         });
+        if (sceneType == SceneType.ACCOUNT) {
+            button.setWrapText(true);
+            button.setMaxSize(166, 300);
+        }
         return button;
     }
 
