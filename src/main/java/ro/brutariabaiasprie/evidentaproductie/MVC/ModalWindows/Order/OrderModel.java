@@ -31,11 +31,6 @@ public class OrderModel {
 
     public void loadProducts() {
         try {
-//            User user = (User) ConfigApp.getConfig(CONFIG_KEY.APPUSER.name());
-//            String whereCond = "";
-//            if(user.getGroupId() != 0) {
-//                whereCond += "WHERE gp.ID = ? ";
-//            }
             String whereCond = "";
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:
@@ -61,7 +56,7 @@ public class OrderModel {
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     whereCond +
-                    "ORDER BY p.UM, p.denumire";
+                    "ORDER BY p.denumire ASC";
 
             PreparedStatement statement = connection.prepareStatement(sql);
             switch (ConfigApp.getRole().getAccessLevel()) {
@@ -222,6 +217,21 @@ public class OrderModel {
             statement.setInt(1, order.getId());
             ResultSet resultSet = statement.executeQuery();
             return resultSet.next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Boolean isOrderStarted() {
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT SUM(cantitate) as quantity FROM REALIZARI WHERE ID_COMANDA = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, order.getId());
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            int count = resultSet.getInt("quantity");
+            return count > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

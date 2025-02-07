@@ -287,6 +287,12 @@ public class DBConnectionService {
         // Setting up the users table triggers
         createTableTriggers("UTILIZATORI");
 
+        try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[GRUPE_UTILIZATORI](" +
+                "[ID_GRUPA] [int]," +
+                "[ID_UTILIZATOR])")) {
+        }
+        createTableTriggers("GRUPE_UTILIZATORI");
+
         // Setting up the orders table
         try(PreparedStatement statement = connection.prepareStatement("CREATE TABLE [dbo].[COMENZI](  " +
                 "[ID] [int] IDENTITY(1,1) NOT NULL, " +

@@ -15,6 +15,8 @@ public class UserModel {
     private final ObservableList<UserRole> roles = FXCollections.observableArrayList();
     private final ObservableList<Group> groups = FXCollections.observableArrayList();
     private final ObservableList<Group> subgroups = FXCollections.observableArrayList();
+    private ObservableList<Group> checked_groups = FXCollections.observableArrayList();
+    private ObservableList<Group> checked_subgroups = FXCollections.observableArrayList();
 
     public UserModel() {
         for(ACCESS_LEVEL accessLevel : ACCESS_LEVEL.values()) {
@@ -43,6 +45,14 @@ public class UserModel {
 
     public ObservableList<Group> getSubgroups() {
         return subgroups;
+    }
+
+    public ObservableList<Group> getChecked_groups() {
+        return checked_groups;
+    }
+
+    public void setChecked_groups(ObservableList<Group> checked_groups) {
+        this.checked_groups = checked_groups;
     }
 
     public void loadGroups() {
@@ -140,6 +150,35 @@ public class UserModel {
         }
     }
 
+//    public void updateUser() {
+//        try {
+//            Connection connection = DBConnectionService.getConnection();
+//            String sql = "UPDATE UTILIZATORI SET " +
+//                    "nume_utilizator = ?, " +
+//                    "parola = ?, " +
+//                    "ID_ROL = ? " +
+////                    "ID_GRUPA = ?, " +
+////                    "ID_SUBGRUPA_PRODUSE = ? " +
+//                    "WHERE ID = ?";
+//            PreparedStatement statement = connection.prepareStatement(sql);
+//            statement.setString(1, user.getUsername());
+//            statement.setString(2, user.getPassword());
+//            statement.setInt(3, user.getRoleId());
+//            statement.setInt(4, user.getId());
+//
+//            String sqlDelGroups = "DELETE FROM GRUPE_UTILIZATORI WHERE ID_UTILIZATOR = ?";
+//            PreparedStatement statementDel = connection.prepareStatement(sqlDelGroups);
+//
+//
+//            String sqlInsertGroups = "INSERT INTO GRUPE_UTILIZATORI (ID_GRUPA, ID_UTILIZATOR) VALUES (?, ?)";
+//
+//            statement.executeUpdate();
+//            statementDel.executeUpdate();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
     public void addUser() {
         try {
             Connection connection = DBConnectionService.getConnection();
@@ -193,4 +232,48 @@ public class UserModel {
         return null;
     }
 
+    public void loadSubgroups2(ObservableList<Group> checked_groups) {
+        subgroups.clear();
+        try {
+            String whereCond = " WHERE 1=1 AND ( 1=0 ";
+            for(Group group : checked_groups) {
+                if(group != null) {
+                    whereCond += " OR ID_GRUPA_PARINTE = ? ";
+                }
+            }
+            whereCond += ")";
+
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE " + whereCond;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramCond = 1;
+            for(Group group : checked_groups) {
+                if(group != null) {
+                    statement.setInt(paramCond, group.getId());
+                    paramCond += 1;
+                }
+            }
+            statement.executeQuery();
+            ResultSet resultSet = statement.getResultSet();
+
+            while (resultSet.next()) {
+                subgroups.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire")
+                ));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public ObservableList<Group> getChecked_subgroups() {
+        return checked_subgroups;
+    }
+
+    public void setChecked_subgroups(ObservableList<Group> checked_subgroups) {
+        this.checked_subgroups = checked_subgroups;
+    }
 }

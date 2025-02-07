@@ -29,7 +29,7 @@ public class MainWindowView extends Parent implements Builder<Region> {
     private final BorderPane root = new BorderPane();
     private VBox navigationMenu;
     private Button accountButton;
-    public Button managerButton;
+    private Button managerButton;
     private Button productionButton;
     private Button dashBoardButton;
 

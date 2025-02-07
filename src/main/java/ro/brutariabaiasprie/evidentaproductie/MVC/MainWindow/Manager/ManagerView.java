@@ -409,7 +409,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             RadioButton orderStatusClosed = new RadioButton("Inchise");
             orderStatusClosed.setUserData(1);
             orderStatusClosed.setToggleGroup(orderStatusToggleGroup);
-            HBox orderStatusFilterContainer = new HBox(orderStatusAll, orderStatusOpen, orderStatusClosed);
+            HBox orderStatusFilterContainer = new HBox(new Label("Status:"), orderStatusAll, orderStatusOpen, orderStatusClosed);
             orderStatusFilterContainer.setSpacing(16);
             orderStatusToggleGroup.selectedToggleProperty().addListener((observableValue, oldValue, newValue) -> filterOrders.run());
 

@@ -277,7 +277,7 @@ public class ProductionModel {
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     "LEFT JOIN GRUPE_PRODUSE subg ON subg.ID = p.ID_SUBGRUPA_PRODUSE " +
                     whereCond +
-                    "ORDER BY p.um, p.denumire ASC";
+                    "ORDER BY p.denumire ASC";
             PreparedStatement statement = connection.prepareStatement(sql);
             switch (ConfigApp.getRole().getAccessLevel()) {
                 case ADMINISTRATOR:
@@ -311,7 +311,6 @@ public class ProductionModel {
                         group,
                         resultSet.getInt("ID_SUBGRUPA_PRODUSE")
                 );
-                product.setGroup(group);
                 ProductionProductDTO productionProductDTO = new ProductionProductDTO(product, resultSet.getInt("nr_comenzi"));
                 products.add(productionProductDTO);
             }

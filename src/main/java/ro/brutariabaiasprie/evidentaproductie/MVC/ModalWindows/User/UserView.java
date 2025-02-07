@@ -1,6 +1,8 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.User;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -9,15 +11,15 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.CheckComboBox;
 import org.kordamp.ikonli.javafx.FontIcon;
-import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
-import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
-import ro.brutariabaiasprie.evidentaproductie.Data.User;
-import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Data.*;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Domain.UserRole;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class UserView extends Parent implements Builder<Region> {
@@ -26,17 +28,22 @@ public class UserView extends Parent implements Builder<Region> {
     private final Consumer<ACTION_TYPE> actionHandler;
 
     private Runnable deleteUserHandler;
+    private final Runnable updateSubgroupList;
 
     private TextField usernameTextField;
     private PasswordField passwordField;
     private ComboBox<UserRole> roleComboBox = new ComboBox<>();
     final ComboBox<Group> groupComboBox = new ComboBox<>();
     final ComboBox<Group> subgroupComboBox = new ComboBox<>();
+    private CheckComboBox<Group> groupCheckComboBox;
+    private CheckComboBox<Group> subgroupCheckComboBox;
+    private Button deleteButton = new Button();
 
-    public UserView(UserModel model, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler) {
+    public UserView(UserModel model, WINDOW_TYPE type, Consumer<ACTION_TYPE> actionHandler, Runnable updateSubgroupList) {
         this.model = model;
         this.type = type;
         this.actionHandler = actionHandler;
+        this.updateSubgroupList = updateSubgroupList;
     }
 
     public void setDeleteUserHandler(Runnable deleteUserHandler) {
@@ -160,6 +167,47 @@ public class UserView extends Parent implements Builder<Region> {
         groupComboBox.setCellFactory(userGroupCellFactory);
         groupComboBox.setMaxWidth(Double.MAX_VALUE);
         groupComboBox.setPromptText("Selectati grupa");
+        groupCheckComboBox = new CheckComboBox<>(model.getGroups());
+        groupCheckComboBox.setMaxWidth(Double.MAX_VALUE);
+        groupCheckComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if (group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+        groupCheckComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            private boolean changing = false;
+            @Override
+            public void onChanged(Change<? extends Integer> change) {
+                groupCheckComboBox.setTitle("");
+                if (!changing) {
+                    change.next();
+                    if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                        changing = true;
+                        groupCheckComboBox.getCheckModel().clearChecks();
+                        changing = false;
+                    } else if (change.wasAdded() && change.getList().contains(0)) {
+                        changing = true;
+                        groupCheckComboBox.getCheckModel().checkAll();
+                        changing = false;
+                    } else if (change.getList().size() < groupCheckComboBox.getItems().size()) {
+                        changing = true;
+                        groupCheckComboBox.getCheckModel().clearCheck(0);
+                        changing = false;
+                    }
+                    updateSubgroupList.run();
+                }
+            }
+        });
+//        VBox groupSection = new VBox(userGroupLabel, groupComboBox);
         VBox groupSection = new VBox(userGroupLabel, groupComboBox);
         groupSection.getStyleClass().add("section");
         groupSection.getStyleClass().add("vbox-layout");
@@ -200,6 +248,23 @@ public class UserView extends Parent implements Builder<Region> {
         subgroupComboBox.setMaxWidth(Double.MAX_VALUE);
         subgroupComboBox.setItems(model.getSubgroups());
         subgroupComboBox.setPromptText("Selectati subgrupa");
+        subgroupCheckComboBox = new CheckComboBox<>(model.getSubgroups());
+        subgroupCheckComboBox.setMaxWidth(Double.MAX_VALUE);
+        subgroupCheckComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if (group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+//        VBox productGroupSection = new VBox(productGroupLabel, subgroupComboBox);
         VBox productGroupSection = new VBox(productGroupLabel, subgroupComboBox);
         productGroupSection.getStyleClass().add("section");
         productGroupSection.getStyleClass().add("vbox-layout");
@@ -236,7 +301,7 @@ public class UserView extends Parent implements Builder<Region> {
         gridPane.getStyleClass().add("grid-form");
         // Adding the controls
         if(type == WINDOW_TYPE.EDIT) {
-            Button deleteButton = new Button("Stergere");
+            deleteButton = new Button("Stergere");
             deleteButton.setOnAction(event -> deleteUserHandler.run());
             deleteButton.getStyleClass().add("filled-button");
             deleteButton.setStyle("-fx-background-color: red;");
@@ -328,8 +393,17 @@ public class UserView extends Parent implements Builder<Region> {
                 if(model.getUser().getSubgroupId() != 0) {
                     subgroupComboBox.getSelectionModel().select(model.getSubgroup(model.getUser().getSubgroupId()));
                 }
+
+                if(ConfigApp.getRole().getAccessLevel() != ACCESS_LEVEL.ADMINISTRATOR &&
+                    model.getUser().getRoleId() == ACCESS_LEVEL.ADMINISTRATOR.getValue()) {
+                    deleteButton.setVisible(false);
+                }
+
                 break;
         }
     }
 
+    public ObservableList<Group> getCheckedGroupList() {
+        return groupCheckComboBox.getCheckModel().getCheckedItems();
+    }
 }

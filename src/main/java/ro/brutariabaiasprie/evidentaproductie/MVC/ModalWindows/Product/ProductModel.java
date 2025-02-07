@@ -50,25 +50,52 @@ public class ProductModel {
             String sql = "UPDATE PRODUSE SET " +
                     "denumire = ?, " +
                     "sarja = ?, " +
-                    "um = ?, " +
-                    "ID_GRUPA = ?, " +
-                    "ID_SUBGRUPA_PRODUSE = ? " +
-                    "WHERE ID = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, product.getName());
-            statement.setDouble(2, product.getBatchValue());
-            statement.setString(3, product.getUnitMeasurement());
+                    "um = ?, ";
             if(product.getGroup() == null) {
-                statement.setNull(4, Types.INTEGER);
+                sql += "ID_GRUPA = NULL, ";
             } else {
-                statement.setInt(4, product.getGroup().getId());
+                if(product.getGroup().getId() <= 0) {
+                    sql += "ID_GRUPA = NULL, ";
+                } else {
+                    sql += "ID_GRUPA = ?, ";
+                }
             }
-            if(product.getSubgroupId() == 0) {
-                statement.setNull(5, Types.INTEGER);
+            if(product.getSubgroupId() <= 0) {
+                sql += "ID_SUBGRUPA_PRODUSE = NULL ";
             } else {
-                statement.setInt(5, product.getSubgroupId());
+                sql += "ID_SUBGRUPA_PRODUSE = ? ";
             }
-            statement.setInt(6, product.getId());
+            sql += "WHERE ID = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramCounter = 1;
+            statement.setString(paramCounter, product.getName());
+            paramCounter += 1;
+            statement.setDouble(paramCounter, product.getBatchValue());
+            paramCounter += 1;
+            statement.setString(paramCounter, product.getUnitMeasurement());
+            paramCounter += 1;
+            if(product.getGroup() != null) {
+                if(product.getGroup().getId() > 0) {
+                    statement.setInt(paramCounter, product.getGroup().getId());
+                    paramCounter += 1;
+                }
+            }
+            if(product.getSubgroupId() > 0) {
+                statement.setInt(paramCounter, product.getSubgroupId());
+                paramCounter += 1;
+            }
+//            if(product.getGroup() == null) {
+//                statement.setNull(4, Types.INTEGER);
+//            } else {
+//                statement.setInt(4, product.getGroup().getId());
+//            }
+//            if(product.getSubgroupId() == 0) {
+//                statement.setNull(5, Types.INTEGER);
+//            } else {
+//                statement.setInt(5, product.getSubgroupId());
+//            }
+            statement.setInt(paramCounter, product.getId());
+            paramCounter +=1;
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

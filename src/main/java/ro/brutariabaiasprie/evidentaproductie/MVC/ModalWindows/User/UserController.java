@@ -35,7 +35,7 @@ public class UserController extends ModalWindow {
         this.stage = new Stage();
         this.model = new UserModel();
         this.model.setUser(user);
-        this.view = new UserView(this.model, type, this::onWindowAction);
+        this.view = new UserView(this.model, type, this::onWindowAction, this::updateSubgroupList);
         this.view.setDeleteUserHandler(this::deleteUser);
         this.view.groupComboBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if(oldValue != newValue) {
@@ -74,6 +74,10 @@ public class UserController extends ModalWindow {
         this.stage.initOwner(owner);
         this.stage.initModality(Modality.APPLICATION_MODAL);
         this.stage.showAndWait();
+    }
+
+    private void updateSubgroupList() {
+        model.loadSubgroups2(view.getCheckedGroupList());
     }
 
     private void deleteUser() {

@@ -98,7 +98,7 @@ public class RecordModel {
                     "FROM PRODUSE p " +
                     "LEFT JOIN GRUPE_PRODUSE gp ON p.ID_GRUPA = gp.ID " +
                     whereCond +
-                    "ORDER BY p.UM, p.denumire";
+                    "ORDER BY p.denumire";
 
             PreparedStatement statement = connection.prepareStatement(sql);
             switch (ConfigApp.getRole().getAccessLevel()) {

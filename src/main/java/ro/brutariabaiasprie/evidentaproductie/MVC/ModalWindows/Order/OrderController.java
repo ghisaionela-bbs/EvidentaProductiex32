@@ -1,15 +1,19 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Order;
 
+import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Data.Images;
+import ro.brutariabaiasprie.evidentaproductie.Data.ModifiedTableData;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Order;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Confirmation.ConfirmationController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
+import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import java.util.Objects;
 
@@ -34,7 +38,7 @@ public class OrderController extends ModalWindow {
         this.model = new OrderModel();
         this.model.setOrder(order);
         this.runDatabaseTask(model::loadProducts);
-        this.view = new OrderView(this.stage, this.model, type, this::onWindowAction);
+        this.view = new OrderView(this.stage, this.model, type, this::onWindowAction, this::isOrderStarted);
         this.view.setDeleteOrderHandler(this::deleteOrder);
         Scene scene = new Scene(this.view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
@@ -45,6 +49,7 @@ public class OrderController extends ModalWindow {
                 break;
             case EDIT:
                 stage.setTitle("Editare comanda");
+                Platform.runLater(() -> view.setDeleteButtonVisibility());
                 break;
             case VIEW:
                 stage.setTitle("Vizualizare comanda");
@@ -56,6 +61,19 @@ public class OrderController extends ModalWindow {
         this.stage.initOwner(owner);
         this.stage.initModality(Modality.APPLICATION_MODAL);
         this.stage.showAndWait();
+
+        DBConnectionService.getModifiedTables().addListener((MapChangeListener<String, ModifiedTableData>) change -> {
+            if (change.wasAdded()) {
+                String key = change.getKey();
+                if(key.equals("COMENZI") || key.equals("REALIZARI")) {
+                    view.setDeleteButtonVisibility();
+                }
+            }
+        });
+    }
+
+    private Boolean isOrderStarted() {
+        return model.isOrderStarted();
     }
 
     private void deleteOrder() {

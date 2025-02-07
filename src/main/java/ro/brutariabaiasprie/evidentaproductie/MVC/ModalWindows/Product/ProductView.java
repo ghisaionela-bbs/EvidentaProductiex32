@@ -9,7 +9,9 @@ import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
+import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
 import ro.brutariabaiasprie.evidentaproductie.Data.WINDOW_TYPE;
 import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
@@ -232,12 +234,14 @@ public class ProductView extends Parent implements Builder<Region> {
         gridPane.add(titleContainer, 0, 0, 2, 1);
         // Adding the controls
         if(type == WINDOW_TYPE.EDIT) {
-            Button deleteButton = new Button("Stergere");
-            deleteButton.setOnAction(event -> deleteProductHandler.run());
-            deleteButton.getStyleClass().add("filled-button");
-            deleteButton.setStyle("-fx-background-color: red;");
-            GridPane.setHalignment(deleteButton, HPos.RIGHT);
-            titleContainer.getChildren().add(deleteButton);
+            if(ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR) {
+                Button deleteButton = new Button("Stergere");
+                deleteButton.setOnAction(event -> deleteProductHandler.run());
+                deleteButton.getStyleClass().add("filled-button");
+                deleteButton.setStyle("-fx-background-color: red;");
+                GridPane.setHalignment(deleteButton, HPos.RIGHT);
+                titleContainer.getChildren().add(deleteButton);
+            }
         }
         gridPane.add(productNameSection, 0, 1, 2, 1);
         gridPane.add(batchSection, 0, 2);
