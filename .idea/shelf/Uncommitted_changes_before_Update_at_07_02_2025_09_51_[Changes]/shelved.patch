@@ -1,0 +1,12 @@
+Index: errorLog.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/errorLog.txt b/errorLog.txt
+deleted file mode 100644
+--- a/errorLog.txt	(revision 3f14c8084d9e6482d720f71b03a65a24e7cf8c96)
++++ /dev/null	(revision 3f14c8084d9e6482d720f71b03a65a24e7cf8c96)
+@@ -1,1 +0,0 @@
+-com.microsoft.sqlserver.jdbc.SQLServerException: Cannot open database "test3" requested by the login. The login failed. ClientConnectionId:9e751084-b057-49c8-a391-f794d1b59192
+\ No newline at end of file
