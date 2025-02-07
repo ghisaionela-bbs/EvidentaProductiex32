@@ -39,4 +39,5 @@ build/
 
 ###My ignored files###
 configApp.txt
+errorLog.txt
 out
