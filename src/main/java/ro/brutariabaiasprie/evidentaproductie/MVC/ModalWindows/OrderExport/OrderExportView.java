@@ -1,12 +1,17 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderExport;
 
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
+import javafx.util.StringConverter;
+import org.controlsfx.control.CheckComboBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.Components.SceneButton;
 
 import java.time.LocalDate;
@@ -14,17 +19,24 @@ import java.time.LocalTime;
 import java.util.function.Consumer;
 
 public class OrderExportView extends Parent implements Builder<Region> {
+    private final OrderExportModel model;
+
     private DatePicker fromDatePicker;
     private DatePicker toDatePicker;
     private final Consumer<ACTION_TYPE> actionHandler;
+    private final Runnable updateSubgroups;
 
     private final Spinner<Integer> hourStartSpinner = new Spinner<>(0, 23, 0);
     private final Spinner<Integer> minuteStartSpinner = new Spinner<>(0, 59, 0);
     private final Spinner<Integer> hourEndSpinner = new Spinner<>(0, 23, 23);
     private final Spinner<Integer> minuteEndSpinner = new Spinner<>(0, 59, 59);
+    private CheckComboBox<Group> groupCheckComboBox;
+    private CheckComboBox<Group> subgroupCheckComboBox;
 
-    public OrderExportView(Consumer<ACTION_TYPE> actionHandler) {
+    public OrderExportView(OrderExportModel model, Consumer<ACTION_TYPE> actionHandler, Runnable updateSubgroups) {
+        this.model = model;
         this.actionHandler = actionHandler;
+        this.updateSubgroups = updateSubgroups;
     }
 
     @Override
@@ -39,9 +51,105 @@ public class OrderExportView extends Parent implements Builder<Region> {
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-conn");
 
+        Label groupFilterLabel = new Label("Grupa:");
+        groupCheckComboBox = new CheckComboBox<>(model.getGroups());
+        groupCheckComboBox.setMaxWidth(200);
+        groupCheckComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if(group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+        groupCheckComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            private boolean changing = false;
+            @Override
+            public void onChanged(Change<? extends Integer> change) {
+                groupCheckComboBox.setTitle("");
+                if (!changing) {
+                    change.next();
+                    if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                        changing = true;
+                        groupCheckComboBox.getCheckModel().clearChecks();
+                        changing = false;
+                    } else if (change.wasAdded() && change.getList().contains(0)) {
+                        changing = true;
+                        groupCheckComboBox.getCheckModel().checkAll();
+                        changing = false;
+                    } else if (change.getList().size() < groupCheckComboBox.getItems().size()) {
+                        changing = true;
+                        groupCheckComboBox.getCheckModel().clearCheck(0);
+                        changing = false;
+                    }
+                    updateSubgroups.run();
+                }
+            }
+        });
+        HBox groupFilterContainer = new HBox(groupFilterLabel, groupCheckComboBox);
+        groupFilterContainer.setAlignment(Pos.CENTER_LEFT);
+        groupFilterContainer.setSpacing(4);
+        Label subgroupFilterLabel = new Label("Subgrupa:");
+        subgroupCheckComboBox = new CheckComboBox<>(model.getSubgroups());
+        subgroupCheckComboBox.setMaxWidth(200);
+        subgroupCheckComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Group group) {
+                if(group == null) {
+                    return "Toate";
+                }
+                return group.getName();
+            }
+
+            @Override
+            public Group fromString(String s) {
+                return null;
+            }
+        });
+        subgroupCheckComboBox.getCheckModel().getCheckedIndices().addListener(new ListChangeListener<Integer>() {
+            private boolean changing = false;
+            @Override
+            public void onChanged(Change<? extends Integer> change) {
+                subgroupCheckComboBox.setTitle("");
+                if (!changing) {
+                    change.next();
+                    if (change.wasRemoved() && change.getRemoved().contains(0)) {
+                        changing = true;
+                        subgroupCheckComboBox.getCheckModel().clearChecks();
+                        changing = false;
+                    } else if (change.wasAdded() && change.getList().contains(0)) {
+                        changing = true;
+                        subgroupCheckComboBox.getCheckModel().checkAll();
+                        changing = false;
+                    } else if (change.getList().size() < subgroupCheckComboBox.getItems().size()) {
+                        changing = true;
+                        subgroupCheckComboBox.getCheckModel().clearCheck(0);
+                        changing = false;
+                    }
+                }
+            }
+        });
+        HBox subgroupFilterContainer = new HBox(subgroupFilterLabel, subgroupCheckComboBox);
+        subgroupFilterContainer.setAlignment(Pos.CENTER_LEFT);
+        subgroupFilterContainer.setSpacing(4);
+        GridPane groupsAndSubgroupsFilters = new GridPane();
+        groupsAndSubgroupsFilters.add(groupFilterLabel, 0, 0);
+        groupsAndSubgroupsFilters.add(groupCheckComboBox, 1, 0);
+        groupsAndSubgroupsFilters.add(subgroupFilterLabel, 0, 1);
+        groupsAndSubgroupsFilters.add(subgroupCheckComboBox, 1, 1);
+        groupsAndSubgroupsFilters.setHgap(8);
+        groupsAndSubgroupsFilters.setVgap(4);
+
         Label lblFromDate = new Label("Din:");
-        lblFromDate.minWidth(200);
-        lblFromDate.setMinSize(Control.USE_PREF_SIZE, Control.USE_PREF_SIZE);
+        lblFromDate.minWidth(50);
+        lblFromDate.prefHeight(50);
+//        lblFromDate.setMinSize(Control.USE_PREF_SIZE, Control.USE_PREF_SIZE);
         fromDatePicker = new DatePicker(LocalDate.now());
         fromDatePicker.setShowWeekNumbers(false);
 
@@ -52,8 +160,9 @@ public class OrderExportView extends Parent implements Builder<Region> {
         clearFromDateButton.getStyleClass().add("filled-button");
 
         Label lblToDate = new Label("Pana in:");
-        lblToDate.minWidth(300);
-        GridPane.setHgrow(lblToDate, Priority.ALWAYS);
+        lblToDate.minWidth(50);
+        lblToDate.minWidth(50);
+//        GridPane.setHgrow(lblToDate, Priority.ALWAYS);
         toDatePicker = new DatePicker(LocalDate.now());
         toDatePicker.setShowWeekNumbers(false);
 
@@ -72,10 +181,12 @@ public class OrderExportView extends Parent implements Builder<Region> {
         dateSection.add(toDatePicker, 1, 1);
         dateSection.add(clearToDateButton, 2, 1);
         dateSection.setAlignment(Pos.CENTER_LEFT);
+        dateSection.setStyle("-fx-alignment: CENTER-LEFT");
 
         ColumnConstraints colDateLabel = new ColumnConstraints();
-        colDateLabel.setHgrow(Priority.ALWAYS);
-        colDateLabel.setMinWidth(100);
+//        colDateLabel.setHgrow(Priority.ALWAYS);
+        colDateLabel.setMinWidth(75);
+        colDateLabel.setPrefWidth(75);
         dateSection.getColumnConstraints().add(colDateLabel);
 
         double spinnerPrefWidth = 100;
@@ -101,8 +212,13 @@ public class OrderExportView extends Parent implements Builder<Region> {
         timeSection.getStyleClass().add("vbox-layout");
 
         gridPane.add(titleLabel, 0, 0);
-        gridPane.add(dateSection, 0, 1);
-        gridPane.add(timeSection, 0, 2);
+        gridPane.add(groupsAndSubgroupsFilters, 0, 1);
+        gridPane.add(new Separator(), 0, 2);
+        gridPane.add(dateSection, 0, 3);
+        gridPane.add(new Separator(), 0, 4);
+        gridPane.add(timeSection, 0, 5);
+        gridPane.setAlignment(Pos.CENTER_LEFT);
+
 
 //        ColumnConstraints col2 = new ColumnConstraints();
 //        col2.setPercentWidth(60);
@@ -140,5 +256,13 @@ public class OrderExportView extends Parent implements Builder<Region> {
 
     public LocalTime getTimeEndValue() {
         return LocalTime.of(hourEndSpinner.getValue(), minuteEndSpinner.getValue());
+    }
+
+    public ObservableList<Group> getCheckedGroups() {
+        return groupCheckComboBox.getCheckModel().getCheckedItems();
+    }
+
+    public ObservableList<Group> getCheckedSubgroups() {
+        return subgroupCheckComboBox.getCheckModel().getCheckedItems();
     }
 }

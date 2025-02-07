@@ -83,11 +83,11 @@ public class OrderView extends Parent implements Builder<Region> {
         HBox titleContainer = new HBox(orderIdLabel);
         titleContainer.setAlignment(Pos.CENTER_LEFT);
 
-        // Analytics
-        Button analyticsButton = new Button("Raport avansat");
-        analyticsButton.setGraphic(new FontIcon("mdi2c-chart-box"));
-        analyticsButton.getStyleClass().add("sub-main-window-button");
-        analyticsButton.getStyleClass().add("filled-button");
+//        // Analytics
+//        Button analyticsButton = new Button("Raport avansat");
+//        analyticsButton.setGraphic(new FontIcon("mdi2c-chart-box"));
+//        analyticsButton.getStyleClass().add("sub-main-window-button");
+//        analyticsButton.getStyleClass().add("filled-button");
 
         // Product
         Label productLabel = new Label("Produs:");
@@ -205,13 +205,13 @@ public class OrderView extends Parent implements Builder<Region> {
             deleteButton.setStyle("-fx-background-color: red;");
             titleContainer.getChildren().add(deleteButton);
         }
-        gridPane.add(analyticsButton, 0, 1);
-        gridPane.add(productSection, 0, 2);
-        gridPane.add(quantitySection, 0, 3);
+//        gridPane.add(analyticsButton, 0, 1);
+        gridPane.add(productSection, 0, 1);
+        gridPane.add(quantitySection, 0, 2);
 //        gridPane.add(numpad, 1, 1, 1, 4);
-        gridPane.add(dateSection, 0, 4);
-        gridPane.add(hourSection, 0, 5);
-        gridPane.add(isClosedCheckBox, 0, 6);
+        gridPane.add(dateSection, 0, 3);
+        gridPane.add(hourSection, 0, 4);
+        gridPane.add(isClosedCheckBox, 0, 5);
 //        GridPane.setHalignment(isClosedCheckBox, HPos.RIGHT);
         // adding constraints
         for (int i = 0 ; i < gridPane.getRowCount(); i++) {

@@ -1,9 +1,13 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderExport;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ro.brutariabaiasprie.evidentaproductie.Data.ACCESS_LEVEL;
 import ro.brutariabaiasprie.evidentaproductie.Data.CONFIG_KEY;
 import ro.brutariabaiasprie.evidentaproductie.Data.ConfigApp;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.Services.DBConnectionService;
 
 import javax.swing.filechooser.FileSystemView;
@@ -25,6 +29,11 @@ public class OrderExportModel {
     private LocalTime timeStart;
     private LocalTime timeEnd;
     private Workbook workbook;
+    private final ObservableList<Group> groups = FXCollections.observableArrayList();
+    private final ObservableList<Group> subgroups = FXCollections.observableArrayList();
+    private ObservableList<Group> checkedGroups = FXCollections.observableArrayList();
+    private ObservableList<Group> checkedSubgroups = FXCollections.observableArrayList();
+
 
     public LocalDate getDateFrom() {
         return dateFrom;
@@ -58,6 +67,99 @@ public class OrderExportModel {
         this.timeStart = timeStart;
     }
 
+    public ObservableList<Group> getGroups() {
+        return groups;
+    }
+
+    public ObservableList<Group> getSubgroups() {
+        return subgroups;
+    }
+
+    public ObservableList<Group> getCheckedGroups() {
+        return checkedGroups;
+    }
+
+    public void setCheckedGroups(ObservableList<Group> checkedGroups) {
+        this.checkedGroups = checkedGroups;
+    }
+
+    public ObservableList<Group> getCheckedSubgroups() {
+        return checkedSubgroups;
+    }
+
+    public void setCheckedSubgroups(ObservableList<Group> checkedSubgroups) {
+        this.checkedSubgroups = checkedSubgroups;
+    }
+
+    public void loadSubgroups(ObservableList<Group> checkedGroups) {
+        subgroups.clear();
+        subgroups.add(null);
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+            Group noSubgroupOption = new Group(-1, "Fara subgrupa");
+            subgroups.add(noSubgroupOption);
+        }
+        if (groups.isEmpty()) {
+            return;
+        }
+
+        String whereCond = " 1=1 ";
+        switch (ConfigApp.getRole().getAccessLevel()) {
+            case ADMINISTRATOR, MANAGER:
+                break;
+            case OPERATOR:
+                whereCond += " AND ID = ? ";
+                break;
+            case UNAUTHORIZED:
+                whereCond += " AND 1=0 ";
+                break;
+        }
+
+        whereCond += " AND ( 1=0 ";
+        for (int i = 0; i < checkedGroups.size(); i++) {
+            if(checkedGroups.get(i) != null) {
+                whereCond += " OR ID_GRUPA_PARINTE = ? ";
+            }
+        }
+        whereCond += " ) ";
+
+        try {
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE WHERE " + whereCond;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramCount = 1;
+
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR, MANAGER:
+                    break;
+                case OPERATOR:
+                    statement.setInt(paramCount, ConfigApp.getUser().getSubgroupId());
+                    paramCount += 1;
+                    break;
+                case UNAUTHORIZED:
+                    break;
+            }
+
+            for (int i = 0; i < checkedGroups.size(); i++) {
+                if (checkedGroups.get(i) != null) {
+                    statement.setInt(paramCount, checkedGroups.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                subgroups.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire"),
+                        resultSet.getInt("ID_GRUPA_PARINTE")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
+        }
+    }
+
     public void export() {
         try {
             Connection connection = DBConnectionService.getConnection();
@@ -75,8 +177,8 @@ public class OrderExportModel {
             }
 
             workbook = new XSSFWorkbook();
-            create_orders_sheet(connection);
-            create_records_sheet(connection);
+            createOrdersSheet(connection);
+            createRecordsSheet(connection);
             // Save the Excel file to a local directory
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat dateTimeTitleFormatter = new SimpleDateFormat("_ddMMyyyy_HHmm");
@@ -94,18 +196,18 @@ public class OrderExportModel {
         }
     }
 
-    private List<Object[]> get_orders(Connection connection) throws SQLException {
+    private List<Object[]> getOrders(Connection connection) throws SQLException {
         String whereCond = "";
         switch (ConfigApp.getRole().getAccessLevel()) {
             case ADMINISTRATOR:
             case DIRECTOR:
                 break;
-            case MANAGER:
-                whereCond += " AND gp.ID = ? ";
-                break;
-            case OPERATOR:
-                whereCond += " AND gp.ID = ? AND subg.ID = ? AND c.inchisa = 0 ";
-                break;
+//            case MANAGER:
+//                whereCond += " AND gp.ID = ? ";
+//                break;
+//            case OPERATOR:
+//                whereCond += " AND gp.ID = ? AND subg.ID = ? AND c.inchisa = 0 ";
+//                break;
             case UNAUTHORIZED:
                 whereCond += " AND 1=0 ";
         }
@@ -121,8 +223,60 @@ public class OrderExportModel {
         whereCond += " AND CAST(c.data_programata AS TIME) >= CAST(? AS TIME) ";
         whereCond += " AND CAST(c.data_programata AS TIME) < CAST(? AS TIME) ";
 
+        whereCond += " AND ( 1=0 ";
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+            for (int i = 0; i < checkedGroups.size(); i++) {
+                if(checkedGroups.get(i) != null) {
+                    if (checkedGroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_GRUPA = ? ";
+                    } else {
+                        whereCond += " OR p.ID_GRUPA IS NULL ";
+                    }
+                } else {
+                    whereCond += " OR 1=1 ";
+                }
+            }
+        } else {
+            for (int i = 0; i < checkedGroups.size(); i++) {
+                if(checkedGroups.get(i) != null) {
+                    if (checkedGroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_GRUPA = ? ";
+                    }
+                }
+            }
+        }
+        whereCond += " ) ";
+
+        whereCond += " AND ( 1=0 ";
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+            for (int i = 0; i < checkedSubgroups.size(); i++) {
+                if(checkedSubgroups.get(i) != null) {
+                    if (checkedSubgroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_SUBGRUPA_PRODUSE = ? ";
+                    } else {
+                        whereCond += " OR p.ID_SUBGRUPA_PRODUSE IS NULL ";
+                    }
+                } else {
+                    whereCond += " OR 1=1 ";
+                }
+            }
+        } else {
+            for (int i = 0; i < checkedSubgroups.size(); i++) {
+                if(checkedSubgroups.get(i) != null) {
+                    if (checkedSubgroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_SUBGRUPA_PRODUSE = ? ";
+                    }
+                }
+            }
+        }
+        whereCond += " ) ";
+
+
         //Select records from database
         String sql = "SELECT c.ID, " +
+                "c.contor, " +
                 "c.ID_PRODUS, " +
                 "p.denumire, " +
                 "p.um, " +
@@ -149,6 +303,7 @@ public class OrderExportModel {
                 "LEFT JOIN UTILIZATORI um ON um.ID = c.ID_UTILIZATOR_M " +
                 "WHERE 1=1 " + whereCond +
                 "GROUP BY c.ID, " +
+                "c.contor, " +
                 "c.data_programata, " +
                 "c.ID_PRODUS, " +
                 "p.denumire, " +
@@ -166,7 +321,7 @@ public class OrderExportModel {
                 "um.nume_utilizator " +
                 "ORDER BY c.data_programata ASC ";
 
-        int curr_param = 1;
+        int paramCount = 1;
         PreparedStatement statement = connection.prepareStatement(sql);
 
         switch (ConfigApp.getRole().getAccessLevel()) {
@@ -174,35 +329,54 @@ public class OrderExportModel {
             case DIRECTOR:
                 break;
             case MANAGER:
-                statement.setInt(curr_param, ConfigApp.getUser().getGroupId());
-                curr_param += 1;
+                statement.setInt(paramCount, ConfigApp.getUser().getGroupId());
+                paramCount += 1;
                 break;
             case OPERATOR:
-                statement.setInt(curr_param, ConfigApp.getUser().getGroupId());
-                curr_param += 1;
-                statement.setInt(curr_param, ConfigApp.getUser().getSubgroupId());
-                curr_param += 1;
+                statement.setInt(paramCount, ConfigApp.getUser().getGroupId());
+                paramCount += 1;
+                statement.setInt(paramCount, ConfigApp.getUser().getSubgroupId());
+                paramCount += 1;
                 break;
             case UNAUTHORIZED:
                 break;
         }
         if(dateFrom != null && dateTo != null) {
-            statement.setTimestamp(curr_param, Timestamp.valueOf(dateFrom.atStartOfDay()));
-            curr_param += 1;
-            statement.setTimestamp(curr_param, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
-            curr_param += 1;
+            statement.setTimestamp(paramCount, Timestamp.valueOf(dateFrom.atStartOfDay()));
+            paramCount += 1;
+            statement.setTimestamp(paramCount, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            paramCount += 1;
         } else if(dateFrom != null){
-            statement.setTimestamp(curr_param, Timestamp.valueOf(dateFrom.atStartOfDay()));
-            curr_param += 1;
+            statement.setTimestamp(paramCount, Timestamp.valueOf(dateFrom.atStartOfDay()));
+            paramCount += 1;
         } else if(dateTo != null) {
-            statement.setTimestamp(curr_param, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
-            curr_param += 1;
+            statement.setTimestamp(paramCount, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
+            paramCount += 1;
         }
 
-        statement.setTime(curr_param, Time.valueOf(timeStart));
-        curr_param += 1;
-        statement.setTime(curr_param, Time.valueOf(timeEnd));
-        curr_param += 1;
+        statement.setTime(paramCount, Time.valueOf(timeStart));
+        paramCount += 1;
+        statement.setTime(paramCount, Time.valueOf(timeEnd));
+        paramCount += 1;
+
+
+        for (int i = 0; i < checkedGroups.size(); i++) {
+            if(checkedGroups.get(i) != null) {
+                if (checkedGroups.get(i).getId() != -1) {
+                    statement.setInt(paramCount, checkedGroups.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+        }
+
+        for (int i = 0; i < checkedSubgroups.size(); i++) {
+            if(checkedSubgroups.get(i) != null) {
+                if (checkedSubgroups.get(i).getId() != -1) {
+                    statement.setInt(paramCount, checkedSubgroups.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+        }
 
         //Select records from database
         ResultSet resultSet = statement.executeQuery();
@@ -210,7 +384,7 @@ public class OrderExportModel {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
         while (resultSet.next()) {
-            int id = resultSet.getInt("ID");
+            int counter = resultSet.getInt("contor");
             Timestamp dateAndTime = resultSet.getTimestamp("data_programata");
             String product = resultSet.getString("denumire");
             double quantity = resultSet.getDouble("cantitate");
@@ -236,13 +410,13 @@ public class OrderExportModel {
                 formatedModifiedDate = dateFormatter.format(dateAndTimeModified);
                 formatedModifiedTime = timeFormatter.format(dateAndTimeModified);
             }
-            recordData.add(new Object[]{id, formatedDate, formatedTime, product, quantity, completed, remainder,
+            recordData.add(new Object[]{counter, formatedDate, formatedTime, product, quantity, completed, remainder,
                     username, modified, formatedModifiedDate, formatedModifiedTime});
         }
         return recordData;
     }
 
-    private List<Object[]> get_records(Connection connection) throws SQLException {
+    private List<Object[]> getRecords(Connection connection) throws SQLException {
 
         String whereCond = "";
         if(dateFrom != null && dateTo != null) {
@@ -255,6 +429,57 @@ public class OrderExportModel {
 
         whereCond += " AND CAST(r.datasiora_i AS TIME) >= CAST(? AS TIME) ";
         whereCond += " AND CAST(r.datasiora_i AS TIME) < CAST(? AS TIME) ";
+
+
+        whereCond += " AND ( 1=0 ";
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+            for (int i = 0; i < checkedGroups.size(); i++) {
+                if(checkedGroups.get(i) != null) {
+                    if (checkedGroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_GRUPA = ? ";
+                    } else {
+                        whereCond += " OR p.ID_GRUPA IS NULL ";
+                    }
+                } else {
+                    whereCond += " OR 1=1 ";
+                }
+            }
+        } else {
+            for (int i = 0; i < checkedGroups.size(); i++) {
+                if(checkedGroups.get(i) != null) {
+                    if (checkedGroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_GRUPA = ? ";
+                    }
+                }
+            }
+        }
+        whereCond += " ) ";
+
+        whereCond += " AND ( 1=0 ";
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+            for (int i = 0; i < checkedSubgroups.size(); i++) {
+                if(checkedSubgroups.get(i) != null) {
+                    if (checkedSubgroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_SUBGRUPA_PRODUSE = ? ";
+                    } else {
+                        whereCond += " OR p.ID_SUBGRUPA_PRODUSE IS NULL ";
+                    }
+                } else {
+                    whereCond += " OR 1=1 ";
+                }
+            }
+        } else {
+            for (int i = 0; i < checkedSubgroups.size(); i++) {
+                if(checkedSubgroups.get(i) != null) {
+                    if (checkedSubgroups.get(i).getId() != -1) {
+                        whereCond += " OR p.ID_SUBGRUPA_PRODUSE = ? ";
+                    }
+                }
+            }
+        }
+        whereCond += " ) ";
 
         //Select records from database
         String sql = "SELECT p.ID, " +
@@ -272,26 +497,44 @@ public class OrderExportModel {
                 "WHERE 1=1 " + whereCond +
                 "ORDER BY r.datasiora_i DESC";
 
-        int curr_param = 1;
+        int paramCount = 1;
 
         PreparedStatement statement = connection.prepareStatement(sql);
         if(dateFrom != null && dateTo != null) {
             statement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
-            curr_param += 1;
+            paramCount += 1;
             statement.setTimestamp(2, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
-            curr_param += 1;
+            paramCount += 1;
         } else if(dateFrom != null){
             statement.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
-            curr_param += 1;
+            paramCount += 1;
         } else if(dateTo != null) {
             statement.setTimestamp(1, Timestamp.valueOf(dateTo.atTime(LocalTime.MAX)));
-            curr_param += 1;
+            paramCount += 1;
         }
 
-        statement.setTime(curr_param, Time.valueOf(timeStart));
-        curr_param += 1;
-        statement.setTime(curr_param, Time.valueOf(timeEnd));
-        curr_param += 1;
+        statement.setTime(paramCount, Time.valueOf(timeStart));
+        paramCount += 1;
+        statement.setTime(paramCount, Time.valueOf(timeEnd));
+        paramCount += 1;
+
+        for (int i = 0; i < checkedGroups.size(); i++) {
+            if(checkedGroups.get(i) != null) {
+                if (checkedGroups.get(i).getId() != -1) {
+                    statement.setInt(paramCount, checkedGroups.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+        }
+
+        for (int i = 0; i < checkedSubgroups.size(); i++) {
+            if(checkedSubgroups.get(i) != null) {
+                if (checkedSubgroups.get(i).getId() != -1) {
+                    statement.setInt(paramCount, checkedSubgroups.get(i).getId());
+                    paramCount += 1;
+                }
+            }
+        }
 
         //Select records from database
         ResultSet resultSet = statement.executeQuery();
@@ -328,8 +571,8 @@ public class OrderExportModel {
         return recordData;
     }
 
-    private void create_orders_sheet(Connection connection) throws SQLException {
-        List<Object[]> recordData = get_orders(connection);
+    private void createOrdersSheet(Connection connection) throws SQLException {
+        List<Object[]> recordData = getOrders(connection);
         // Create a new Excel workbook
         Calendar calendar = Calendar.getInstance();
         Timestamp timestamp = new java.sql.Timestamp(calendar.getTimeInMillis());
@@ -394,8 +637,8 @@ public class OrderExportModel {
         }
     }
 
-    private void create_records_sheet(Connection connection) throws SQLException {
-        List<Object[]> recordData = get_records(connection);
+    private void createRecordsSheet(Connection connection) throws SQLException {
+        List<Object[]> recordData = getRecords(connection);
 
         // Create a new Excel workbook
         Calendar calendar = Calendar.getInstance();
@@ -450,6 +693,55 @@ public class OrderExportModel {
             row.createCell(5).setCellValue((String) recordData.get(i)[5]);
             row.createCell(6).setCellValue((String) recordData.get(i)[6]);
             row.createCell(7).setCellValue((String) recordData.get(i)[7]);
+        }
+    }
+
+    public void loadGroups() {
+        try {
+            groups.clear();
+            groups.add(null);
+            if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                    ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR) {
+                Group noGroupOption = new Group(-1, "Fara grupa");
+                groups.add(noGroupOption);
+            }
+            String whereCond = " WHERE 1=1 ";
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR :
+                    break;
+                case MANAGER, OPERATOR:
+                    whereCond += " AND ID = ? ";
+                    break;
+                case UNAUTHORIZED:
+                    whereCond += " AND 1=0 ";
+                    break;
+            }
+
+            Connection connection = DBConnectionService.getConnection();
+            String sql = "SELECT * FROM GRUPE_PRODUSE " + whereCond + " AND ID_GRUPA_PARINTE IS NULL";
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            int paramCount = 1;
+            switch (ConfigApp.getRole().getAccessLevel()) {
+                case ADMINISTRATOR:
+                    break;
+                case MANAGER, OPERATOR:
+                    statement.setInt(paramCount, ConfigApp.getUser().getGroupId());
+                    paramCount += 1;
+                    break;
+                case UNAUTHORIZED:
+                    break;
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                groups.add(new Group(
+                        resultSet.getInt("ID"),
+                        resultSet.getString("denumire")
+                ));
+            }
+        } catch (SQLException e) {
+            throw  new RuntimeException(e);
         }
     }
 }

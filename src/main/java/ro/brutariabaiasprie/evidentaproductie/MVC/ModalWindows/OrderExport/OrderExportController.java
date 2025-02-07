@@ -1,12 +1,15 @@
 package ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.OrderExport;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ro.brutariabaiasprie.evidentaproductie.Data.ACTION_TYPE;
+import ro.brutariabaiasprie.evidentaproductie.Domain.Group;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.Dialogues.Warning.WarningController;
 import ro.brutariabaiasprie.evidentaproductie.MVC.ModalWindows.ModalWindow;
 
@@ -21,9 +24,14 @@ public class OrderExportController extends ModalWindow {
     public OrderExportController(Stage owner) {
         PARENT_STAGE = owner;
         stage = new Stage();
-        view = new OrderExportView(this::onWindowAction);
+        view = new OrderExportView(this.model, this::onWindowAction, this::updateSubgroups);
         Scene scene = new Scene(view.build());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/ro/brutariabaiasprie/evidentaproductie/styles.css")).toExternalForm());
+
+        Platform.runLater( () -> {
+            model.loadGroups();
+            model.loadSubgroups(FXCollections.observableArrayList());
+        });
 
         stage.setTitle("Exporta in excel");
         Image icon16x16 = new Image("app-icon-16x16.png");
@@ -34,6 +42,11 @@ public class OrderExportController extends ModalWindow {
         stage.initOwner(owner);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
+    }
+
+    private void updateSubgroups() {
+        ObservableList<Group> checkedGroups  = view.getCheckedGroups();
+        Platform.runLater( () ->{model.loadSubgroups(checkedGroups);});
     }
 
     @Override
@@ -47,6 +60,8 @@ public class OrderExportController extends ModalWindow {
                         model.setDateTo(view.getToDateValue());
                         model.setTimeStart(view.getTimeStartValue());
                         model.setTimeEnd(view.getTimeEndValue());
+                        model.setCheckedGroups(view.getCheckedGroups());
+                        model.setCheckedSubgroups(view.getCheckedSubgroups());
                         model.export();
                     } catch (Exception e) {
                         e.printStackTrace();
