@@ -30,7 +30,9 @@ public class OrderExportController extends ModalWindow {
 
         Platform.runLater( () -> {
             model.loadGroups();
+            view.setGroupFilter();
             model.loadSubgroups(FXCollections.observableArrayList());
+            view.setSubgroupFilter();
         });
 
         stage.setTitle("Exporta in excel");

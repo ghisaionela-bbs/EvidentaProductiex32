@@ -177,7 +177,7 @@ public class OrderView extends Parent implements Builder<Region> {
                 hourSpinner.setEditable(true);
                 minuteSpinner.setEditable(true);
             case EDIT:
-                orderIdLabel.setText("Comanda " + model.getOrder().getId());
+                orderIdLabel.setText("Comanda " + model.getOrder().getCounter());
                 productComboBox.getSelectionModel().select(model.getOrder().getProduct());
                 quantityTextField.setText(String.format("%.2f", model.getOrder().getQuantity()));
 //                dateLabel.setText("Introdusa la: " + dateTimeFormatter.format(model.getOrder().getDateTimeInserted()));

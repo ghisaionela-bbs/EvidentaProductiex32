@@ -518,9 +518,17 @@ public class ManagerView extends Parent implements Builder<Region> {
 
             header.getChildren().addAll(orderStatusFilterContainer, groupAndSubgroupFilterContainer);
 
+        if (ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.ADMINISTRATOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.DIRECTOR ||
+                ConfigApp.getRole().getAccessLevel() == ACCESS_LEVEL.MANAGER
+        ) {
             Button addOrderButton = new Button();
             addOrderButton.textProperty().bind(Bindings.createStringBinding(
-                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Adauga comanda";},
+                    () -> {
+                        if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {
+                            return "";
+                        } else return "Adauga comanda";
+                    },
                     stage.widthProperty())
             );
             addOrderButton.setOnAction(event -> new OrderController(stage, WINDOW_TYPE.ADD));
@@ -529,7 +537,11 @@ public class ManagerView extends Parent implements Builder<Region> {
 
             Button orderExportButton = new Button();
             orderExportButton.textProperty().bind(Bindings.createStringBinding(
-                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Exporta in excel";},
+                    () -> {
+                        if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {
+                            return "";
+                        } else return "Exporta in excel";
+                    },
                     stage.widthProperty())
             );
             orderExportButton.setOnAction(event -> new OrderExportController(stage));
@@ -538,7 +550,11 @@ public class ManagerView extends Parent implements Builder<Region> {
 
             Button importOrderButton = new Button();
             importOrderButton.textProperty().bind(Bindings.createStringBinding(
-                    () -> {if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {return "";} else return "Importa comenzi";},
+                    () -> {
+                        if (stage.getWidth() < Globals.MINIMIZE_WIDTH) {
+                            return "";
+                        } else return "Importa comenzi";
+                    },
                     stage.widthProperty())
             );
             importOrderButton.setOnAction(event -> new OrderImportController(stage));
@@ -548,6 +564,7 @@ public class ManagerView extends Parent implements Builder<Region> {
             addOrderButton.getStyleClass().add("sub-main-window-button");
 
             headerSection.getChildren().addAll(addOrderButton, importOrderButton, orderExportButton);
+        }
 
         switch (ConfigApp.getRole().getAccessLevel()) {
             case ADMINISTRATOR, DIRECTOR, MANAGER:

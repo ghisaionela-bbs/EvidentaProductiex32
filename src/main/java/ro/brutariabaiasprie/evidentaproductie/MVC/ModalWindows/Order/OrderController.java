@@ -77,12 +77,9 @@ public class OrderController extends ModalWindow {
     }
 
     private void deleteOrder() {
-        String message = "Sunteti sigur ca doriti sa stergeti comanda %d?\n\n" +
-                "COMANDA ACEASTA VA FI STEARSA DE LA TOATE REALIZARILE\n" +
-                "ASOCIATE LA ACEASTA GRUPA\n\n" +
-                "!!! ACEASTA ACTIUNE ESTE IREVERSIBILA !!!";
+        String message = "Sunteti sigur ca doriti sa stergeti comanda %d?";
         if(new ConfirmationController(stage, "Confirmati stergerea",
-                String.format(message, model.getOrder().getId())).isSUCCESS()) {
+                String.format(message, model.getOrder().getCounter())).isSUCCESS()) {
             model.deleteOrder();
             stage.close();
         }

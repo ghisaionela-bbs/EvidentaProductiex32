@@ -265,4 +265,12 @@ public class OrderExportView extends Parent implements Builder<Region> {
     public ObservableList<Group> getCheckedSubgroups() {
         return subgroupCheckComboBox.getCheckModel().getCheckedItems();
     }
+
+    public void setGroupFilter() {
+        groupCheckComboBox.getCheckModel().check(0);
+    }
+
+    public void setSubgroupFilter() {
+        subgroupCheckComboBox.getCheckModel().check(0);
+    }
 }
